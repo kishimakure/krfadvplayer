@@ -1,0 +1,668 @@
+{
+  "m_GameObject": {
+    "m_FileID": 0,
+    "m_PathID": 0
+  },
+  "m_Enabled": 1,
+  "m_Script": {
+    "m_FileID": 0,
+    "m_PathID": 2911583354704347062
+  },
+  "m_Name": "ADVEffectList",
+  "m_Params": [
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_angry",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_angry_smoke",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_aura",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_exclamation",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_fall",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_fun",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_heart",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_impatient",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_note",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_question",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_react",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_shock",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_sleep",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_surprise",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_sweat",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_darkaura",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_emo",
+      "m_EffectID": "ef_ADV_emo_aura_2",
+      "m_InstanceMax": 5,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_blow",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_blow"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_blow_slash",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0,
+        1
+      ],
+      "m_CueIDs": [
+        "adv_blow",
+        "adv_slash"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_concent",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_filmnoise",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_letter_00",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_letter_00"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_letter_01",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_letter_01"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_letter_02",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_letter_02"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_letter_03",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_letter_04",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_letter_04"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_letter_05",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_letter_05"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_magic",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_magic"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_slash",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_slash"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_transfer",
+      "m_InstanceMax": 2,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_teleport"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_light",
+      "m_InstanceMax": 2,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_msquare",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_summon"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_magicattack_st",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_magic_2_st"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_magicattack_lp",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_magicattack_ed",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_magic_2_ed"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_dragonbreath_R_st",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_dragon_fire_st"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_dragonbreath_R_lp",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_dragonbreath_R_ed",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [
+        0
+      ],
+      "m_CueIDs": [
+        "adv_dragon_fire_ed"
+      ]
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_flashback",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_H_rain",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_L_rain",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_thunder",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_spring",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_sunlight",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_bubble",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_powa_00",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_powa_01",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_powa_02",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_black_snow",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_white_snow",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_H_black_snow",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_L_snow",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_curse",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_dispel",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_seal",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_mist",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_pheromone",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_pheromone_loop",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_tornado",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_smokebomb",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_ripple",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_inspiration_L",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_inspiration_R",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_gunfire",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_tumbleweed",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_dirtsmoke",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_com_msquare_00",
+      "m_InstanceMax": 2,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_com_msquare_01",
+      "m_InstanceMax": 2,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_com_console",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_tv_phone",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_tv_frame",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_tv_live",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_tv_noise",
+      "m_EffectID": "ef_ADV_tv_noise_st",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "ef_ADV_tv_noise",
+      "m_EffectID": "ef_ADV_tv_noise_lp",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_explode",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_timelap",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_ball_trail",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_com_msquare_2_00",
+      "m_InstanceMax": 2,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_curse_2",
+      "m_InstanceMax": 3,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_light_2",
+      "m_InstanceMax": 2,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_arousal_L",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_arousal_R",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_ADV_H_snow",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    },
+    {
+      "m_PackName": "",
+      "m_EffectID": "ef_comic_concent",
+      "m_InstanceMax": 1,
+      "m_PlayFrames": [],
+      "m_CueIDs": []
+    }
+  ]
+}

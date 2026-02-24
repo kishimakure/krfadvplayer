@@ -1,0 +1,15 @@
+{
+    "Host":"file://D:/kirafan/export/adv",
+    "ADVIDs":[
+        1000000,
+        1000001
+    ],
+    "Width":1920,
+    "Font":"ja",
+    "AudioMode":"ogg",
+    "Volume":{
+        "BGM":100,
+        "SE":100,
+        "Voice":100
+    }
+}

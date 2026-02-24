@@ -1,0 +1,290 @@
+{
+  "m_GameObject": {
+    "m_FileID": 0,
+    "m_PathID": 0
+  },
+  "m_Enabled": 1,
+  "m_Script": {
+    "m_FileID": 0,
+    "m_PathID": -1449454239100241691
+  },
+  "m_Name": "ADVTextTagArg",
+  "m_Params": [
+    {
+      "m_ReferenceName": "通常",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "喜",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "怒",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "哀",
+      "m_EnumID": 3
+    },
+    {
+      "m_ReferenceName": "楽",
+      "m_EnumID": 4
+    },
+    {
+      "m_ReferenceName": "照",
+      "m_EnumID": 5
+    },
+    {
+      "m_ReferenceName": "驚",
+      "m_EnumID": 6
+    },
+    {
+      "m_ReferenceName": "固有1",
+      "m_EnumID": 7
+    },
+    {
+      "m_ReferenceName": "固有2",
+      "m_EnumID": 8
+    },
+    {
+      "m_ReferenceName": "固有3",
+      "m_EnumID": 9
+    },
+    {
+      "m_ReferenceName": "固有4",
+      "m_EnumID": 10
+    },
+    {
+      "m_ReferenceName": "固有5",
+      "m_EnumID": 11
+    },
+    {
+      "m_ReferenceName": "固有6",
+      "m_EnumID": 12
+    },
+    {
+      "m_ReferenceName": "固有7",
+      "m_EnumID": 13
+    },
+    {
+      "m_ReferenceName": "固有8",
+      "m_EnumID": 14
+    },
+    {
+      "m_ReferenceName": "固有9",
+      "m_EnumID": 15
+    },
+    {
+      "m_ReferenceName": "固有10",
+      "m_EnumID": 16
+    },
+    {
+      "m_ReferenceName": "固有11",
+      "m_EnumID": 17
+    },
+    {
+      "m_ReferenceName": "固有12",
+      "m_EnumID": 18
+    },
+    {
+      "m_ReferenceName": "固有13",
+      "m_EnumID": 19
+    },
+    {
+      "m_ReferenceName": "エモ位置デフォルト",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "エモ位置顔",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "エモ位置左",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "エモ位置右",
+      "m_EnumID": 3
+    },
+    {
+      "m_ReferenceName": "エモ位置足元",
+      "m_EnumID": 4
+    },
+    {
+      "m_ReferenceName": "ランダム弱",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "ランダム中",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "ランダム強",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "横揺れ弱",
+      "m_EnumID": 3
+    },
+    {
+      "m_ReferenceName": "横揺れ中",
+      "m_EnumID": 4
+    },
+    {
+      "m_ReferenceName": "横揺れ強",
+      "m_EnumID": 5
+    },
+    {
+      "m_ReferenceName": "縦揺れ弱",
+      "m_EnumID": 6
+    },
+    {
+      "m_ReferenceName": "縦揺れ中",
+      "m_EnumID": 7
+    },
+    {
+      "m_ReferenceName": "縦揺れ強",
+      "m_EnumID": 8
+    },
+    {
+      "m_ReferenceName": "リニア",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "加速",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "減速",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "加速減速",
+      "m_EnumID": 3
+    },
+    {
+      "m_ReferenceName": "加速(倍速)",
+      "m_EnumID": 4
+    },
+    {
+      "m_ReferenceName": "減速（倍速)",
+      "m_EnumID": 5
+    },
+    {
+      "m_ReferenceName": "加速減速（倍速)",
+      "m_EnumID": 6
+    },
+    {
+      "m_ReferenceName": "上段左",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "上段中",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "上段右",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "中段左",
+      "m_EnumID": 3
+    },
+    {
+      "m_ReferenceName": "中段中",
+      "m_EnumID": 4
+    },
+    {
+      "m_ReferenceName": "中段右",
+      "m_EnumID": 5
+    },
+    {
+      "m_ReferenceName": "下段左",
+      "m_EnumID": 6
+    },
+    {
+      "m_ReferenceName": "下段中",
+      "m_EnumID": 7
+    },
+    {
+      "m_ReferenceName": "下段右",
+      "m_EnumID": 8
+    },
+    {
+      "m_ReferenceName": "画面中央",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "画面上",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "画面下",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "キャラ中心",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "キャラ顔",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "キャラ足元",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "左",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "中左",
+      "m_EnumID": 1
+    },
+    {
+      "m_ReferenceName": "中央",
+      "m_EnumID": 2
+    },
+    {
+      "m_ReferenceName": "中右",
+      "m_EnumID": 3
+    },
+    {
+      "m_ReferenceName": "右",
+      "m_EnumID": 4
+    },
+    {
+      "m_ReferenceName": "左間3",
+      "m_EnumID": 5
+    },
+    {
+      "m_ReferenceName": "左間2",
+      "m_EnumID": 6
+    },
+    {
+      "m_ReferenceName": "左間1",
+      "m_EnumID": 7
+    },
+    {
+      "m_ReferenceName": "右間1",
+      "m_EnumID": 8
+    },
+    {
+      "m_ReferenceName": "右間2",
+      "m_EnumID": 9
+    },
+    {
+      "m_ReferenceName": "右間3",
+      "m_EnumID": 10
+    },
+    {
+      "m_ReferenceName": "左裾",
+      "m_EnumID": 0
+    },
+    {
+      "m_ReferenceName": "右裾",
+      "m_EnumID": 1
+    }
+  ]
+}

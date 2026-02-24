@@ -1,0 +1,1045 @@
+{
+    "Params": [
+        {
+            "Name": "ef_ADV_arousal_L",
+            "Files": [
+                "ef_ADV_arousal_flash_a.png",
+                "ef_ADV_arousal_L@Take 001.json",
+                "ef_ADV_arousal_maru_01_a.png",
+                "ef_ADV_arousal_maru_02_a.png",
+                "ef_ADV_arousal_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_arousal_R",
+            "Files": [
+                "ef_ADV_arousal_flash_a.png",
+                "ef_ADV_arousal_maru_01_a.png",
+                "ef_ADV_arousal_maru_02_a.png",
+                "ef_ADV_arousal_R@Take 001.json",
+                "ef_ADV_arousal_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_ball_trail",
+            "Files": [
+                "ef_ADV_ball_trail@Take 001.json",
+                "ef_ADV_ball_trail_line_01_a.png",
+                "ef_ADV_ball_trail_line_02_a.png",
+                "ef_ADV_ball_trail_line_03_a.png",
+                "ef_ADV_ball_trail_line_03_rgb.png",
+                "ef_ADV_ball_trail_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_black_snow",
+            "Files": [
+                "ef_ADV_black_snow@Take 001.json",
+                "ef_ADV_black_snow_A_a.png",
+                "ef_ADV_black_snow_A_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/snow_A_P_1.json",
+                "MeigeParticleEmitter/snow_A_P_2.json",
+                "MeigeParticleEmitter/snow_A_P_3.json",
+                "MeigeParticleEmitter/snow_A_P_4.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_blow",
+            "Files": [
+                "ef_ADV_blow@Take 001.json",
+                "ef_ADV_blow_a.png",
+                "ef_ADV_blow_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_blow_slash",
+            "Files": [
+                "ef_ADV_blow_a.png",
+                "ef_ADV_blow_rgb.png",
+                "ef_ADV_blow_slash@Take 001.json",
+                "ef_ADV_slash_a.png",
+                "ef_ADV_slash_impact_a.png",
+                "ef_ADV_slash_impact_rgb.png",
+                "ef_ADV_slash_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_bubble",
+            "Files": [
+                "ef_ADV_bubble@Take 001.json",
+                "ef_ADV_bubble_A_a.png",
+                "ef_ADV_bubble_A_rgb.png",
+                "ef_ADV_bubble_P_a.png",
+                "ef_ADV_bubble_P_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/a_P_A_01.json",
+                "MeigeParticleEmitter/a_P_A_02.json",
+                "MeigeParticleEmitter/b_P_A_01.json",
+                "MeigeParticleEmitter/b_P_A_02.json",
+                "MeigeParticleEmitter/c_P_A_01.json",
+                "MeigeParticleEmitter/c_P_A_02.json",
+                "MeigeParticleEmitter/d_P_A_01.json",
+                "MeigeParticleEmitter/d_P_A_02.json",
+                "MeigeParticleEmitter/P_01.json",
+                "MeigeParticleEmitter/P_A_04.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_com_console",
+            "Files": [
+                "ef_ADV_com_console@Take 001.json",
+                "ef_ADV_com_console_arrows_a.png",
+                "ef_ADV_com_console_arrows_rgb.png",
+                "ef_ADV_com_console_graph_a.png",
+                "ef_ADV_com_console_graph_rgb.png",
+                "ef_ADV_com_console_star_a.png",
+                "ef_ADV_com_console_star_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_com_msquare_00",
+            "Files": [
+                "ef_ADV_com_msquare_magic_a.png",
+                "ef_ADV_com_msquare_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_com_msquare_01",
+            "Files": [
+                "ef_ADV_com_msquare_noise_a.png",
+                "ef_ADV_com_msquare_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_com_msquare_2_00",
+            "Files": [
+                "ef_ADV_com_msquare_magic_a.png",
+                "ef_ADV_com_msquare_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_concent",
+            "Files": [
+                "ef_ADV_concent@Take 001.json",
+                "ef_ADV_concent_a.png",
+                "ef_ADV_concent_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_curse",
+            "Files": [
+                "ef_ADV_curse@Take 001.json",
+                "ef_ADV_curse_aura_01_a.png",
+                "ef_ADV_curse_aura_02_a.png",
+                "ef_ADV_curse_ball_a.png",
+                "ef_ADV_curse_ball_rgb.png",
+                "ef_ADV_curse_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_curse_2",
+            "Files": [
+                "ef_ADV_curse_2@Take 001.json",
+                "ef_ADV_curse_2_aura_01_a.png",
+                "ef_ADV_curse_2_aura_02_a.png",
+                "ef_ADV_curse_2_ball_a.png",
+                "ef_ADV_curse_2_ball_rgb.png",
+                "ef_ADV_curse_2_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_dirtsmoke",
+            "Files": [
+                "ef_ADV_dirtsmoke@Take 001.json",
+                "ef_ADV_dirtsmoke_smoke_a.png",
+                "ef_ADV_dirtsmoke_smoke_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_smoke_C.json",
+                "MeigeParticleEmitter/P_smoke_L.json",
+                "MeigeParticleEmitter/P_smoke_R.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_dispel",
+            "Files": [
+                "ef_ADV_dispel@Take 001.json",
+                "ef_ADV_dispel_aura_01_a.png",
+                "ef_ADV_dispel_line_01_a.png",
+                "ef_ADV_dispel_line_02_a.png",
+                "ef_ADV_dispel_line_03_a.png",
+                "ef_ADV_dispel_line_03_rgb.png",
+                "ef_ADV_dispel_line_04_rgb.png",
+                "ef_ADV_dispel_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_dragonbreath_R_ed",
+            "Files": [
+                "ef_ADV_dragonbreath_A_a.png",
+                "ef_ADV_dragonbreath_A_rgb.png",
+                "ef_ADV_dragonbreath_B_a.png",
+                "ef_ADV_dragonbreath_B_rgb.png",
+                "ef_ADV_dragonbreath_C_a.png",
+                "ef_ADV_dragonbreath_C_rgb.png",
+                "ef_ADV_dragonbreath_R_ed@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_dragonbreath_R_lp",
+            "Files": [
+                "ef_ADV_dragonbreath_A_a.png",
+                "ef_ADV_dragonbreath_A_rgb.png",
+                "ef_ADV_dragonbreath_B_a.png",
+                "ef_ADV_dragonbreath_B_rgb.png",
+                "ef_ADV_dragonbreath_R_lp@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_dragonbreath_R_st",
+            "Files": [
+                "ef_ADV_dragonbreath_A_a.png",
+                "ef_ADV_dragonbreath_A_rgb.png",
+                "ef_ADV_dragonbreath_B_a.png",
+                "ef_ADV_dragonbreath_B_rgb.png",
+                "ef_ADV_dragonbreath_R_st@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_angry",
+            "Files": [
+                "ef_ADV_emo_angry01.png",
+                "ef_ADV_emo_angry02.png",
+                "ef_ADV_emo_angry@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_angry_smoke",
+            "Files": [
+                "ef_ADV_emo_angry_smoke.png",
+                "ef_ADV_emo_angry_smoke@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_aura",
+            "Files": [
+                "ef_ADV_emo_aura@Take 001.json",
+                "ef_adv_emo_aura_01_a.png",
+                "ef_adv_emo_aura_01_rgb.png",
+                "ef_adv_emo_aura_02_a.png",
+                "ef_adv_emo_aura_02_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_aura_2",
+            "Files": [
+                "ef_ADV_emo_aura_2@Take 001.json",
+                "ef_adv_emo_aura_a.png",
+                "ef_adv_emo_aura_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_darkaura",
+            "Files": [
+                "ef_ADV_emo_darkaura_A_a.png",
+                "ef_ADV_emo_darkaura_A_rgb.png",
+                "ef_ADV_emo_darkaura_B_a.png",
+                "ef_ADV_emo_darkaura_B_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_exclamation",
+            "Files": [
+                "ef_ADV_emo_exclamation.png",
+                "ef_ADV_emo_exclamation@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_fall",
+            "Files": [
+                "ef_ADV_emo_fall01.png",
+                "ef_ADV_emo_fall02.png",
+                "ef_ADV_emo_fall@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_fun",
+            "Files": [
+                "ef_ADV_emo_fun.png",
+                "ef_ADV_emo_fun@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_heart",
+            "Files": [
+                "ef_ADV_emo_heart.png",
+                "ef_ADV_emo_heart@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_impatient",
+            "Files": [
+                "ef_ADV_emo_impatient01.png",
+                "ef_ADV_emo_impatient02.png",
+                "ef_ADV_emo_impatient@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_note",
+            "Files": [
+                "ef_ADV_emo_note.png",
+                "ef_ADV_emo_note@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_question",
+            "Files": [
+                "ef_ADV_emo_question.png",
+                "ef_ADV_emo_question@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_react",
+            "Files": [
+                "ef_ADV_emo_react.png",
+                "ef_ADV_emo_react@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_shock",
+            "Files": [
+                "ef_ADV_emo_shock.png",
+                "ef_ADV_emo_shock@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_sleep",
+            "Files": [
+                "ef_ADV_emo_sleep@Take 001.json",
+                "ef_ADV_emo_sleep_01.png",
+                "ef_ADV_emo_sleep_03.png",
+                "ef_ADV_emo_sleep_04.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_surprise",
+            "Files": [
+                "ef_ADV_emo_surprise.png",
+                "ef_ADV_emo_surprise@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_emo_sweat",
+            "Files": [
+                "ef_ADV_emo_sweat.png",
+                "ef_ADV_emo_sweat@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_explode",
+            "Files": [
+                "ef_ADV_explode@Take 001.json",
+                "ef_ADV_explode_P_smoke_a.png",
+                "ef_ADV_explode_P_smoke_rgb.png",
+                "ef_ADV_explode_P_sparks_a.png",
+                "ef_ADV_explode_P_sparks_rgb.png",
+                "ef_ADV_explode_smoke_line_a.png",
+                "ef_ADV_explode_smoke_line_rgb.png",
+                "ef_ADV_explode_sparks_a.png",
+                "ef_ADV_explode_sparks_rgb.png",
+                "ef_ADV_explode_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_smoke.json",
+                "MeigeParticleEmitter/P_sparks.json",
+                "MeigeParticleEmitter/P_sparks1.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_filmnoise",
+            "Files": [
+                "ef_ADV_filmnoise@Take 001.json",
+                "ef_ADV_filmnoise_a.png",
+                "ef_ADV_filmnoise_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_flashback",
+            "Files": [
+                "ef_ADV_flashback@Take 001.json",
+                "ef_ADV_flashback_a.png",
+                "ef_ADV_flashback_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_gunfire",
+            "Files": [
+                "ef_ADV_gunfire@Take 001.json",
+                "ef_ADV_gunfire_flash_a.png",
+                "ef_ADV_gunfire_flash_rgb.png",
+                "ef_ADV_gunfire_gun_a.png",
+                "ef_ADV_gunfire_gun_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_H_black_snow",
+            "Files": [
+                "ef_ADV_H_black_snow@Take 001.json",
+                "ef_ADV_H_black_snow_A_a.png",
+                "ef_ADV_H_black_snow_B_a.png",
+                "ef_ADV_H_black_snow_rgb.png",
+                "ef_ADV_H_black_snow_smoke_a.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_H_rain",
+            "Files": [
+                "ef_ADV_H_rain@Take 001.json",
+                "ef_ADV_H_rain_a.png",
+                "ef_ADV_H_rain_rgb.png",
+                "ef_ADV_H_rain_smoke_a.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_H_snow",
+            "Files": [
+                "ef_ADV_H_snow@Take 001.json",
+                "ef_ADV_H_snow_A_a.png",
+                "ef_ADV_H_snow_A_rgb.png",
+                "ef_ADV_H_snow_B_a.png",
+                "ef_ADV_H_snow_B_rgb.png",
+                "ef_ADV_H_snow_smoke_a.png",
+                "ef_ADV_H_snow_smoke_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_inspiration_L",
+            "Files": [
+                "ef_ADV_inspiration_flash_a.png",
+                "ef_ADV_inspiration_L@Take 001.json",
+                "ef_ADV_inspiration_maru_01_a.png",
+                "ef_ADV_inspiration_maru_02_a.png",
+                "ef_ADV_inspiration_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_inspiration_R",
+            "Files": [
+                "ef_ADV_inspiration_flash_a.png",
+                "ef_ADV_inspiration_maru_01_a.png",
+                "ef_ADV_inspiration_maru_02_a.png",
+                "ef_ADV_inspiration_R@Take 001.json",
+                "ef_ADV_inspiration_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_letter_00",
+            "Files": [
+                "ef_ADV_letter_00@Take 001.json",
+                "ef_ADV_letter_00_a.png",
+                "ef_ADV_letter_00_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_letter_01",
+            "Files": [
+                "ef_ADV_letter_01@Take 001.json",
+                "ef_ADV_letter_01_text_a.png",
+                "ef_ADV_letter_01_text_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_letter_02",
+            "Files": [
+                "ef_ADV_letter_02@Take 001.json",
+                "ef_ADV_letter_02_a.png",
+                "ef_ADV_letter_02_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_letter_03",
+            "Files": [
+                "ef_ADV_letter_03@Take 001.json",
+                "ef_ADV_letter_rgb_03_a.png",
+                "ef_ADV_letter_rgb_03_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_letter_04",
+            "Files": [
+                "ef_ADV_letter_04@Take 001.json",
+                "ef_ADV_letter_04_a.png",
+                "ef_ADV_letter_04_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_letter_05",
+            "Files": [
+                "ef_ADV_letter_05@Take 001.json",
+                "ef_ADV_letter_rgb_05_a.png",
+                "ef_ADV_letter_rgb_05_rgb.png",
+                "ef_ADV_letter_star_rgb_05_a.png",
+                "ef_ADV_letter_star_rgb_05_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_light",
+            "Files": [
+                "ef_ADV_light@Take 001.json",
+                "ef_ADV_light_A_a.png",
+                "ef_ADV_light_A_rgb.png",
+                "ef_ADV_light_B_a.png",
+                "ef_ADV_light_B_rgb.png",
+                "ef_ADV_light_C_a.png",
+                "ef_ADV_light_C_rgb.png",
+                "ef_ADV_light_flash_a.png",
+                "ef_ADV_light_flash_rgb.png",
+                "ef_ADV_light_line_a.png",
+                "ef_ADV_light_line_rgb.png",
+                "ef_ADV_light_P_a.png",
+                "ef_ADV_light_P_rgb.png",
+                "ef_ADV_light_ring_a.png",
+                "ef_ADV_light_ring_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/line_P.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_light_2",
+            "Files": [
+                "ef_ADV_light_2@Take 001.json",
+                "ef_ADV_light_2_flash_a.png",
+                "ef_ADV_light_2_flash_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_L_rain",
+            "Files": [
+                "ef_ADV_L_rain@Take 001.json",
+                "ef_ADV_L_rain_a.png",
+                "ef_ADV_L_rain_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_L_snow",
+            "Files": [
+                "ef_ADV_L_snow@Take 001.json",
+                "ef_ADV_L_snow_A_a.png",
+                "ef_ADV_L_snow_A_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/snow_A_P_1.json",
+                "MeigeParticleEmitter/snow_A_P_2.json",
+                "MeigeParticleEmitter/snow_A_P_3.json",
+                "MeigeParticleEmitter/snow_A_P_4.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_magic",
+            "Files": [
+                "ef_ADV_magic@Take 001.json",
+                "ef_ADV_magic_rgb_flash_a.png",
+                "ef_ADV_magic_rgb_flash_rgb.png",
+                "ef_ADV_magic_rgb_particle_a.png",
+                "ef_ADV_magic_rgb_particle_rgb.png",
+                "ef_ADV_magic_rgb_ring_a.png",
+                "ef_ADV_magic_rgb_ring_rgb.png",
+                "ef_ADV_magic_rgb_wind_a.png",
+                "ef_ADV_magic_rgb_wind_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_magicattack_ed",
+            "Files": [
+                "ef_ADV_magicattack_ed@Take 001.json",
+                "ef_ADV_magicattack_F_a.png",
+                "ef_ADV_magicattack_F_rgb.png",
+                "ef_ADV_magicattack_I_a.png",
+                "ef_ADV_magicattack_I_rgb.png",
+                "ef_ADV_magicattack_J_a.png",
+                "ef_ADV_magicattack_J_rgb.png",
+                "ef_ADV_magicattack_line_a.png",
+                "ef_ADV_magicattack_line_rgb.png",
+                "ef_ADV_magicattack_P_a.png",
+                "ef_ADV_magicattack_P_rgb.png",
+                "ef_ADV_magicattack_red_2_a.png",
+                "ef_ADV_magicattack_red_2_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_B.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_magicattack_lp",
+            "Files": [
+                "ef_ADV_magicattack_E_a.png",
+                "ef_ADV_magicattack_E_rgb.png",
+                "ef_ADV_magicattack_F_a.png",
+                "ef_ADV_magicattack_F_rgb.png",
+                "ef_ADV_magicattack_G_a.png",
+                "ef_ADV_magicattack_G_rgb.png",
+                "ef_ADV_magicattack_H_a.png",
+                "ef_ADV_magicattack_H_rgb.png",
+                "ef_ADV_magicattack_line_a.png",
+                "ef_ADV_magicattack_line_rgb.png",
+                "ef_ADV_magicattack_lp@Take 001.json",
+                "ef_ADV_magicattack_P_a.png",
+                "ef_ADV_magicattack_P_rgb.png",
+                "ef_ADV_magicattack_red_2_a.png",
+                "ef_ADV_magicattack_red_2_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_A.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_magicattack_st",
+            "Files": [
+                "ef_ADV_magicattack_A_a.png",
+                "ef_ADV_magicattack_A_rgb.png",
+                "ef_ADV_magicattack_B_a.png",
+                "ef_ADV_magicattack_B_rgb.png",
+                "ef_ADV_magicattack_C_a.png",
+                "ef_ADV_magicattack_C_rgb.png",
+                "ef_ADV_magicattack_D_a.png",
+                "ef_ADV_magicattack_D_rgb.png",
+                "ef_ADV_magicattack_E_a.png",
+                "ef_ADV_magicattack_E_rgb.png",
+                "ef_ADV_magicattack_F_a.png",
+                "ef_ADV_magicattack_F_rgb.png",
+                "ef_ADV_magicattack_G_a.png",
+                "ef_ADV_magicattack_G_rgb.png",
+                "ef_ADV_magicattack_line_a.png",
+                "ef_ADV_magicattack_line_rgb.png",
+                "ef_ADV_magicattack_red_2_a.png",
+                "ef_ADV_magicattack_red_2_rgb.png",
+                "ef_ADV_magicattack_red_rgb.png",
+                "ef_ADV_magicattack_st@Take 001.json",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_mist",
+            "Files": [
+                "ef_ADV_mist_P_aura_a.png",
+                "ef_ADV_mist_smoke_a.png",
+                "ef_ADV_mist_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_aura.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_msquare",
+            "Files": [
+                "ef_ADV_msquare@Take 001.json",
+                "ef_ADV_msquare_a.png",
+                "ef_ADV_msquare_line_a.png",
+                "ef_ADV_msquare_line_rgb.png",
+                "ef_ADV_msquare_rgb.png",
+                "ef_ADV_msquare_star_a.png",
+                "ef_ADV_msquare_star_rgb.png",
+                "ef_ADV_msquare_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_pheromone",
+            "Files": [
+                "ef_ADV_pheromone@Take 001.json",
+                "ef_ADV_pheromone_heart_A_a.png",
+                "ef_ADV_pheromone_heart_B_a.png",
+                "ef_ADV_pheromone_P_star_a.png",
+                "ef_ADV_pheromone_smoke_a.png",
+                "ef_ADV_pheromone_smoke_rgb.png",
+                "ef_ADV_pheromone_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_star.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_pheromone_loop",
+            "Files": [
+                "ef_ADV_pheromone_heart_A_a.png",
+                "ef_ADV_pheromone_heart_B_a.png",
+                "ef_ADV_pheromone_loop@Take 001.json",
+                "ef_ADV_pheromone_P_star_a.png",
+                "ef_ADV_pheromone_smoke_a.png",
+                "ef_ADV_pheromone_smoke_rgb.png",
+                "ef_ADV_pheromone_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_star.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_powa_00",
+            "Files": [
+                "ef_ADV_powa_00@Take 001.json",
+                "ef_ADV_powa_ball_a.png",
+                "ef_ADV_powa_ball_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_powa_01",
+            "Files": [
+                "ef_ADV_powa_01@Take 001.json",
+                "ef_ADV_powa_ball_a.png",
+                "ef_ADV_powa_ball_rgb.png",
+                "ef_ADV_powa_star_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/star.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_powa_02",
+            "Files": [
+                "ef_ADV_powa_02@Take 001.json",
+                "ef_ADV_powa_ball_a.png",
+                "ef_ADV_powa_ball_rgb.png",
+                "ef_ADV_powa_BG_a.png",
+                "ef_ADV_powa_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_ripple",
+            "Files": [
+                "ef_ADV_ripple@Take 001.json",
+                "ef_ADV_ripple_aura_02_a.png",
+                "ef_ADV_ripple_line_01_a.png",
+                "ef_ADV_ripple_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_seal",
+            "Files": [
+                "ef_ADV_seal@Take 001.json",
+                "ef_ADV_seal_aura_01_a.png",
+                "ef_ADV_seal_chain_a.png",
+                "ef_ADV_seal_dot_a.png",
+                "ef_ADV_seal_flashline_a.png",
+                "ef_ADV_seal_line_01_a.png",
+                "ef_ADV_seal_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_dot.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_slash",
+            "Files": [
+                "ef_ADV_slash@Take 001.json",
+                "ef_ADV_slash_a.png",
+                "ef_ADV_slash_impact_a.png",
+                "ef_ADV_slash_impact_rgb.png",
+                "ef_ADV_slash_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_smokebomb",
+            "Files": [
+                "ef_ADV_smokebomb@Take 001.json",
+                "ef_ADV_smokebomb_bom_a.png",
+                "ef_ADV_smokebomb_bom_rgb.png",
+                "ef_ADV_smokebomb_smoke_line_a.png",
+                "ef_ADV_smokebomb_smoke_line_rgb.png",
+                "ef_ADV_smokebomb_smoke_top_a.png",
+                "ef_ADV_smokebomb_smoke_top_rgb.png",
+                "ef_ADV_smokebomb_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_spring",
+            "Files": [
+                "ef_ADV_spring@Take 001.json",
+                "ef_ADV_spring_A_a.png",
+                "ef_ADV_spring_A_rgb.png",
+                "ef_ADV_spring_B_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_sunlight",
+            "Files": [
+                "ef_ADV_sunlight@Take 001.json",
+                "ef_ADV_sunlight_A_a.png",
+                "ef_ADV_sunlight_flash_2_a.png",
+                "ef_ADV_sunlight_flash_2_rgb.png",
+                "ef_ADV_sunlight_flash_a.png",
+                "ef_ADV_sunlight_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_thunder",
+            "Files": [
+                "ef_ADV_thunder@Take 001.json",
+                "ef_ADV_thunder_a.png",
+                "ef_ADV_thunder_maru_a.png",
+                "ef_ADV_thunder_maru_rgb.png",
+                "ef_ADV_thunder_rgb.png",
+                "ef_ADV_thunder_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_timelap",
+            "Files": [
+                "ef_ADV_timelap@Take 001.json",
+                "ef_ADV_timelap_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tornado",
+            "Files": [
+                "ef_ADV_tornado@Take 001.json",
+                "ef_ADV_tornado_P_dust_a.png",
+                "ef_ADV_tornado_P_smoke_a.png",
+                "ef_ADV_tornado_white_rgb.png",
+                "ef_ADV_tornado_wind_01_a.png",
+                "ef_ADV_tornado_wind_01_rgb.png",
+                "ef_ADV_tornado_wind_02_a.png",
+                "ef_ADV_tornado_wind_BG_a.png",
+                "ef_ADV_tornado_wind_BG_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_dust.json",
+                "MeigeParticleEmitter/P_smoke.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_transfer",
+            "Files": [
+                "ef_ADV_transfer@Take 001.json",
+                "ef_ADV_transfer_A_a.png",
+                "ef_ADV_transfer_A_rgb.png",
+                "ef_ADV_transfer_A_white_a.png",
+                "ef_ADV_transfer_A_white_rgb.png",
+                "ef_ADV_transfer_B_a.png",
+                "ef_ADV_transfer_B_rgb.png",
+                "ef_ADV_transfer_line_a.png",
+                "ef_ADV_transfer_line_rgb.png",
+                "ef_ADV_transfer_P_a.png",
+                "ef_ADV_transfer_P_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tumbleweed",
+            "Files": [
+                "ef_ADV_tumbleweed@Take 001.json",
+                "ef_ADV_tumbleweed_ball_a.png",
+                "ef_ADV_tumbleweed_ball_rgb.png",
+                "ef_ADV_tumbleweed_smoke_a.png",
+                "ef_ADV_tumbleweed_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tv_frame",
+            "Files": [
+                "ef_ADV_tv_frame@Take 001.json",
+                "ef_ADV_tv_frame_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tv_live",
+            "Files": [
+                "ef_ADV_tv_live@Take 001.json",
+                "ef_ADV_tv_live_Live_rgb.png",
+                "ef_ADV_tv_live_star_a.png",
+                "ef_ADV_tv_live_star_rgb.png",
+                "ef_ADV_tv_live_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tv_noise_lp",
+            "Files": [
+                "ef_ADV_tv_noise_line_01_a.png",
+                "ef_ADV_tv_noise_line_02_a.png",
+                "ef_ADV_tv_noise_lp@Take 001.json",
+                "ef_ADV_tv_noise_noise_rgb.png",
+                "ef_ADV_tv_noise_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tv_noise_st",
+            "Files": [
+                "ef_ADV_tv_noise_noise_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "why/MeigeAnimClipHolder.json",
+                "why/MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_tv_phone",
+            "Files": [
+                "ef_ADV_tv_phone@Take 001.json",
+                "ef_ADV_tv_phone_01_a.png",
+                "ef_ADV_tv_phone_01_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        },
+        {
+            "Name": "ef_ADV_white_snow",
+            "Files": [
+                "ef_ADV_white_snow@Take 001.json",
+                "ef_ADV_white_snow_P_dust_a.png",
+                "ef_ADV_white_snow_P_dust_BG_a.png",
+                "ef_ADV_white_snow_P_dust_blur_a.png",
+                "ef_ADV_white_snow_snow_a.png",
+                "ef_ADV_white_snow_snow_rgb.png",
+                "ef_ADV_white_snow_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json",
+                "MeigeParticleEmitter/P_dust_1.json",
+                "MeigeParticleEmitter/P_dust_2.json",
+                "MeigeParticleEmitter/P_dust_blur.json",
+                "MeigeParticleEmitter/snow_P.json"
+            ]
+        },
+        {
+            "Name": "ef_comic_concent",
+            "Files": [
+                "ef_comic_concent_line_a.png",
+                "ef_comic_concent_white_rgb.png",
+                "MeigeAnimClipHolder.json",
+                "MsbHandler.json"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,224 @@
+{
+  "m_GameObject": {
+    "m_FileID": 0,
+    "m_PathID": 0
+  },
+  "m_Enabled": 1,
+  "m_Script": {
+    "m_FileID": 0,
+    "m_PathID": -8677050947608444451
+  },
+  "m_Name": "ADVEmotionList",
+  "m_Params": [
+    {
+      "m_EmotionID": "なし",
+      "m_EffectID": "none",
+      "m_DefaultPosition": 1,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "怒り",
+      "m_EffectID": "ef_ADV_emo_angry",
+      "m_DefaultPosition": 2,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "怒り_ループ",
+      "m_EffectID": "ef_ADV_emo_angry",
+      "m_DefaultPosition": 2,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "プンスカ煙",
+      "m_EffectID": "ef_ADV_emo_angry_smoke",
+      "m_DefaultPosition": 1,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "プンスカ煙_ループ",
+      "m_EffectID": "ef_ADV_emo_angry_smoke",
+      "m_DefaultPosition": 1,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "オーラ",
+      "m_EffectID": "ef_ADV_emo_aura",
+      "m_DefaultPosition": 4,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "オーラ_ループ",
+      "m_EffectID": "ef_ADV_emo_aura",
+      "m_DefaultPosition": 4,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "びっくり",
+      "m_EffectID": "ef_ADV_emo_exclamation",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "びっくり_ループ",
+      "m_EffectID": "ef_ADV_emo_exclamation",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "ぐずぐず",
+      "m_EffectID": "ef_ADV_emo_fall",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "ぐずぐず_ループ",
+      "m_EffectID": "ef_ADV_emo_fall",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "喜び",
+      "m_EffectID": "ef_ADV_emo_fun",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "喜び_ループ",
+      "m_EffectID": "ef_ADV_emo_fun",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "ハート",
+      "m_EffectID": "ef_ADV_emo_heart",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "ハート_ループ",
+      "m_EffectID": "ef_ADV_emo_heart",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "焦り",
+      "m_EffectID": "ef_ADV_emo_impatient",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "焦り_ループ",
+      "m_EffectID": "ef_ADV_emo_impatient",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "音符",
+      "m_EffectID": "ef_ADV_emo_note",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "音符_ループ",
+      "m_EffectID": "ef_ADV_emo_note",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "はてな",
+      "m_EffectID": "ef_ADV_emo_question",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "はてな_ループ",
+      "m_EffectID": "ef_ADV_emo_question",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "気づく",
+      "m_EffectID": "ef_ADV_emo_react",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "気づく_ループ",
+      "m_EffectID": "ef_ADV_emo_react",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "がーん",
+      "m_EffectID": "ef_ADV_emo_shock",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "がーん_ループ",
+      "m_EffectID": "ef_ADV_emo_shock",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "眠り",
+      "m_EffectID": "ef_ADV_emo_sleep",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "眠り_ループ",
+      "m_EffectID": "ef_ADV_emo_sleep",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "驚き",
+      "m_EffectID": "ef_ADV_emo_surprise",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "驚き_ループ",
+      "m_EffectID": "ef_ADV_emo_surprise",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "たらり汗",
+      "m_EffectID": "ef_ADV_emo_sweat",
+      "m_DefaultPosition": 3,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "たらり汗_ループ",
+      "m_EffectID": "ef_ADV_emo_sweat",
+      "m_DefaultPosition": 3,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "オーラ2",
+      "m_EffectID": "ef_ADV_emo_aura_2",
+      "m_DefaultPosition": 4,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "オーラ2_ループ",
+      "m_EffectID": "ef_ADV_emo_aura_2",
+      "m_DefaultPosition": 4,
+      "m_Loop": 1
+    },
+    {
+      "m_EmotionID": "ぽわぽわ",
+      "m_EffectID": "ef_ADV_powa_00",
+      "m_DefaultPosition": 1,
+      "m_Loop": 0
+    },
+    {
+      "m_EmotionID": "ぽわぽわ_ループ",
+      "m_EffectID": "ef_ADV_powa_00",
+      "m_DefaultPosition": 1,
+      "m_Loop": 1
+    }
+  ]
+}

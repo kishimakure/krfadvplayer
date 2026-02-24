@@ -1,0 +1,808 @@
+{
+  "m_GameObject": {
+    "m_FileID": 0,
+    "m_PathID": 0
+  },
+  "m_Enabled": 1,
+  "m_Script": {
+    "m_FileID": 0,
+    "m_PathID": 4717522048195811966
+  },
+  "m_Name": "ADVMotionList",
+  "m_Params": [
+    {
+      "m_MotionID": "なし",
+      "m_Datas": [
+        {
+          "m_Action": 0,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.0,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ジャンプ",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -10.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 100.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -10.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ジャンプ_小",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -5.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 50.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -5.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "うなずく",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -25.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "うなずく_小",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -10.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "いばる",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 1.05,
+          "m_Y": 1.05,
+          "m_Duration": 0.2,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 2,
+          "m_X": 1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.3,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "いばる_小",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 1.03,
+          "m_Y": 1.03,
+          "m_Duration": 0.1,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 2,
+          "m_X": 1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "縮こまる",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 0.95,
+          "m_Y": 0.95,
+          "m_Duration": 0.2,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 2,
+          "m_X": 1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.3,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "縮こまる_小",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 0.98,
+          "m_Y": 0.98,
+          "m_Duration": 0.1,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 2,
+          "m_X": 1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ゆれる",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 50.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.25,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -50.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.5,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.25,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ダメージ_右",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 50.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.3,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ダメージ_左",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": -50.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.3,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "はしゃぐ",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 10.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 10.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "震える",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 0.98,
+          "m_Y": 0.98,
+          "m_Duration": 0.2,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 1.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 1.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 1.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 1.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 2,
+          "m_X": 1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "眠る",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 0.99,
+          "m_Y": 0.99,
+          "m_Duration": 0.5,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 2,
+          "m_X": 1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.5,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "走る",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "跳ねる",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 10.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "転ぶ",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -800.0,
+          "m_Duration": 0.5,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 0,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 1.0,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "巨大化",
+      "m_Datas": [
+        {
+          "m_Action": 2,
+          "m_X": 1.1,
+          "m_Y": 1.1,
+          "m_Duration": 0.5,
+          "m_EaseType": 2,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 0,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ふわふわ",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 10.0,
+          "m_Duration": 0.4,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.6,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "首振り",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 5.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -5.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 5.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -5.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.08,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.04,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "うなずく_2回",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -8.0,
+          "m_Duration": 0.15,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.15,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -8.0,
+          "m_Duration": 0.15,
+          "m_EaseType": 4,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.15,
+          "m_EaseType": 5,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ステップ",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 25.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -25.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "ステップ_反転",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": -25.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 25.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.2,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.1,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "振動",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 1.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 1.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": -1.0,
+          "m_Y": 1.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.01,
+          "m_EaseType": 0,
+          "m_WaitEnd": 1
+        }
+      ]
+    },
+    {
+      "m_MotionID": "呼吸",
+      "m_Datas": [
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": -8.0,
+          "m_Duration": 0.4,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        },
+        {
+          "m_Action": 1,
+          "m_X": 0.0,
+          "m_Y": 0.0,
+          "m_Duration": 0.4,
+          "m_EaseType": 3,
+          "m_WaitEnd": 1
+        }
+      ]
+    }
+  ]
+}
