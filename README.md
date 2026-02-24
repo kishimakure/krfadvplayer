@@ -7,3 +7,5 @@
 4. Link the Assets: Find the `"Host"` field and enter the **absolute local path** pointing to the `adv` folder inside your extracted asset library. **Make sure to use the `file://` prefix.**
    * *Example:* `"Host": "file://D:/path/to/adv"`
 5. Save `params.json` and launch the player executable (`.exe`).
+
+Check out the bilibili article for more info or krfadveditor: https://www.bilibili.com/opus/1071238068570161192
