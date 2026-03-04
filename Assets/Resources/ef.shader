@@ -10,8 +10,8 @@ Shader "CustomShader_EF"
         [HideInInspector] _RendererColor ("RendererColor", Color) = (1,1,1,1)
         [HideInInspector] _Flip ("Flip", Vector) = (1,1,1,1)
         _HDRFactor          ("HDR Factor", Range(0.01,10)) = 1
-        _BlendSrc           ("Blend Source", Float) = 5
-        _BlendDst           ("Blend Destination", Float) = 10
+        _BlendSrc           ("Blend Source", Int) = 5
+        _BlendDst           ("Blend Destination", Int) = 10
         _MainRotation       ("Main Rotation", Range(-1.6,1.6)) = 0
         _DistortionLevel    ("Distortion Level", Float) = 0
         _Texture_Noise      ("Noise",  2D) = "gray"  {}

@@ -1165,6 +1165,7 @@ public class player : MonoBehaviour
     private static readonly int _MainTex = Shader.PropertyToID("_MainTex");
     private static readonly int _AlphaTex = Shader.PropertyToID("_AlphaTex");
     private static readonly int _HDRFactor = Shader.PropertyToID("_HDRFactor");
+    private static readonly int _BlendSrc = Shader.PropertyToID("_BlendSrc");
     private static readonly int _BlendDst = Shader.PropertyToID("_BlendDst");
     private static readonly int _Warp = Shader.PropertyToID("_Warp");
     private static readonly int _ProgressRate = Shader.PropertyToID("_ProgressRate");
@@ -2375,6 +2376,7 @@ public class player : MonoBehaviour
         RTEf.transform.SetParent(RTEfObj.transform);
         RTEf.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
         RTEf.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, cameraEf.targetTexture);
+        RTEf.GetComponent<MeshRenderer>().material.SetInt(_BlendSrc, 1);
         RTEf.GetComponent<MeshRenderer>().sortingOrder = -99;
         RTEf.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
         rectTransform = RTEf.AddComponent<RectTransform>();
@@ -2384,13 +2386,14 @@ public class player : MonoBehaviour
         RTEfCB.transform.SetParent(RTEfObj.transform);
         RTEfCB.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
         RTEfCB.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, cameraEfCB.targetTexture);
+        RTEfCB.GetComponent<MeshRenderer>().material.SetInt(_BlendSrc, 1);
         RTEfCB.GetComponent<MeshRenderer>().sortingOrder = -1099;
         RTEfCB.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
         rectTransform = RTEfCB.AddComponent<RectTransform>();
         rectTransform.localScale = new Vector3(1f, 1f, 1f);
         rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
         particleObj = new GameObject("Particle");
-        particleObj.transform.position = new Vector3(0f, -10000f, 0f);
+        particleObj.transform.position = new Vector3(0f, 0f, 0f);
         if (useCustomJson)
         {
             StartCoroutine(LoadCustomJson());
@@ -4463,6 +4466,7 @@ public class player : MonoBehaviour
         Dictionary<GameObject, GameObject> fPtclRoot = new Dictionary<GameObject, GameObject>();
         List<GameObject> efObjects = new List<GameObject> { ef };
         List<string> efMaterials = new List<string>();
+        List<GameObject> efPtclParents = new List<GameObject>();
         ef.transform.localPosition = new Vector3(efClone.transform.localPosition.x, efClone.transform.localPosition.y, efClone.transform.localPosition.z);
         ef.transform.localRotation = efClone.transform.localRotation;
         ef.transform.localScale = efClone.transform.localScale;
@@ -4578,6 +4582,7 @@ public class player : MonoBehaviour
                 fPtclRoot.Add(efObject, efRoot);
                 efObjects.Add(ptclParent);
                 ptclParent.transform.SetParent(f[efCloneObject.transform.parent.gameObject].transform);
+                efPtclParents.Add(ptclParent);
                 MeigeParticleEmitterJson meigeParticleEmitterJson = webMeigeParticleEmitter[EffectID + @"\MeigeParticleEmitter/" + ptclParent.name + ".json"];
                 RuleJson rule = meigeParticleEmitterJson.m_Rule;
                 MeshFilter meshFilter = ptclParent.AddComponent<MeshFilter>();
@@ -4608,9 +4613,11 @@ public class player : MonoBehaviour
                 efObject.transform.localPosition = new Vector3(0f, 0f, 0f);
                 efObject.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                 efObject.transform.localScale = new Vector3(1f, 1f, 1f) * multiple;
+                efObject.layer = isCharaBehind ? 31 : 30;
                 efRoot.transform.position = new Vector3(0f, 0f, 0f);
                 efRoot.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                 efRoot.transform.localScale = new Vector3(1f, 1f, 1f);
+                efRoot.layer = isCharaBehind ? 31 : 30;
                 ParticleObjectParams particleObjectParams = efObject.AddComponent<ParticleObjectParams>();
                 particleObjectParams.m_thisTransform = ptclParent.transform;
                 material.SetTexture(_MainTex, webTexture[EffectID + @"\" + efMaterialHandler.m_Src.m_Texture[0].m_Name + ".png"]);
@@ -5189,7 +5196,7 @@ public class player : MonoBehaviour
                         rectTransform.localScale = multiple * new Vector3(curves["scalex"].Evaluate(timeElapsed), curves["scaley"].Evaluate(timeElapsed), curves["scalez"].Evaluate(timeElapsed));
                         continue;
                     }
-                    efObject.transform.localPosition = new Vector3(curves["positionx"].Evaluate(timeElapsed), curves["positiony"].Evaluate(timeElapsed), curves["positionz"].Evaluate(timeElapsed));
+                    efObject.transform.localPosition = (efPtclParents.Contains(efObject) ? -shift / multiple : Vector3.zero) + new Vector3(curves["positionx"].Evaluate(timeElapsed), curves["positiony"].Evaluate(timeElapsed), curves["positionz"].Evaluate(timeElapsed));
                     efObject.transform.localRotation = new Quaternion(curves["rotationx"].Evaluate(timeElapsed), curves["rotationy"].Evaluate(timeElapsed), curves["rotationz"].Evaluate(timeElapsed), curves["rotationw"].Evaluate(timeElapsed));
                     efObject.transform.localScale = new Vector3(curves["scalex"].Evaluate(timeElapsed), curves["scaley"].Evaluate(timeElapsed), curves["scalez"].Evaluate(timeElapsed));
                     efObject.SetActive(curves["enabled"].Evaluate(timeElapsed) > 0f);
@@ -5232,7 +5239,7 @@ public class player : MonoBehaviour
                         rectTransform.localScale = multiple * new Vector3(curves["scalex"].Evaluate(animtime), curves["scaley"].Evaluate(animtime), curves["scalez"].Evaluate(animtime));
                         continue;
                     }
-                    efObject.transform.localPosition = new Vector3(curves["positionx"].Evaluate(animtime), curves["positiony"].Evaluate(animtime), curves["positionz"].Evaluate(animtime));
+                    efObject.transform.localPosition = (efPtclParents.Contains(efObject) ? -shift / multiple : Vector3.zero) + new Vector3(curves["positionx"].Evaluate(animtime), curves["positiony"].Evaluate(animtime), curves["positionz"].Evaluate(animtime));
                     efObject.transform.localRotation = new Quaternion(curves["rotationx"].Evaluate(animtime), curves["rotationy"].Evaluate(animtime), curves["rotationz"].Evaluate(animtime), curves["rotationw"].Evaluate(animtime));
                     efObject.transform.localScale = new Vector3(curves["scalex"].Evaluate(animtime), curves["scaley"].Evaluate(animtime), curves["scalez"].Evaluate(animtime));
                     efObject.SetActive(curves["enabled"].Evaluate(animtime) > 0f);
@@ -5282,7 +5289,7 @@ public class player : MonoBehaviour
                         rectTransform.localScale = multiple * new Vector3(curves["scalex"].Evaluate(timeElapsed), curves["scaley"].Evaluate(timeElapsed), curves["scalez"].Evaluate(timeElapsed));
                         continue;
                     }
-                    efObject.transform.localPosition = new Vector3(curves["positionx"].Evaluate(timeElapsed), curves["positiony"].Evaluate(timeElapsed), curves["positionz"].Evaluate(timeElapsed));
+                    efObject.transform.localPosition = (efPtclParents.Contains(efObject) ? -shift / multiple : Vector3.zero) + new Vector3(curves["positionx"].Evaluate(timeElapsed), curves["positiony"].Evaluate(timeElapsed), curves["positionz"].Evaluate(timeElapsed));
                     efObject.transform.localRotation = new Quaternion(curves["rotationx"].Evaluate(timeElapsed), curves["rotationy"].Evaluate(timeElapsed), curves["rotationz"].Evaluate(timeElapsed), curves["rotationw"].Evaluate(timeElapsed));
                     efObject.transform.localScale = new Vector3(curves["scalex"].Evaluate(timeElapsed), curves["scaley"].Evaluate(timeElapsed), curves["scalez"].Evaluate(timeElapsed));
                     efObject.SetActive(curves["enabled"].Evaluate(timeElapsed) > 0f);
@@ -5372,6 +5379,7 @@ public class player : MonoBehaviour
                 particleUnitParamsCache[gameObject] = particleUnitParams;
                 particleUnitParams.m_Index = -1;
                 gameObject.transform.SetParent(ptclRoot.transform);
+                gameObject.layer = isCharaBehind ? 31 : 30;
                 ptclUnits[ptclDummy].Add(gameObject);
             }
             for (int i = 0; i < ptclUnits[ptclDummy].Count; i++)

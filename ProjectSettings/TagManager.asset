@@ -35,8 +35,8 @@ TagManager:
   - Chara17
   - Chara18
   - Chara19
-  - 
-  - 
+  - Effect
+  - Effect_CharaBehind
   m_SortingLayers:
   - name: Default
     uniqueID: 0
