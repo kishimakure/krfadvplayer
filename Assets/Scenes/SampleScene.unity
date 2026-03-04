@@ -273,13 +273,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   host: file://D:/kirafan/export/adv/
-  ADVIDs: 40420f0041420f00
+  ADVIDs: feffffffe8030000dc050000
   auto: 0
   QuickPlay: 0
   Attempt: 100
   AttemptDelay: 0.1
   TimeScale: 1
-  DebugMode: 0
+  DebugMode: 1
   useCustomJson: 1
   globalFont: ja
   audioMode: ogg

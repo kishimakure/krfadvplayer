@@ -15,6 +15,7 @@ using UnityEngine.Rendering.Universal;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine.UIElements;
+using System.Text;
 #if !UNITY_EDITOR
 using UnityEngine.Rendering;
 using UnityEngine.Scripting;
@@ -1029,7 +1030,6 @@ public class SpriteProperties : MonoBehaviour
     public uint ID;
     public Vector2 pos;
     public Vector2 scale;
-    public bool VisibleFlg;
     public Color color;
     public float fade;
 }
@@ -1128,11 +1128,10 @@ public class player : MonoBehaviour
     private Dictionary<string, AudioClip> webAudio = new Dictionary<string, AudioClip>();
     private Dictionary<string, AssetBundle> webAssetBundle = new Dictionary<string, AssetBundle>();
     private Dictionary<string, GameObject> webGameObject = new Dictionary<string, GameObject>();
-    private Dictionary<Coroutine, string> LoadingCoroutines = new Dictionary<Coroutine, string>();
+    private Dictionary<string, IEnumerator> LoadingIEnumerators = new Dictionary<string, IEnumerator>();
     private List<string> LoadedPacks = new List<string>();
     private Dictionary<int, string[]> Jsons = new Dictionary<int, string[]>();
     private List<string> LoadedAssets = new List<string>();
-    private List<string> RequiredAssets = new List<string>();
     private Dictionary<string, float> lineSpacing = new Dictionary<string, float> { { "ja", 0.8f }, { "zh", 1.2f } };
     private Dictionary<Vector4, Mesh> meshCache = new Dictionary<Vector4, Mesh>();
     private Dictionary<string, GameObject> gameObjectCache = new Dictionary<string, GameObject>();
@@ -1209,8 +1208,6 @@ public class player : MonoBehaviour
 
     private IEnumerator DownloadText(string name, string url)
     {
-        if (RequiredAssets.Contains(name)) { yield break; }
-        RequiredAssets.Add(name);
         webText.Add(name, null);
         int attempt = 0;
         while (attempt < Attempt)
@@ -1254,8 +1251,6 @@ public class player : MonoBehaviour
     }
     private IEnumerator DownloadTexture(string name, string url)
     {
-        if (RequiredAssets.Contains(name)) { yield break; }
-        RequiredAssets.Add(name);
         webTexture.Add(name, null);
         int attempt = 0;
         while (attempt < Attempt)
@@ -1283,8 +1278,6 @@ public class player : MonoBehaviour
     }
     private IEnumerator DownloadAudio(string name, string url, string type)
     {
-        if (RequiredAssets.Contains(name)) { yield break; }
-        RequiredAssets.Add(name);
         webAudio.Add(name, null);
         int attempt = 0;
         while (attempt < Attempt)
@@ -1312,8 +1305,6 @@ public class player : MonoBehaviour
     }
     private IEnumerator DownloadAssetBundle(string name, string url)
     {
-        if (RequiredAssets.Contains(name)) { yield break; }
-        RequiredAssets.Add(name);
         webAssetBundle.Add(name, null);
         int attempt = 0;
         while (attempt < Attempt)
@@ -1361,7 +1352,7 @@ public class player : MonoBehaviour
             LoadedPacks.Add(name);
             foreach (string file in StandPics.Params.First(param => param.Name == name).Files)
             {
-                LoadingCoroutines.Add(StartCoroutine(DownloadTexture(name + "_" + file, Path.Join(host, @"\standpic\" + name + "_" + file + ".png"))), name + "_" + file);
+                LoadingIEnumerators.Add(name + "_" + file, DownloadTexture(name + "_" + file, Path.Join(host, @"\standpic\" + name + "_" + file + ".png")));
             }
         }
     }
@@ -1374,31 +1365,31 @@ public class player : MonoBehaviour
             {
                 if (file.EndsWith(".json"))
                 {
-                    LoadingCoroutines.Add(StartCoroutine(DownloadText(name + @"\" + file, Path.Join(host, @"\ef_adv\" + name + @"\" + file))), name + @"\" + file);
+                    LoadingIEnumerators.Add(name + @"\" + file, DownloadText(name + @"\" + file, Path.Join(host, @"\ef_adv\" + name + @"\" + file)));
                 }
                 else
                 {
-                    LoadingCoroutines.Add(StartCoroutine(DownloadTexture(name + @"\" + file, Path.Join(host, @"\ef_adv\" + name + @"\" + file))), name + @"\" + file);
+                    LoadingIEnumerators.Add(name + @"\" + file, DownloadTexture(name + @"\" + file, Path.Join(host, @"\ef_adv\" + name + @"\" + file)));
                 }
             }
             string PackName = advEffectList.m_Params.First(param => param.m_EffectID == name).m_PackName;
             if (PackName == "")
             {
-                LoadingCoroutines.Add(StartCoroutine(DownloadAssetBundle(name, Path.Join(host, @"\ef_adv\ab\" + name.ToLower() + ".assetbundle"))), name);
+                LoadingIEnumerators.Add(name, DownloadAssetBundle(name, Path.Join(host, @"\ef_adv\ab\" + name.ToLower() + ".assetbundle")));
                 foreach (string CueID in advEffectList.m_Params.First(param => param.m_EffectID == name).m_CueIDs)
                 {
-                    if (!webAudio.ContainsKey(CueID))
+                    if (!LoadingIEnumerators.ContainsKey(CueID))
                     {
-                        LoadingCoroutines.Add(StartCoroutine(DownloadAudio(CueID, Path.Join(host, @"\se\" + CueID + ".wav"), "wav")), CueID);
+                        LoadingIEnumerators.Add(CueID, DownloadAudio(CueID, Path.Join(host, @"\se\" + CueID + ".wav"), "wav"));
                     }
                 }
                 StartCoroutine(GetGameObject(name, name));
             }
             else
             {
-                if (!webAssetBundle.ContainsKey(PackName))
+                if (!LoadingIEnumerators.ContainsKey(PackName))
                 {
-                    LoadingCoroutines.Add(StartCoroutine(DownloadAssetBundle(PackName, Path.Join(host, @"\ef_adv\ab\" + PackName.ToLower() + ".assetbundle"))), PackName);
+                    LoadingIEnumerators.Add(PackName, DownloadAssetBundle(PackName, Path.Join(host, @"\ef_adv\ab\" + PackName.ToLower() + ".assetbundle")));
                 }
                 StartCoroutine(GetGameObject(name, PackName));
             }
@@ -1412,7 +1403,7 @@ public class player : MonoBehaviour
             if (Voices.Params.First(param => param.Name == name).VoiceLabels.FirstOrDefault(param => param.VoiceLabel == voicelabel) == null) { return; }
             foreach (string file in Voices.Params.First(param => param.Name == name).VoiceLabels.First(param => param.VoiceLabel == voicelabel).Choices)
             {
-                LoadingCoroutines.Add(StartCoroutine(DownloadAudio(name + @"\voice_" + voicelabel + "_" + file, Path.Join(host, @"\voice\" + name + @"\voice_" + voicelabel + "_" + file + "." + audioMode), audioMode)), name + @"\voice_" + voicelabel + "_" + file);
+                LoadingIEnumerators.Add(name + @"\voice_" + voicelabel + "_" + file, DownloadAudio(name + @"\voice_" + voicelabel + "_" + file, Path.Join(host, @"\voice\" + name + @"\voice_" + voicelabel + "_" + file + "." + audioMode), audioMode));
             }
         }
     }
@@ -1453,24 +1444,28 @@ public class player : MonoBehaviour
         }
         else
         {
-            string scriptPath = Path.Join(host, @"\comic\" + advcategory + @"\ComicScript_" + advlistParams.m_ComicGroupName + ".json");
+            string scriptPath = Path.Join(host, @"\comic\ComicScript_" + advlistParams.m_ComicGroupName + ".json");
             Jsons.Add(ADVID, new string[2]);
             Coroutine coroutine1 = StartCoroutine(DownloadJson(scriptPath, ADVID, 0));
             yield return coroutine1;
             comicScript = JsonConvert.DeserializeObject<comicscript>(Jsons[ADVID][0]);
             comicScripts.Add(ADVID, comicScript);
-            //Debug.Log(advScript.m_Name);
-            string spriteListPath = Path.Join(host, @"\advscript\" + advcategory + @"\ComicSpriteList_" + advlistParams.m_ComicGroupName + ".json");
+            //Debug.Log(comicScript.m_Name);
+            string spriteListPath = Path.Join(host, @"\comic\ComicSpriteList_" + advlistParams.m_ComicGroupName + ".json");
             Coroutine coroutine2 = StartCoroutine(DownloadJson(spriteListPath, ADVID, 1));
             yield return coroutine2;
             comicSpriteList = JsonConvert.DeserializeObject<comicspritelist>(Jsons[ADVID][1]);
             comicSpriteLists.Add(ADVID, comicSpriteList);
-            //Debug.Log(advScriptText.m_Name);
+            //Debug.Log(comicSpriteList.m_Name);
         }
     }
     private IEnumerator Preload(int ADVID)
     {
         yield return StartCoroutine(LoadJson(ADVID));
+        if (!advScripts.ContainsKey(ADVID))
+        {
+            yield break;
+        }
         Dictionary<string, string> CharasExistPreLoad = new Dictionary<string, string>();
         string[] TargetsPreLoad = new string[5];
         foreach (class_FuncParam func in advScripts[ADVID].m_Params[0].FuncParam)
@@ -1482,9 +1477,9 @@ public class player : MonoBehaviour
             switch (func.funcName)
             {
                 case "BGVisible":
-                    if (!webTexture.ContainsKey(func.m_value2))
+                    if (!LoadingIEnumerators.ContainsKey(func.m_value2))
                     {
-                        LoadingCoroutines.Add(StartCoroutine(DownloadTexture(func.m_value2, Path.Join(host, @"\bg\" + func.m_value2 + ".png"))), func.m_value2);
+                        LoadingIEnumerators.Add(func.m_value2, DownloadTexture(func.m_value2, Path.Join(host, @"\bg\" + func.m_value2 + ".png")));
                     }
                     break;
                 case "CharaIn":
@@ -1619,17 +1614,17 @@ public class player : MonoBehaviour
                     }
                     break;
                 case "SpriteSet":
-                    if (!webTexture.ContainsKey(func.m_value2))
+                    if (!LoadingIEnumerators.ContainsKey(func.m_value2))
                     {
-                        LoadingCoroutines.Add(StartCoroutine(DownloadTexture(func.m_value2, Path.Join(host, @"\sprite\" + func.m_value2 + ".png"))), func.m_value2);
+                        LoadingIEnumerators.Add(func.m_value2, DownloadTexture(func.m_value2, Path.Join(host, @"\sprite\" + func.m_value2 + ".png")));
                     }
                     break;
                 case "SetCaptionBGSprite":
                     if (func.m_value1 != "無し")
                     {
-                        if (!webTexture.ContainsKey(func.m_value1))
+                        if (!LoadingIEnumerators.ContainsKey(func.m_value1))
                         {
-                            LoadingCoroutines.Add(StartCoroutine(DownloadTexture(func.m_value1, Path.Join(host, @"\sprite\" + func.m_value1 + ".png"))), func.m_value1);
+                            LoadingIEnumerators.Add(func.m_value1, DownloadTexture(func.m_value1, Path.Join(host, @"\sprite\" + func.m_value1 + ".png")));
                         }
                     }
                     break;
@@ -1702,9 +1697,9 @@ public class player : MonoBehaviour
                     textparam = advScriptText.m_Params[int.Parse(func.m_value1)];
                     if (textparam.m_voiceLabel.StartsWith("voice"))
                     {
-                        if (!webAudio.ContainsKey(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel))
+                        if (!LoadingIEnumerators.ContainsKey(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel))
                         {
-                            LoadingCoroutines.Add(StartCoroutine(DownloadAudio(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, Path.Join(host, @"\cuesheet\" + advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel + "." + audioMode), audioMode)), advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel);
+                            LoadingIEnumerators.Add(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, DownloadAudio(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, Path.Join(host, @"\cuesheet\" + advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel + "." + audioMode), audioMode));
                         }
                     }
                     if (func.argNum == 3)
@@ -1782,15 +1777,15 @@ public class player : MonoBehaviour
                     DownloadPackEffect(func.m_value2);
                     break;
                 case "PlayBGM":
-                    if (!webAudio.ContainsKey(func.m_value1))
+                    if (!LoadingIEnumerators.ContainsKey(func.m_value1))
                     {
-                        LoadingCoroutines.Add(StartCoroutine(DownloadAudio(func.m_value1, Path.Join(host, @"\bgm\" + func.m_value1 + ".wav"), "wav")), func.m_value1);
+                        LoadingIEnumerators.Add(func.m_value1, DownloadAudio(func.m_value1, Path.Join(host, @"\bgm\" + func.m_value1 + ".wav"), "wav"));
                     }
                     break;
                 case "PlaySE":
-                    if (!webAudio.ContainsKey(func.m_value1))
+                    if (!LoadingIEnumerators.ContainsKey(func.m_value1))
                     {
-                        LoadingCoroutines.Add(StartCoroutine(DownloadAudio(func.m_value1, Path.Join(host, @"\se\" + func.m_value1 + ".wav"), "wav")), func.m_value1);
+                        LoadingIEnumerators.Add(func.m_value1, DownloadAudio(func.m_value1, Path.Join(host, @"\se\" + func.m_value1 + ".wav"), "wav"));
                     }
                     break;
                 case "PlayVOICE":
@@ -1816,9 +1811,9 @@ public class player : MonoBehaviour
                     }
                     break;
                 case "PlayFULLVOICE":
-                    if (!webAudio.ContainsKey(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1))
+                    if (!LoadingIEnumerators.ContainsKey(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1))
                     {
-                        LoadingCoroutines.Add(StartCoroutine(DownloadAudio(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, Path.Join(host, @"\cuesheet\" + advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1 + "." + audioMode), audioMode)), advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1);
+                        LoadingIEnumerators.Add(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, DownloadAudio(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, Path.Join(host, @"\cuesheet\" + advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1 + "." + audioMode), audioMode));
                     }
                     break;
                 default:
@@ -1852,9 +1847,9 @@ public class player : MonoBehaviour
                                 }
                                 break;
                             case "se":
-                                if (!webAudio.ContainsKey(command[1]))
+                                if (!LoadingIEnumerators.ContainsKey(command[1]))
                                 {
-                                    LoadingCoroutines.Add(StartCoroutine(DownloadAudio(command[1], Path.Join(host, @"\se\" + command[1] + ".wav"), "wav")), command[1]);
+                                    LoadingIEnumerators.Add(command[1], DownloadAudio(command[1], Path.Join(host, @"\se\" + command[1] + ".wav"), "wav"));
                                 }
                                 break;
                             case "emo":
@@ -2472,11 +2467,10 @@ public class player : MonoBehaviour
             Destroy(gameObject);
         }
         webGameObject = new Dictionary<string, GameObject>();
-        LoadingCoroutines = new Dictionary<Coroutine, string>();
+        LoadingIEnumerators = new Dictionary<string, IEnumerator>();
         LoadedPacks = new List<string>();
         Jsons = new Dictionary<int, string[]>();
         LoadedAssets = new List<string>();
-        RequiredAssets = new List<string>();
         PreloadEnd = false;
         List<Coroutine> Preloads = new List<Coroutine>();
         if (ADVIDs[0] == -2)
@@ -2506,6 +2500,7 @@ public class player : MonoBehaviour
                 Debug.Log(ADVIDs[2]);
             }
         }
+        Coroutine coroutine = StartCoroutine(LoadingStart());
         for (int i = 0; i < ADVIDs.Count; i++)
         {
             int ADVID = ADVIDs[i];
@@ -2521,16 +2516,26 @@ public class player : MonoBehaviour
             {
                 if (advlist_Params.m_ScriptName != "" || advlist_Params.m_ComicGroupName != "")
                 {
-                    Preloads.Add(StartCoroutine(Preload(ADVID)));
+                    yield return StartCoroutine(Preload(ADVID));
                 }
             }
         }
-        Coroutine coroutine = StartCoroutine(LoadingStart());
-        foreach (Coroutine preload in Preloads)
-        {
-            yield return preload;
-        }
         PreloadEnd = true;
+        int maxConcurrentLoads = 10, currentActiveLoads = 0;
+        Queue<IEnumerator> pendingQueue = new Queue<IEnumerator>(LoadingIEnumerators.Values);
+        while (pendingQueue.Count > 0 || currentActiveLoads > 0)
+        {
+            while (currentActiveLoads < maxConcurrentLoads && pendingQueue.Count > 0)
+            {
+                IEnumerator nextAsset = pendingQueue.Dequeue();
+                currentActiveLoads++;
+                StartCoroutine(LoadSingleAssetRoutine(nextAsset, () => 
+                {
+                    currentActiveLoads--; 
+                }));
+            }
+            yield return null; 
+        }
         yield return coroutine;
         SetUp();
         Playing = true;
@@ -2549,11 +2554,17 @@ public class player : MonoBehaviour
             }
             ADVID = ADVIDs[ADVIndex];
         }
+        Debug.Log(ADVID);
         SetWindowText(GetActiveWindow(), "krfadvplayer - " + ADVID.ToString());
         advScript = advScripts[ADVID];
         advScriptText = advScriptTexts[ADVID];
         StartCoroutine(autoSpin());
         PenCoroutine = StartCoroutine(PenCycle());
+    }
+    private IEnumerator LoadSingleAssetRoutine(IEnumerator loadRoutine, Action onComplete)
+    {
+        yield return StartCoroutine(loadRoutine);
+        onComplete?.Invoke();
     }
     private IEnumerator EndingLoading()
     {
@@ -2625,7 +2636,7 @@ public class player : MonoBehaviour
         GameObject Loaded = new GameObject("Loaded");
         Loaded.transform.SetParent(SceneChange.transform);
         RectTransform loadedTransform = Loaded.AddComponent<RectTransform>();
-        loadedTransform.localPosition = new Vector3(0f, 0f, 0f);
+        loadedTransform.localPosition = new Vector3(-300f, 0f, 0f);
         loadedTransform.sizeDelta = new Vector2(1000f, 1000f);
         loadedTransform.localScale = new Vector3(1f, 1f, 1f);
         Text loadedText = Loaded.AddComponent<Text>();
@@ -2657,60 +2668,81 @@ public class player : MonoBehaviour
             yield return null;
         }
         loadedText.text = "";
-        int lineLimit = 100;
-        List<string> toloadshown = new List<string>(RequiredAssets);
-        while (shown.Count != RequiredAssets.Count)
+        int lineLimit = 40;
+        List<string> toloadshown = new List<string>(LoadingIEnumerators.Keys);
+        int dotStatus = 0, newDotStatus = 0;
+        Queue<string> loadedLinesQueue = new Queue<string>();
+        StringBuilder toloadBuilder = new StringBuilder();
+        int processedAssetCount = 0; 
+        bool uiNeedsUpdate = false;
+        while (shown.Count != LoadingIEnumerators.Count)
         {
-            foreach (string asset in LoadedAssets)
+            uiNeedsUpdate = false;
+            while (processedAssetCount < LoadedAssets.Count)
             {
+                string asset = LoadedAssets[processedAssetCount];
+
                 if (!shown.Contains(asset))
                 {
                     shown.Add(asset);
-                    loadedText.text += '\n' + "(" + shown.Count + "/" + RequiredAssets.Count + ")" + asset;
-                    if (shown.Count > lineLimit)
+                    string newLine = $"({shown.Count}/{LoadingIEnumerators.Count}) {asset}";
+                    loadedLinesQueue.Enqueue(newLine);
+                    if (loadedLinesQueue.Count > lineLimit)
                     {
-                        loadedText.text = loadedText.text[(loadedText.text.IndexOf('\n') + 1)..];
+                        loadedLinesQueue.Dequeue();
+                    }
+                    if (toloadshown.Contains(asset))
+                    {
+                        toloadshown.Remove(asset);
+                    }
+                    uiNeedsUpdate = true;
+                }
+                processedAssetCount++;
+            }
+            if (uiNeedsUpdate)
+            {
+                loadedText.text = string.Join("\n", loadedLinesQueue);
+                toloadBuilder.Clear();
+                int toloadCount = 0;
+                foreach (string asset in toloadshown)
+                {
+                    toloadBuilder.AppendLine(asset);
+                    toloadCount++;
+                    if (toloadCount > lineLimit)
+                    {
+                        break;
                     }
                 }
-                if (toloadshown.Contains(asset))
-                {
-                    toloadshown.Remove(asset);
-                }
-            }
-            toloadText.text = "";
-            int toloadCount = 0;
-            foreach (string asset in toloadshown)
-            {
-                toloadText.text += asset + '\n';
-                toloadCount++;
-                if (toloadCount > lineLimit)
-                {
-                    break;
-                }
+                toloadText.text = toloadBuilder.ToString();
             }
             timeElapsed += Time.deltaTime;
-            switch ((int)(timeElapsed * 4 % 4))
+            newDotStatus = (int)(timeElapsed * 4 % 4);
+            if (newDotStatus != dotStatus)
             {
-                case 0:
-                    Dot1.SetActive(false);
-                    Dot2.SetActive(false);
-                    Dot3.SetActive(false);
-                    break;
-                case 1:
-                    Dot1.SetActive(true);
-                    Dot2.SetActive(false);
-                    Dot3.SetActive(false);
-                    break;
-                case 2:
-                    Dot1.SetActive(true);
-                    Dot2.SetActive(true);
-                    Dot3.SetActive(false);
-                    break;
-                case 3:
-                    Dot1.SetActive(true);
-                    Dot2.SetActive(true);
-                    Dot3.SetActive(true);
-                    break;
+                dotStatus = newDotStatus;
+                switch ((int)(timeElapsed * 4 % 4))
+                {
+                    case 0:
+                        Dot1.SetActive(false);
+                        Dot2.SetActive(false);
+                        Dot3.SetActive(false);
+                        break;
+                    case 1:
+                        Dot1.SetActive(true);
+                        Dot2.SetActive(false);
+                        Dot3.SetActive(false);
+                        break;
+                    case 2:
+                        Dot1.SetActive(true);
+                        Dot2.SetActive(true);
+                        Dot3.SetActive(false);
+                        break;
+                    case 3:
+                        Dot1.SetActive(true);
+                        Dot2.SetActive(true);
+                        Dot3.SetActive(true);
+                        break;
+                }
             }
             yield return null;
         }
@@ -3049,6 +3081,7 @@ public class player : MonoBehaviour
     }
     private advcharacterlist_Params GetCharaParams(string ADVCharaID)
     {
+        if (ADVCharaID == null){ return null; }
         charaParamsLookup.TryGetValue(ADVCharaID, out advcharacterlist_Params result);
         return result;
     }
@@ -4026,7 +4059,7 @@ public class player : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
-            if (bg == null) { BGScaling.Remove(ID); yield break; }
+            if (bg == null) { BGScaling.RemoveAll(item => item == ID); yield break; }
             timeElapsed += Time.deltaTime;
             float scale = Mathf.Lerp(startScale, Scale, Ease(timeElapsed / Sec, CurveType));
             bgProperties.Scale = scale;
@@ -4046,7 +4079,7 @@ public class player : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
-            if (bg == null) { BGScrolling.Remove(ID); yield break; }
+            if (bg == null) { BGScrolling.RemoveAll(item => item == ID); yield break; }
             timeElapsed += Time.deltaTime;
             float x_axis = Mathf.Lerp(startPos[0], X, Ease(timeElapsed / Sec, CurveType));
             float y_axis = Mathf.Lerp(startPos[1], Y, Ease(timeElapsed / Sec, CurveType));
@@ -4087,16 +4120,16 @@ public class player : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
-            if (sprite == null) { SpriteScaling.Remove(ID); yield break; }
+            if (sprite == null) { SpriteScaling.RemoveAll(item => item == ID); yield break; }
             timeElapsed += Time.deltaTime;
             float x = Mathf.Lerp(start[0], X, timeElapsed / Sec);
             float y = Mathf.Lerp(start[1], Y, timeElapsed / Sec);
             rectTransform.localScale = new Vector3(x, y, 1f);
             yield return null;
         }
-        if (sprite == null) { SpriteScaling.Remove(ID); yield break; }
+        if (sprite == null) { SpriteScaling.RemoveAll(item => item == ID); yield break; }
         rectTransform.localScale = new Vector3(X, Y, 1f);
-        SpriteScaling.Remove(ID);
+        SpriteScaling.RemoveAll(item => item == ID);
     }
     private IEnumerator SpritePosChange(uint ID, float X, float Y, float Sec)
     {
@@ -4108,16 +4141,16 @@ public class player : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
-            if (sprite == null) { SpritePosing.Remove(ID); yield break; }
+            if (sprite == null) { SpritePosing.RemoveAll(item => item == ID); yield break; }
             timeElapsed += Time.deltaTime;
             float x = Mathf.Lerp(start[0], X, timeElapsed / Sec);
             float y = Mathf.Lerp(start[1], Y, timeElapsed / Sec);
             rectTransform.anchoredPosition = new Vector3(x, y, 0f);
             yield return null;
         }
-        if (sprite == null) { SpritePosing.Remove(ID); yield break; }
+        if (sprite == null) { SpritePosing.RemoveAll(item => item == ID); yield break; }
         rectTransform.anchoredPosition = new Vector3(X, Y, 1f);
-        SpritePosing.Remove(ID);
+        SpritePosing.RemoveAll(item => item == ID);
     }
     private IEnumerator SpriteFade(uint ID, float Sec, float A)
     {
@@ -4131,17 +4164,17 @@ public class player : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
-            if (sprite == null) { SpriteFading.Remove(ID); yield break; }
+            if (sprite == null) { SpriteFading.RemoveAll(item => item == ID); yield break; }
             timeElapsed += Time.deltaTime;
             float a = Mathf.Lerp(start, A, timeElapsed / Sec);
             spriteProperties.fade = a;
-            spriteRenderer.color = new Color(color.r, color.g, color.b, color.a * spriteProperties.fade * (spriteProperties.VisibleFlg ? 1 : 0));
+            spriteRenderer.color = new Color(color.r, color.g, color.b, color.a * spriteProperties.fade);
             yield return null;
         }
-        if (sprite == null) { SpriteFading.Remove(ID); yield break; }
+        if (sprite == null) { SpriteFading.RemoveAll(item => item == ID); yield break; }
         spriteProperties.fade = A;
-        spriteRenderer.color = new Color(color.r, color.g, color.b, color.a * spriteProperties.fade * (spriteProperties.VisibleFlg ? 1 : 0));
-        SpriteFading.Remove(ID);
+        spriteRenderer.color = new Color(color.r, color.g, color.b, color.a * spriteProperties.fade);
+        SpriteFading.RemoveAll(item => item == ID);
     }
     private IEnumerator SpriteColorChange(uint ID, Color color, float Sec)
     {
@@ -4153,7 +4186,7 @@ public class player : MonoBehaviour
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
-            if (sprite == null) { SpriteColoring.Remove(ID); yield break; }
+            if (sprite == null) { SpriteColoring.RemoveAll(item => item == ID); yield break; }
             timeElapsed += Time.deltaTime;
             float r = Mathf.Lerp(start.r, color.r, timeElapsed / Sec);
             float g = Mathf.Lerp(start.g, color.g, timeElapsed / Sec);
@@ -4162,9 +4195,9 @@ public class player : MonoBehaviour
             spriteRenderer.color = new Color(r, g, b, a);
             yield return null;
         }
-        if (sprite == null) { SpriteColoring.Remove(ID); yield break; }
+        if (sprite == null) { SpriteColoring.RemoveAll(item => item == ID); yield break; }
         spriteRenderer.color = color;
-        SpriteColoring.Remove(ID);
+        SpriteColoring.RemoveAll(item => item == ID);
     }
     private IEnumerator Caption(uint textID)
     {
@@ -5220,10 +5253,11 @@ public class player : MonoBehaviour
             }
         }
         if (ef == null) { yield break; }
-        while (ProcessParticle(fPtcl, fPtclMat, fPtclRoot, ptclUnits, isCharaBehind, false, multiple))
+        while (ef != null && ProcessParticle(fPtcl, fPtclMat, fPtclRoot, ptclUnits, isCharaBehind, false, multiple))
         {
             yield return null;
         }
+        if (ef == null) { yield break; }
         foreach (MeshRenderer meshRenderer in ef.GetComponentsInChildren<MeshRenderer>())
         {
             Destroy(meshRenderer);
@@ -5727,105 +5761,8 @@ public class player : MonoBehaviour
                             particleUnitParams.meshRenderer.material.SetColor(_MeshColor, particleUnitParams.m_color);
                             break;
                         case 3:
-                            PrimLine prim = particleObjectParams.lines[index];
-                            int pointNum = prim.positions.Length;
-                            if (pointNum < 2) { 
-                                MeshFilter mf0 = particleObjectParams.m_thisTransform.GetComponent<MeshFilter>();
-                            }
-                            int vCount = pointNum * 2;
-                            int triCount = (pointNum - 1) * 6;
-                            if (polyLineVerts == null || polyLineVerts.Length < vCount)
                             {
-                                polyLineVerts = new Vector3[vCount];
-                                polyLineUVs = new Vector2[vCount];
-                                polyLineCols = new Color[vCount];
-                            }
-                            if (polyLineTris == null || polyLineTris.Length < triCount)
-                            {
-                                polyLineTris = new int[triCount];
-                            }
-                            for (int ii = 0; ii < pointNum; ii++)
-                            {
-                                Vector3 p = prim.positions[ii];
-                                Vector3 tangent;
-                                if (ii == 0) tangent = prim.positions[1] - prim.positions[0];
-                                else tangent = prim.positions[ii] - prim.positions[ii - 1];
-                                if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.right;
-                                Vector3 normal = Vector3.Cross(tangent.normalized, Vector3.forward);
-                                float w = (ii < prim.widths.Length ? prim.widths[ii] : (prim.widths.LastOrDefault())) * 0.5f;
-                                polyLineVerts[ii * 2]     = p + normal * w;
-                                polyLineVerts[ii * 2 + 1] = p - normal * w;
-                                Vector2 uv = (prim.UVs != null && ii < prim.UVs.Length) ? prim.UVs[ii] : new Vector2(ii / Mathf.Max(1, pointNum - 1), 0f);
-                                polyLineUVs[ii * 2] = uv;
-                                polyLineUVs[ii * 2 + 1] = uv;
-                                Color c = (prim.colors != null && ii < prim.colors.Length) ? prim.colors[ii] : Color.white;
-                                polyLineCols[ii * 2] = c;
-                                polyLineCols[ii * 2 + 1] = c;
-
-                                if (ii < pointNum - 1)
-                                {
-                                    int vi = ii * 2;
-                                    int ti = ii * 6;
-                                    polyLineTris[ti + 0] = vi;
-                                    polyLineTris[ti + 1] = vi + 2;
-                                    polyLineTris[ti + 2] = vi + 1;
-                                    polyLineTris[ti + 3] = vi + 2;
-                                    polyLineTris[ti + 4] = vi + 3;
-                                    polyLineTris[ti + 5] = vi + 1;
-                                }
-                            }
-                            MeshFilter mf = particleObjectParams.m_thisTransform.GetComponent<MeshFilter>();
-                            if (mf == null) mf = particleObjectParams.m_thisTransform.gameObject.AddComponent<MeshFilter>();
-                            MeshRenderer mr = particleObjectParams.m_thisTransform.GetComponent<MeshRenderer>();
-                            if (mr == null) mr = particleObjectParams.m_thisTransform.gameObject.AddComponent<MeshRenderer>();
-
-                            Mesh mesh = mf.sharedMesh;
-                            if (mesh == null) { mesh = new Mesh(); mesh.name = "PrimLineMesh"; mesh.MarkDynamic(); mf.sharedMesh = mesh; }
-                            mesh.Clear();
-                            if (polyLineVerts.Length == vCount)
-                            {
-                                mesh.vertices = polyLineVerts;
-                            }
-                            else
-                            {
-                                Vector3[] trimVerts = new Vector3[vCount];
-                                Array.Copy(polyLineVerts, trimVerts, vCount);
-                                mesh.vertices = trimVerts;
-                            }
-                            if (polyLineTris.Length == triCount)
-                            {
-                                mesh.triangles = polyLineTris;
-                            }
-                            else
-                            {
-                                int[] trimTris = new int[triCount];
-                                Array.Copy(polyLineTris, trimTris, triCount);
-                                mesh.triangles = trimTris;
-                            }
-                            if (polyLineUVs.Length == vCount)
-                            {
-                                mesh.uv = polyLineUVs;
-                            }
-                            else
-                            {
-                                Vector2[] trimUVs = new Vector2[vCount];
-                                Array.Copy(polyLineUVs, trimUVs, vCount);
-                                mesh.uv = trimUVs;
-                            }
-                            if (polyLineCols.Length == vCount)
-                            {
-                                mesh.colors = polyLineCols;
-                            }
-                            else
-                            {
-                                Color[] trimCols = new Color[vCount];
-                                Array.Copy(polyLineCols, trimCols, vCount);
-                                mesh.colors = trimCols;
-                            }
-                            mesh.RecalculateBounds();
-                            break;
-                            /*{
-                                PrimLine line = particleObjectParams.lines[index];
+                                PrimLine prim = particleObjectParams.lines[index];
                                 int linePoints = particleUnitParams.m_polyLine.m_jointNum + 2;
                                 int historyPoints = particleUnitParams.m_polyLine.m_HistoryPointNum;
                                 for (int j = historyPoints - 1; j >= 1; j--)
@@ -5837,16 +5774,14 @@ public class player : MonoBehaviour
                                 {
                                     for (int j = 0; j < linePoints; j++)
                                     {
-                                        Vector3 pos = particleUnitParams.m_polyLine.m_pPos[j];
-                                        line.positions[j] = pos;
-                                        Vector2 uv = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
-                                        line.UVs[j] = uv;
-                                        line.UWidths[j] = particleUnitParams.m_uvRect.height;
+                                        prim.positions[j] = particleUnitParams.m_polyLine.m_pPos[j];
+                                        prim.UVs[j] = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
+                                        prim.UWidths[j] = particleUnitParams.m_uvRect.height;
                                         PolyLine polyLine = particleUnitParams.m_polyLine;
-                                        line.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
+                                        prim.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
                                         if (particleUnitParams.m_aliveCount > j + 2)
                                         {
-                                            line.colors[j] = particleUnitParams.m_color;
+                                            prim.colors[j] = particleUnitParams.m_color;
                                         }
                                     }
                                 }
@@ -5860,21 +5795,114 @@ public class player : MonoBehaviour
                                         float Rate = pointFraction - point;
                                         float rateSqr = Rate * Rate;
                                         float rateCub = Rate * rateSqr;
-                                        Vector3 vector4 = ((2f * rateSqr - rateCub - Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Max(point - 1, 0)] + (3f * rateCub - 5f * rateSqr + 2f) * particleUnitParams.m_polyLine.m_pPos[point] + (4f * rateSqr - 3f * rateCub + Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 1, historyPoints - 1)] + (rateCub - rateSqr) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 2, historyPoints - 1)]) * 0.5f;
-                                        line.positions[j] = vector4;
-                                        Vector2 uv = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
-                                        line.UVs[j] = uv;
-                                        line.UWidths[j] = particleUnitParams.m_uvRect.height;
+                                        Vector3 vector4 = ((2f * rateSqr - rateCub - Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Max(point - 1, 0)]
+                                            + (3f * rateCub - 5f * rateSqr + 2f) * particleUnitParams.m_polyLine.m_pPos[point]
+                                            + (4f * rateSqr - 3f * rateCub + Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 1, historyPoints - 1)]
+                                            + (rateCub - rateSqr) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 2, historyPoints - 1)]) * 0.5f;
+                                        prim.positions[j] = vector4;
+                                        prim.UVs[j] = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
+                                        prim.UWidths[j] = particleUnitParams.m_uvRect.height;
                                         PolyLine polyLine = particleUnitParams.m_polyLine;
-                                        line.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
+                                        prim.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
                                         if (particleUnitParams.m_aliveCount > j / points + 2f)
                                         {
-                                            line.colors[j] = particleUnitParams.m_color;
+                                            prim.colors[j] = particleUnitParams.m_color;
                                         }
                                     }
                                 }
+                                int pointNum = prim.positions.Length;
+                                if (pointNum < 2) { break; }
+                                int vCount = pointNum * 2;
+                                int triCount = (pointNum - 1) * 6;
+                                if (polyLineVerts == null || polyLineVerts.Length < vCount)
+                                {
+                                    polyLineVerts = new Vector3[vCount];
+                                    polyLineUVs = new Vector2[vCount];
+                                    polyLineCols = new Color[vCount];
+                                }
+                                if (polyLineTris == null || polyLineTris.Length < triCount)
+                                {
+                                    polyLineTris = new int[triCount];
+                                }
+                                for (int ii = 0; ii < pointNum; ii++)
+                                {
+                                    Vector3 p = prim.positions[ii];
+                                    Vector3 tangent;
+                                    if (ii == 0) tangent = prim.positions[1] - prim.positions[0];
+                                    else tangent = prim.positions[ii] - prim.positions[ii - 1];
+                                    if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.right;
+                                    Vector3 normal = Vector3.Cross(tangent.normalized, Vector3.forward);
+                                    float w = (ii < prim.widths.Length ? prim.widths[ii] : (prim.widths.LastOrDefault())) * 0.5f;
+                                    polyLineVerts[ii * 2]     = p + normal * w;
+                                    polyLineVerts[ii * 2 + 1] = p - normal * w;
+                                    Vector2 meshUV = (prim.UVs != null && ii < prim.UVs.Length) ? prim.UVs[ii] : new Vector2(ii / Mathf.Max(1, pointNum - 1), 0f);
+                                    polyLineUVs[ii * 2] = meshUV;
+                                    polyLineUVs[ii * 2 + 1] = meshUV;
+                                    Color c = (prim.colors != null && ii < prim.colors.Length) ? prim.colors[ii] : Color.white;
+                                    polyLineCols[ii * 2] = c;
+                                    polyLineCols[ii * 2 + 1] = c;
+                                    if (ii < pointNum - 1)
+                                    {
+                                        int vi = ii * 2;
+                                        int ti = ii * 6;
+                                        polyLineTris[ti + 0] = vi;
+                                        polyLineTris[ti + 1] = vi + 2;
+                                        polyLineTris[ti + 2] = vi + 1;
+                                        polyLineTris[ti + 3] = vi + 2;
+                                        polyLineTris[ti + 4] = vi + 3;
+                                        polyLineTris[ti + 5] = vi + 1;
+                                    }
+                                }
+                                MeshFilter mf = particleObjectParams.m_thisTransform.GetComponent<MeshFilter>();
+                                if (mf == null) mf = particleObjectParams.m_thisTransform.gameObject.AddComponent<MeshFilter>();
+                                MeshRenderer mr = particleObjectParams.m_thisTransform.GetComponent<MeshRenderer>();
+                                if (mr == null) mr = particleObjectParams.m_thisTransform.gameObject.AddComponent<MeshRenderer>();
+                                Mesh mesh = mf.sharedMesh;
+                                if (mesh == null || !mesh.isReadable) { mesh = new Mesh(); mesh.name = "PrimLineMesh"; mesh.MarkDynamic(); mf.sharedMesh = mesh; }
+                                mesh.Clear();
+                                if (polyLineVerts.Length == vCount)
+                                {
+                                    mesh.vertices = polyLineVerts;
+                                }
+                                else
+                                {
+                                    Vector3[] trimVerts = new Vector3[vCount];
+                                    Array.Copy(polyLineVerts, trimVerts, vCount);
+                                    mesh.vertices = trimVerts;
+                                }
+                                if (polyLineTris.Length == triCount)
+                                {
+                                    mesh.triangles = polyLineTris;
+                                }
+                                else
+                                {
+                                    int[] trimTris = new int[triCount];
+                                    Array.Copy(polyLineTris, trimTris, triCount);
+                                    mesh.triangles = trimTris;
+                                }
+                                if (polyLineUVs.Length == vCount)
+                                {
+                                    mesh.uv = polyLineUVs;
+                                }
+                                else
+                                {
+                                    Vector2[] trimUVs = new Vector2[vCount];
+                                    Array.Copy(polyLineUVs, trimUVs, vCount);
+                                    mesh.uv = trimUVs;
+                                }
+                                if (polyLineCols.Length == vCount)
+                                {
+                                    mesh.colors = polyLineCols;
+                                }
+                                else
+                                {
+                                    Color[] trimCols = new Color[vCount];
+                                    Array.Copy(polyLineCols, trimCols, vCount);
+                                    mesh.colors = trimCols;
+                                }
+                                mesh.RecalculateBounds();
                                 break;
-                            }*/
+                            }
                         case 4:
                             ptclUnit.transform.position = particleUnitParams.m_pos + particleUnitParams.m_offset;
                             ptclUnit.transform.localScale = new Vector3(particleUnitParams.m_confetti.m_width * particleUnitParams.m_scale, particleUnitParams.m_confetti.m_height * particleUnitParams.m_scale, 1f);
@@ -6550,6 +6578,11 @@ public class player : MonoBehaviour
     }
     private void CharaShot(string ADVCharaID, string ADVCharaID2, string ADVCharaID3, string ADVCharaID4, string ADVCharaID5)
     {
+        foreach (string chara in CharasExist.Keys)
+        {
+            if (charaCoroutinesDict[chara]["destroy"] != null) { StopCoroutine(charaCoroutinesDict[chara]["destroy"]); }
+            charaCoroutinesDict[chara]["destroy"] = StartCoroutine(DestroyAfterAnimation(chara, new List<Coroutine> { }));
+        }
         string[] ADVCharaIDs = new string[5] { ADVCharaID, ADVCharaID2, ADVCharaID3, ADVCharaID4, ADVCharaID5 };
         for (int i = 0; i < 5; i++)
         {
@@ -6579,11 +6612,13 @@ public class player : MonoBehaviour
     }
     private void CharaOut(string ADVCharaID)
     {
+        if (!CharasExist.ContainsKey(ADVCharaID)) { return; }
         if (charaCoroutinesDict[ADVCharaID]["destroy"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["destroy"]); }
         charaCoroutinesDict[ADVCharaID]["destroy"] = StartCoroutine(DestroyAfterAnimation(ADVCharaID, new List<Coroutine> { }));
     }
     private void CharaOut(string ADVCharaID, int EndSide, float Sec, int CurveType)
     {
+        if (!CharasExist.ContainsKey(ADVCharaID)) { return; }
         Coroutine MoveCoroutine = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[EndSide == 0 ? -1 : -2], 0, Sec, CurveType));
         if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
         charaCoroutinesDict[ADVCharaID]["move"] = MoveCoroutine;
@@ -6643,6 +6678,11 @@ public class player : MonoBehaviour
     }
     private void CharaShotFade(string ADVCharaID, string ADVCharaID2, string ADVCharaID3, string ADVCharaID4, string ADVCharaID5, float Sec)
     {
+        foreach (string chara in CharasExist.Keys)
+        {
+            if (charaCoroutinesDict[chara]["destroy"] != null) { StopCoroutine(charaCoroutinesDict[chara]["destroy"]); }
+            charaCoroutinesDict[chara]["destroy"] = StartCoroutine(DestroyAfterAnimation(chara, new List<Coroutine> { }));
+        }
         string[] ADVCharaIDs = new string[5] { ADVCharaID, ADVCharaID2, ADVCharaID3, ADVCharaID4, ADVCharaID5 };
         for (int i = 0; i < 5; i++)
         {
@@ -7060,9 +7100,8 @@ public class player : MonoBehaviour
         spriteProperties.ID = ID;
         spriteProperties.pos = new Vector2(0f, 0f);
         spriteProperties.scale = new Vector2(0f, 0f);
-        spriteProperties.VisibleFlg = false;
         spriteProperties.color = new Color(1f, 1f, 1f, 1f);
-        spriteProperties.fade = 1f;
+        spriteProperties.fade = 0f;
     }
     private void SpriteScale(uint ID, float X, float Y, float Sec)
     {
@@ -7080,9 +7119,9 @@ public class player : MonoBehaviour
     {
         GameObject sprite = FindCached("Sprite_" + ID.ToString());
         SpriteProperties spriteProperties = sprite.GetComponent<SpriteProperties>();
-        spriteProperties.VisibleFlg = VisibleFlg == 1;
+        spriteProperties.fade = VisibleFlg == 1 ? 1f : 0f;
         Color color = spriteProperties.color;
-        sprite.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, color.a * spriteProperties.fade * (spriteProperties.VisibleFlg ? 1 : 0));
+        sprite.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, color.a * spriteProperties.fade);
     }
     private void SpriteColor(uint ID, string RGBA, float Sec)
     {
@@ -7248,6 +7287,7 @@ public class player : MonoBehaviour
         }
         foreach (string[] emoremove in emoremoves)
         {
+            Destroy(Emotioning[emoremove]);
             Emotioning.Remove(emoremove);
         }
     }
@@ -8179,6 +8219,10 @@ public class player : MonoBehaviour
                         Destroy(transform.gameObject);
                     }
                     foreach (Transform transform in effectCanvas.GetComponentsInChildren<Transform>()[1..])
+                    {
+                        Destroy(transform.gameObject);
+                    }
+                    foreach (Transform transform in particleObj.GetComponentsInChildren<Transform>()[1..])
                     {
                         Destroy(transform.gameObject);
                     }
