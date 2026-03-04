@@ -2343,10 +2343,54 @@ public class player : MonoBehaviour
             newCamera.backgroundColor = new Color(0f, 0f, 0f, 0f);
             newCamera.cullingMask = 1 << LayerMask.NameToLayer("Chara" + i.ToString());
         }
+        GameObject cameraEfObj = new GameObject("Camera_Effect");
+        cameraEfObj.transform.SetParent(camerasObj.transform);
+        RenderTexture renderTextureEffect = new RenderTexture(4000, 2250, 24);
+        Camera cameraEf = cameraEfObj.AddComponent<Camera>();
+        cameraEf.transform.position = new Vector3(0f, -10000f, -10000f);
+        cameraEf.orthographic = true;
+        cameraEf.orthographicSize = 375;
+        cameraEf.nearClipPlane = 0.3f;
+        cameraEf.farClipPlane = 200000f;
+        cameraEf.backgroundColor = new Color(0f, 0f, 0f, 0f);
+        cameraEf.cullingMask = 1 << LayerMask.NameToLayer("Effect");
+        cameraEf.targetTexture = renderTextureEffect;
+        GameObject cameraEfCBObj = new GameObject("Camera_Effect_CharaBehind");
+        cameraEfCBObj.transform.SetParent(camerasObj.transform);
+        RenderTexture renderTextureEffectCB = new RenderTexture(4000, 2250, 24);
+        Camera cameraEfCB = cameraEfCBObj.AddComponent<Camera>();
+        cameraEfCB.transform.position = new Vector3(0f, -10000f, -10000f);
+        cameraEfCB.orthographic = true;
+        cameraEfCB.orthographicSize = 375;
+        cameraEfCB.nearClipPlane = 0.3f;
+        cameraEfCB.farClipPlane = 200000f;
+        cameraEfCB.backgroundColor = new Color(0f, 0f, 0f, 0f);
+        cameraEfCB.cullingMask = 1 << LayerMask.NameToLayer("Effect_CharaBehind");
+        cameraEfCB.targetTexture = renderTextureEffectCB;
         renderTextureObj = new GameObject("RenderTextures");
         renderTextureObj.transform.position = new Vector3(0f, 0f, 0f);
+        GameObject RTEfObj = new GameObject("RenderTexturesEffect");
+        RTEfObj.transform.position = new Vector3(0f, 0f, 0f);
+        GameObject RTEf = new GameObject("Effect_RT");
+        RTEf.transform.SetParent(RTEfObj.transform);
+        RTEf.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
+        RTEf.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, cameraEf.targetTexture);
+        RTEf.GetComponent<MeshRenderer>().sortingOrder = -99;
+        RTEf.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
+        rectTransform = RTEf.AddComponent<RectTransform>();
+        rectTransform.localScale = new Vector3(1f, 1f, 1f);
+        rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
+        GameObject RTEfCB = new GameObject("Effect_CharaBehind_RT");
+        RTEfCB.transform.SetParent(RTEfObj.transform);
+        RTEfCB.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
+        RTEfCB.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, cameraEfCB.targetTexture);
+        RTEfCB.GetComponent<MeshRenderer>().sortingOrder = -1099;
+        RTEfCB.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
+        rectTransform = RTEfCB.AddComponent<RectTransform>();
+        rectTransform.localScale = new Vector3(1f, 1f, 1f);
+        rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
         particleObj = new GameObject("Particle");
-        particleObj.transform.position = new Vector3(0f, 0f, 0f);
+        particleObj.transform.position = new Vector3(0f, -10000f, 0f);
         if (useCustomJson)
         {
             StartCoroutine(LoadCustomJson());
@@ -4403,6 +4447,7 @@ public class player : MonoBehaviour
     private IEnumerator PlayEffect(GameObject ef, GameObject asset, string EffectID, float X, float Y, float Rotate, bool isCharaBehind, bool isLoop, float multiple, int sortingOrder, bool isMuted)
     {
         RectTransform rectTransform = ef.GetComponent<RectTransform>();
+        ef.layer = isCharaBehind ? 31 : 30;
         ef.transform.SetParent(effectCanvas.transform);
         efjsonanimclip efJsonAnimClip = null;
         if (webText.ContainsKey(EffectID + @"\" + EffectID + "@Take 001.json"))
@@ -4472,6 +4517,7 @@ public class player : MonoBehaviour
                 efObject.transform.localPosition = efCloneObject.transform.localPosition;
                 efObject.transform.localRotation = efCloneObject.transform.localRotation;
                 efObject.transform.localScale = efCloneObject.transform.localScale;
+                efObject.layer = isCharaBehind ? 31 : 30;
             }
             else if (msbHandler.m_MsbObjectHandlerArray.FirstOrDefault(param => param.m_Name == efCloneObject.name) != null)
             {
@@ -4519,6 +4565,7 @@ public class player : MonoBehaviour
                 efObject.transform.localPosition = efCloneObject.transform.localPosition;
                 efObject.transform.localRotation = efCloneObject.transform.localRotation;
                 efObject.transform.localScale = efCloneObject.transform.localScale;
+                efObject.layer = isCharaBehind ? 31 : 30;
             }
             else
             {
@@ -4538,7 +4585,7 @@ public class player : MonoBehaviour
                 meshRenderer.sortingOrder = isCharaBehind ? -1099 : -99;
                 meshRenderer.enabled = false;
                 meshFilter.mesh = efCloneObject.GetComponent<MeshFilter>().sharedMesh;
-                Material material = new Material(Shader.Find("CustomShader_EF"));
+                Material material = new Material(Shader.Find("CustomShader_COMMON"));
                 MsbMaterialHandler efMaterialHandler = msbHandler.m_MsbMaterialHandlerArray.First(param => param.m_Name == efCloneObject.GetComponent<MeshRenderer>().sharedMaterial.name);
                 switch (efMaterialHandler.m_Src.m_BlendMode)
                 {
@@ -5121,6 +5168,7 @@ public class player : MonoBehaviour
         {
             ptclUnits.Add(ptcl.Key, new List<GameObject>());
         }
+        Vector3 shift = new Vector3(0f, -10000f, 0f);
         if (!isLoop)
         {
             while (timeElapsed < animtime)
@@ -5136,7 +5184,7 @@ public class player : MonoBehaviour
                         float y = curves["positiony"].Evaluate(timeElapsed);
                         float cos = Mathf.Cos(Rotate * Mathf.Deg2Rad);
                         float sin = Mathf.Sin(Rotate * Mathf.Deg2Rad);
-                        rectTransform.anchoredPosition = new Vector3(X, Y, 0f) + multiple * new Vector3(x * cos - y * sin, x * sin + y * cos, curves["positionz"].Evaluate(timeElapsed));
+                        rectTransform.anchoredPosition = shift + new Vector3(X, Y, 0f) + multiple * new Vector3(x * cos - y * sin, x * sin + y * cos, curves["positionz"].Evaluate(timeElapsed));
                         rectTransform.localRotation = Quaternion.Euler(new Quaternion(curves["rotationx"].Evaluate(timeElapsed), curves["rotationy"].Evaluate(timeElapsed), curves["rotationz"].Evaluate(timeElapsed), curves["rotationw"].Evaluate(timeElapsed)).eulerAngles + new Vector3(0f, 180f, Rotate));
                         rectTransform.localScale = multiple * new Vector3(curves["scalex"].Evaluate(timeElapsed), curves["scaley"].Evaluate(timeElapsed), curves["scalez"].Evaluate(timeElapsed));
                         continue;
@@ -5179,7 +5227,7 @@ public class player : MonoBehaviour
                         float y = curves["positiony"].Evaluate(animtime);
                         float cos = Mathf.Cos(Rotate * Mathf.Deg2Rad);
                         float sin = Mathf.Sin(Rotate * Mathf.Deg2Rad);
-                        rectTransform.anchoredPosition = new Vector3(X, Y, 0f) + multiple * new Vector3(x * cos - y * sin, x * sin + y * cos, curves["positionz"].Evaluate(timeElapsed));
+                        rectTransform.anchoredPosition = shift + new Vector3(X, Y, 0f) + multiple * new Vector3(x * cos - y * sin, x * sin + y * cos, curves["positionz"].Evaluate(timeElapsed));
                         rectTransform.localRotation = Quaternion.Euler(new Quaternion(curves["rotationx"].Evaluate(animtime), curves["rotationy"].Evaluate(animtime), curves["rotationz"].Evaluate(animtime), curves["rotationw"].Evaluate(animtime)).eulerAngles + new Vector3(0f, 180f, Rotate));
                         rectTransform.localScale = multiple * new Vector3(curves["scalex"].Evaluate(animtime), curves["scaley"].Evaluate(animtime), curves["scalez"].Evaluate(animtime));
                         continue;
@@ -5229,7 +5277,7 @@ public class player : MonoBehaviour
                         float y = curves["positiony"].Evaluate(timeElapsed);
                         float cos = Mathf.Cos(Rotate * Mathf.Deg2Rad);
                         float sin = Mathf.Sin(Rotate * Mathf.Deg2Rad);
-                        rectTransform.anchoredPosition = new Vector3(X, Y, 0f) + multiple * new Vector3(x * cos - y * sin, x * sin + y * cos, curves["positionz"].Evaluate(timeElapsed));
+                        rectTransform.anchoredPosition = shift + new Vector3(X, Y, 0f) + multiple * new Vector3(x * cos - y * sin, x * sin + y * cos, curves["positionz"].Evaluate(timeElapsed));
                         rectTransform.localRotation = Quaternion.Euler(new Quaternion(curves["rotationx"].Evaluate(timeElapsed), curves["rotationy"].Evaluate(timeElapsed), curves["rotationz"].Evaluate(timeElapsed), curves["rotationw"].Evaluate(timeElapsed)).eulerAngles + new Vector3(0f, 180f, Rotate));
                         rectTransform.localScale = multiple * new Vector3(curves["scalex"].Evaluate(timeElapsed), curves["scaley"].Evaluate(timeElapsed), curves["scalez"].Evaluate(timeElapsed));
                         continue;
