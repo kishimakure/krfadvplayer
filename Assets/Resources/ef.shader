@@ -39,7 +39,7 @@ Shader "CustomShader_EF"
     SubShader
     {
         Tags {"Queue" = "Transparent" "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" }
-        Blend [_BlendSrc] [_BlendDst]
+        Blend [_BlendSrc] [_BlendDst], One OneMinusSrcAlpha
         //Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
         ZWrite Off
@@ -48,6 +48,7 @@ Shader "CustomShader_EF"
         {
             ZWrite On
             ZTest LEqual
+            
             HLSLPROGRAM
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #if defined(DEBUG_DISPLAY)
@@ -227,6 +228,7 @@ Shader "CustomShader_EF"
                 }
 
                 mainTex.a *= alpha;
+                //clip(mainTex.a - _AlphaTestRefValue);
                 mainTex.rgb /=_HDRFactor;
                 #if defined(DEBUG_DISPLAY)
                 SurfaceData2D surfaceData;

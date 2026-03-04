@@ -4475,11 +4475,6 @@ public class player : MonoBehaviour
             MsbObjectHandler msbParams = msbHandler.m_MsbObjectHandlerArray.FirstOrDefault(param => param.m_Name == ef.name);
             MeshFilter meshFilter = ef.AddComponent<MeshFilter>();
             MeshRenderer meshRenderer = ef.AddComponent<MeshRenderer>();
-            if (msbParams != null)
-            {
-                meshRenderer.sortingOrder = (isCharaBehind ? -1000 : 0) + msbParams.m_Src.m_RenderOrder + sortingOrder;
-            }
-            else { meshRenderer.sortingOrder = (isCharaBehind ? -1000 : 0) + sortingOrder; }
             meshFilter.mesh = efClone.GetComponent<MeshFilter>().sharedMesh;
             MsbMaterialHandler efMaterialHandler = msbHandler.m_MsbMaterialHandlerArray.First(param => param.m_Name == efClone.GetComponent<MeshRenderer>().sharedMaterial.name);
             Material material = new Material(Shader.Find("CustomShader_EF"));
@@ -4533,7 +4528,6 @@ public class player : MonoBehaviour
                 efObject.transform.SetParent(f[efCloneObject.transform.parent.gameObject].transform);
                 MeshFilter meshFilter = efObject.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = efObject.AddComponent<MeshRenderer>();
-                meshRenderer.sortingOrder = (isCharaBehind ? -1000 : 0) + msbParams.m_Src.m_RenderOrder + sortingOrder;
                 meshFilter.mesh = efCloneObject.GetComponent<MeshFilter>().sharedMesh;
                 MsbMaterialHandler efMaterialHandler = null;
                 if ("Lit" == efCloneObject.GetComponent<MeshRenderer>().sharedMaterial.name)
@@ -4587,7 +4581,6 @@ public class player : MonoBehaviour
                 RuleJson rule = meigeParticleEmitterJson.m_Rule;
                 MeshFilter meshFilter = ptclParent.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = ptclParent.AddComponent<MeshRenderer>();
-                meshRenderer.sortingOrder = isCharaBehind ? -1099 : -99;
                 meshRenderer.enabled = false;
                 meshFilter.mesh = efCloneObject.GetComponent<MeshFilter>().sharedMesh;
                 Material material = new Material(Shader.Find("CustomShader_COMMON"));
@@ -5399,7 +5392,6 @@ public class player : MonoBehaviour
                         particleUnitParams.meshRenderer = ptclUnit.AddComponent<MeshRenderer>();
                     }
                     particleUnitParams.meshRenderer.material = material;
-                    particleUnitParams.meshRenderer.sortingOrder = isCharaBehind ? -1099 : -99;
                     if (ptclUnit.GetComponent<MeshFilter>() == null)
                     {
                         ptclUnit.AddComponent<MeshFilter>().mesh = CreateMesh(1f, 1f, new Vector2(0.5f, 0.5f));
