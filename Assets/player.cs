@@ -2521,7 +2521,7 @@ public class player : MonoBehaviour
             }
         }
         PreloadEnd = true;
-        int maxConcurrentLoads = 10, currentActiveLoads = 0;
+        int maxConcurrentLoads = 20, currentActiveLoads = 0;
         Queue<IEnumerator> pendingQueue = new Queue<IEnumerator>(LoadingIEnumerators.Values);
         while (pendingQueue.Count > 0 || currentActiveLoads > 0)
         {
@@ -3969,6 +3969,7 @@ public class player : MonoBehaviour
             }
             foreach (CanvasGroup canvasGroup in cachedCanvasGroups)
             {
+                if (canvasGroup == null) { continue; }
                 canvasGroup.alpha = a;
             }
             talkerRenderer.color = new Color(1f, 1f, 1f, hasCharaName ? a : 0f);
@@ -3983,6 +3984,7 @@ public class player : MonoBehaviour
         }
         foreach (CanvasGroup canvasGroup in cachedCanvasGroups)
         {
+            if (canvasGroup == null) { continue; }
             canvasGroup.alpha = isVisible ? 1 : 0;
         }
         talkerRenderer.color = new Color(1f, 1f, 1f, hasCharaName ? (isVisible ? 1 : 0) : 0f);
