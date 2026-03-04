@@ -826,7 +826,7 @@ public class PathMoveComponentJson
     public RangeJson m_endFocusRadiusRange { get; set; }
     public List<RangeJson> m_FocusRadiusRange { get; set; }
 }
-public class PrimLine
+public class PrimPolyLine
 {
     public Line[] lines;
     public Vector3[] positions;
@@ -837,12 +837,19 @@ public class PrimLine
     public int lineNum;
     public int pointNum;
 }
+public class PrimLineArray : MonoBehaviour
+{
+    public Vector3[] vertices;
+    public Vector2[] uvs;
+    public Color[] colors;
+    public int[] triangles;
+}
 public class ParticleObjectParams : MonoBehaviour
 {
     public Transform m_thisTransform;
     public Matrix4x4 m_Matrix;
     public Matrix4x4 m_OldMatrix;
-    public List<PrimLine> lines;
+    public List<PrimPolyLine> lines;
 }
 public class ParticleUnitParams : MonoBehaviour
 {
@@ -877,6 +884,7 @@ public class ParticleUnitParams : MonoBehaviour
     public PathMoveComponent m_PathMoveComponent;
     public bool m_activeFlg;
     public MeshRenderer meshRenderer;
+    public float lastUpdateTime;
 }
 public class Billboard
 {
@@ -5351,17 +5359,17 @@ public class player : MonoBehaviour
             particleObjectParams.m_Matrix = particleObjectParams.m_thisTransform.localToWorldMatrix;
             if (rule.m_particleType == 3 && particleObjectParams.lines == null)
             {
-                particleObjectParams.lines = new List<PrimLine>();
+                particleObjectParams.lines = new List<PrimPolyLine>();
                 for (int i = 0; i < rule.m_particleNum; i++)
                 {
-                    PrimLine primLine = new PrimLine();
-                    primLine.lines = new Line[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primLine.widths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primLine.UWidths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primLine.positions = new Vector3[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primLine.UVs = new Vector2[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primLine.colors = new Color[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    particleObjectParams.lines.Add(primLine);
+                    PrimPolyLine primPolyLine = new PrimPolyLine();
+                    primPolyLine.lines = new Line[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    primPolyLine.widths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    primPolyLine.UWidths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    primPolyLine.positions = new Vector3[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    primPolyLine.UVs = new Vector2[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    primPolyLine.colors = new Color[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    particleObjectParams.lines.Add(primPolyLine);
                 }
             }
             for (int i = ptclUnits[ptclDummy].Count; i < ptclUnits[ptclDummy].Count + ptclCount; i++)
@@ -5394,7 +5402,7 @@ public class player : MonoBehaviour
                     particleUnitParams.meshRenderer.material = material;
                     if (ptclUnit.GetComponent<MeshFilter>() == null)
                     {
-                        ptclUnit.AddComponent<MeshFilter>().mesh = CreateMesh(1f, 1f, new Vector2(0.5f, 0.5f));
+                        ptclUnit.AddComponent<MeshFilter>().mesh = new Mesh();
                     }
                     particleUnitParams.m_Index = i;
                     particleUnitParams.m_particleType = rule.m_particleType;
@@ -5402,6 +5410,7 @@ public class player : MonoBehaviour
                     particleUnitParams.m_lifeSpanType = rule.m_lifeSpanType;
                     particleUnitParams.m_lifeSpanRate = 0f;
                     particleUnitParams.m_lifeSpanFadeAlphaRate = 1f;
+                    particleUnitParams.lastUpdateTime = Time.time;
                     switch (rule.m_emitionType)
                     {
                         case 0://eParticleEmitionType_Point
@@ -5454,9 +5463,6 @@ public class player : MonoBehaviour
                             break;
                         case 3://eParticleType_PolyLine
                             particleUnitParams.m_polyLine = new PolyLine();
-                            float factor2 = UnityEngine.Random.Range(0f, 1f);
-                            particleUnitParams.m_polyLine.m_topWidth = rule.m_particleTypeParam.m_polyLine.m_topWidthRange.Lerp(factor2) * coef;
-                            particleUnitParams.m_polyLine.m_endWidth = rule.m_particleTypeParam.m_polyLine.m_endWidthRange.Lerp(factor2) * coef;
                             for (int j = 0; j < rule.m_particleTypeParam.m_polyLine.m_HistoryPointNum; j++)
                             {
                                 particleUnitParams.m_polyLine.m_pPos[j] = particleUnitParams.m_pos;
@@ -5471,6 +5477,20 @@ public class player : MonoBehaviour
                             }
                             particleUnitParams.m_polyLine.m_pPos = new Vector3[particleUnitParams.m_polyLine.m_HistoryPointNum];
                             particleUnitParams.m_polyLine.m_jointNum = (short)rule.m_particleTypeParam.m_polyLine.m_jointNum;
+                            float factor2 = UnityEngine.Random.Range(0f, 1f);
+                            particleUnitParams.m_polyLine.m_topWidth = rule.m_particleTypeParam.m_polyLine.m_topWidthRange.Lerp(factor2) * coef;
+                            particleUnitParams.m_polyLine.m_endWidth = rule.m_particleTypeParam.m_polyLine.m_endWidthRange.Lerp(factor2) * coef;
+                            for (int j = 0; j < particleUnitParams.m_polyLine.m_HistoryPointNum; j++) {
+                                particleUnitParams.m_polyLine.m_pPos[j] = particleUnitParams.m_pos;
+                            }
+                            PrimLineArray newLineArray = ptclUnit.AddComponent<PrimLineArray>();
+                            int linePoints = particleUnitParams.m_polyLine.m_jointNum + 2;
+                            int vertexCount = linePoints * 2;
+                            int triangleCount = (linePoints - 1) * 6;
+                            newLineArray.vertices = new Vector3[vertexCount];
+                            newLineArray.uvs = new Vector2[vertexCount];
+                            newLineArray.colors = new Color[vertexCount];
+                            newLineArray.triangles = new int[triangleCount];
                             break;
                         case 4://eParticleType_Confetti
                             particleUnitParams.m_confetti = new Confetti();
@@ -5811,148 +5831,116 @@ public class player : MonoBehaviour
                             particleUnitParams.meshRenderer.material.SetColor(_MeshColor, particleUnitParams.m_color);
                             break;
                         case 3:
+                            float currentTime = Time.time;
+                            if (currentTime - particleUnitParams.lastUpdateTime >= 1/30f)
                             {
-                                PrimLine prim = particleObjectParams.lines[index];
-                                int linePoints = particleUnitParams.m_polyLine.m_jointNum + 2;
-                                int historyPoints = particleUnitParams.m_polyLine.m_HistoryPointNum;
-                                for (int j = historyPoints - 1; j >= 1; j--)
-                                {
-                                    particleUnitParams.m_polyLine.m_pPos[j] = particleUnitParams.m_polyLine.m_pPos[j - 1];
-                                }
-                                particleUnitParams.m_polyLine.m_pPos[0] = particleUnitParams.m_pos + particleUnitParams.m_offset;
-                                if (historyPoints == linePoints)
-                                {
-                                    for (int j = 0; j < linePoints; j++)
-                                    {
-                                        prim.positions[j] = particleUnitParams.m_polyLine.m_pPos[j];
-                                        prim.UVs[j] = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
-                                        prim.UWidths[j] = particleUnitParams.m_uvRect.height;
-                                        PolyLine polyLine = particleUnitParams.m_polyLine;
-                                        prim.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
-                                        if (particleUnitParams.m_aliveCount > j + 2)
-                                        {
-                                            prim.colors[j] = particleUnitParams.m_color;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    float points = Mathf.Max(linePoints / (float)historyPoints, 1f);
-                                    for (int j = 0; j < linePoints; j++)
-                                    {
-                                        float pointFraction = j / (float)(linePoints - 1) * (historyPoints - 1);
-                                        int point = (int)pointFraction;
-                                        float Rate = pointFraction - point;
-                                        float rateSqr = Rate * Rate;
-                                        float rateCub = Rate * rateSqr;
-                                        Vector3 vector4 = ((2f * rateSqr - rateCub - Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Max(point - 1, 0)]
-                                            + (3f * rateCub - 5f * rateSqr + 2f) * particleUnitParams.m_polyLine.m_pPos[point]
-                                            + (4f * rateSqr - 3f * rateCub + Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 1, historyPoints - 1)]
-                                            + (rateCub - rateSqr) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 2, historyPoints - 1)]) * 0.5f;
-                                        prim.positions[j] = vector4;
-                                        prim.UVs[j] = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
-                                        prim.UWidths[j] = particleUnitParams.m_uvRect.height;
-                                        PolyLine polyLine = particleUnitParams.m_polyLine;
-                                        prim.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
-                                        if (particleUnitParams.m_aliveCount > j / points + 2f)
-                                        {
-                                            prim.colors[j] = particleUnitParams.m_color;
-                                        }
-                                    }
-                                }
-                                int pointNum = prim.positions.Length;
-                                if (pointNum < 2) { break; }
-                                int vCount = pointNum * 2;
-                                int triCount = (pointNum - 1) * 6;
-                                if (polyLineVerts == null || polyLineVerts.Length < vCount)
-                                {
-                                    polyLineVerts = new Vector3[vCount];
-                                    polyLineUVs = new Vector2[vCount];
-                                    polyLineCols = new Color[vCount];
-                                }
-                                if (polyLineTris == null || polyLineTris.Length < triCount)
-                                {
-                                    polyLineTris = new int[triCount];
-                                }
-                                for (int ii = 0; ii < pointNum; ii++)
-                                {
-                                    Vector3 p = prim.positions[ii];
-                                    Vector3 tangent;
-                                    if (ii == 0) tangent = prim.positions[1] - prim.positions[0];
-                                    else tangent = prim.positions[ii] - prim.positions[ii - 1];
-                                    if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.right;
-                                    Vector3 normal = Vector3.Cross(tangent.normalized, Vector3.forward);
-                                    float w = (ii < prim.widths.Length ? prim.widths[ii] : (prim.widths.LastOrDefault())) * 0.5f;
-                                    polyLineVerts[ii * 2]     = p + normal * w;
-                                    polyLineVerts[ii * 2 + 1] = p - normal * w;
-                                    Vector2 meshUV = (prim.UVs != null && ii < prim.UVs.Length) ? prim.UVs[ii] : new Vector2(ii / Mathf.Max(1, pointNum - 1), 0f);
-                                    polyLineUVs[ii * 2] = meshUV;
-                                    polyLineUVs[ii * 2 + 1] = meshUV;
-                                    Color c = (prim.colors != null && ii < prim.colors.Length) ? prim.colors[ii] : Color.white;
-                                    polyLineCols[ii * 2] = c;
-                                    polyLineCols[ii * 2 + 1] = c;
-                                    if (ii < pointNum - 1)
-                                    {
-                                        int vi = ii * 2;
-                                        int ti = ii * 6;
-                                        polyLineTris[ti + 0] = vi;
-                                        polyLineTris[ti + 1] = vi + 2;
-                                        polyLineTris[ti + 2] = vi + 1;
-                                        polyLineTris[ti + 3] = vi + 2;
-                                        polyLineTris[ti + 4] = vi + 3;
-                                        polyLineTris[ti + 5] = vi + 1;
-                                    }
-                                }
-                                MeshFilter mf = particleObjectParams.m_thisTransform.GetComponent<MeshFilter>();
-                                if (mf == null) mf = particleObjectParams.m_thisTransform.gameObject.AddComponent<MeshFilter>();
-                                MeshRenderer mr = particleObjectParams.m_thisTransform.GetComponent<MeshRenderer>();
-                                if (mr == null) mr = particleObjectParams.m_thisTransform.gameObject.AddComponent<MeshRenderer>();
-                                Mesh mesh = mf.sharedMesh;
-                                if (mesh == null || !mesh.isReadable) { mesh = new Mesh(); mesh.name = "PrimLineMesh"; mesh.MarkDynamic(); mf.sharedMesh = mesh; }
-                                mesh.Clear();
-                                if (polyLineVerts.Length == vCount)
-                                {
-                                    mesh.vertices = polyLineVerts;
-                                }
-                                else
-                                {
-                                    Vector3[] trimVerts = new Vector3[vCount];
-                                    Array.Copy(polyLineVerts, trimVerts, vCount);
-                                    mesh.vertices = trimVerts;
-                                }
-                                if (polyLineTris.Length == triCount)
-                                {
-                                    mesh.triangles = polyLineTris;
-                                }
-                                else
-                                {
-                                    int[] trimTris = new int[triCount];
-                                    Array.Copy(polyLineTris, trimTris, triCount);
-                                    mesh.triangles = trimTris;
-                                }
-                                if (polyLineUVs.Length == vCount)
-                                {
-                                    mesh.uv = polyLineUVs;
-                                }
-                                else
-                                {
-                                    Vector2[] trimUVs = new Vector2[vCount];
-                                    Array.Copy(polyLineUVs, trimUVs, vCount);
-                                    mesh.uv = trimUVs;
-                                }
-                                if (polyLineCols.Length == vCount)
-                                {
-                                    mesh.colors = polyLineCols;
-                                }
-                                else
-                                {
-                                    Color[] trimCols = new Color[vCount];
-                                    Array.Copy(polyLineCols, trimCols, vCount);
-                                    mesh.colors = trimCols;
-                                }
-                                mesh.RecalculateBounds();
+                                particleUnitParams.lastUpdateTime += 1/30f;
+                            }
+                            else
+                            {
                                 break;
                             }
+                            PrimPolyLine prim = particleObjectParams.lines[index];
+                            int linePoints = particleUnitParams.m_polyLine.m_jointNum + 2;
+                            int historyPoints = particleUnitParams.m_polyLine.m_HistoryPointNum;
+                            for (int j = historyPoints - 1; j >= 1; j--)
+                            {
+                                particleUnitParams.m_polyLine.m_pPos[j] = particleUnitParams.m_polyLine.m_pPos[j - 1];
+                            }
+                            particleUnitParams.m_polyLine.m_pPos[0] = particleUnitParams.m_pos + particleUnitParams.m_offset;
+                            if (historyPoints == linePoints)
+                            {
+                                for (int j = 0; j < linePoints; j++)
+                                {
+                                    prim.positions[j] = particleUnitParams.m_polyLine.m_pPos[j];
+                                    prim.UVs[j] = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
+                                    prim.UWidths[j] = particleUnitParams.m_uvRect.height;
+                                    PolyLine polyLine = particleUnitParams.m_polyLine;
+                                    prim.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
+                                    if (particleUnitParams.m_aliveCount > j + 2)
+                                    {
+                                        prim.colors[j] = particleUnitParams.m_color;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                float points = Mathf.Max(linePoints / (float)historyPoints, 1f);
+                                for (int j = 0; j < linePoints; j++)
+                                {
+                                    float pointFraction = j / (float)(linePoints - 1) * (historyPoints - 1);
+                                    int point = (int)pointFraction;
+                                    float Rate = pointFraction - point;
+                                    float rateSqr = Rate * Rate;
+                                    float rateCub = Rate * rateSqr;
+                                    Vector3 vector4 = ((2f * rateSqr - rateCub - Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Max(point - 1, 0)]
+                                        + (3f * rateCub - 5f * rateSqr + 2f) * particleUnitParams.m_polyLine.m_pPos[point]
+                                        + (4f * rateSqr - 3f * rateCub + Rate) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 1, historyPoints - 1)]
+                                        + (rateCub - rateSqr) * particleUnitParams.m_polyLine.m_pPos[Mathf.Min(point + 2, historyPoints - 1)]) * 0.5f;
+                                    prim.positions[j] = vector4;
+                                    prim.UVs[j] = new Vector2(particleUnitParams.m_uvRect.x + particleUnitParams.m_uvRect.width * j / (linePoints - 1), particleUnitParams.m_uvRect.y);
+                                    prim.UWidths[j] = particleUnitParams.m_uvRect.height;
+                                    PolyLine polyLine = particleUnitParams.m_polyLine;
+                                    prim.widths[j] = Mathf.Lerp(polyLine.m_topWidth, polyLine.m_endWidth, j / (float)(polyLine.m_jointNum + 1)) * particleUnitParams.m_scale;
+                                    if (particleUnitParams.m_aliveCount > j / points + 2f)
+                                    {
+                                        prim.colors[j] = particleUnitParams.m_color;
+                                    }
+                                }
+                            }
+                            int vertexCount = linePoints * 2;
+                            int triangleCount = (linePoints - 1) * 6;
+                            Mesh mesh = ptclUnit.GetComponent<MeshFilter>().mesh;
+                            PrimLineArray lineArray = ptclUnit.GetComponent<PrimLineArray>();
+                            Vector3[] vertices = lineArray.vertices;
+                            Vector2[] uvs = lineArray.uvs;
+                            Color[] colors = lineArray.colors;
+                            int[] triangles = lineArray.triangles;
+                            for (int j = 0; j < linePoints; j++)
+                            {
+                                Vector3 centerPos = prim.positions[j];
+                                if (centerPos == Vector3.zero) centerPos = particleUnitParams.m_pos + particleUnitParams.m_offset;
+                                Vector3 tangent;
+                                if (j == 0) 
+                                {
+                                    tangent = prim.positions[1] - prim.positions[0];
+                                }
+                                else 
+                                {
+                                    tangent = prim.positions[j] - prim.positions[j - 1];
+                                }
+                                if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.right;
+                                Vector3 normal = Vector3.Cross(tangent.normalized, Vector3.forward).normalized;
+                                float halfWidth = prim.widths[j] * 0.5f;
+                                if(i==0 && j==0)
+                                {
+                                    Debug.Log("centerPos: " + centerPos + " normal: " + normal + " halfWidth: " + halfWidth);
+                                }
+                                int vIndex = j * 2;
+                                vertices[vIndex]     = centerPos + normal * halfWidth;
+                                vertices[vIndex + 1] = centerPos - normal * halfWidth;
+                                uvs[vIndex]     = prim.UVs[j];
+                                uvs[vIndex + 1] = new Vector2(prim.UVs[j].x, prim.UVs[j].y + prim.UWidths[j]); ;
+                                colors[vIndex]     = prim.colors[j];
+                                colors[vIndex + 1] = prim.colors[j];
+                                if (j < linePoints - 1)
+                                {
+                                    int tIndex = j * 6;
+                                    triangles[tIndex + 0] = vIndex;
+                                    triangles[tIndex + 1] = vIndex + 3;
+                                    triangles[tIndex + 2] = vIndex + 1;
+                                    triangles[tIndex + 3] = vIndex;
+                                    triangles[tIndex + 4] = vIndex + 2;
+                                    triangles[tIndex + 5] = vIndex + 3;
+                                }
+                            }
+                            mesh.Clear();
+                            mesh.SetVertices(vertices, 0, vertexCount);
+                            mesh.SetUVs(0, uvs, 0, vertexCount);
+                            mesh.SetColors(colors, 0, vertexCount);
+                            mesh.SetTriangles(triangles, 0, triangleCount, 0);
+                            mesh.RecalculateBounds();
+                            break;
                         case 4:
                             ptclUnit.transform.position = particleUnitParams.m_pos + particleUnitParams.m_offset;
                             ptclUnit.transform.localScale = new Vector3(particleUnitParams.m_confetti.m_width * particleUnitParams.m_scale, particleUnitParams.m_confetti.m_height * particleUnitParams.m_scale, 1f);
@@ -5962,7 +5950,10 @@ public class player : MonoBehaviour
                             break;
                     }
                 }
-                ptclUnit.transform.rotation *= Quaternion.Euler(0f, 180f, 0f);
+                if (particleUnitParams.m_particleType == 0 || particleUnitParams.m_particleType == 4)
+                {
+                    ptclUnit.transform.rotation *= Quaternion.Euler(0f, 180f, 0f);
+                }
                 if (particleUnitParams.m_lifeSpanRate >= 1f)
                 {
                     if (isLoop)
