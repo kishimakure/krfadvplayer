@@ -1,4 +1,4 @@
-Shader "CustomShader2"
+Shader "CustomShader_PP"
 {
     Properties
     {

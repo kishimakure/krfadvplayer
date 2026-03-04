@@ -1,4 +1,4 @@
-Shader "CustomShader1"
+Shader "CustomShader_EF"
 {
     Properties
     {
@@ -46,6 +46,8 @@ Shader "CustomShader1"
 
         Pass
         {
+            ZWrite On
+            ZTest LEqual
             HLSLPROGRAM
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #if defined(DEBUG_DISPLAY)

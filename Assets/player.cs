@@ -2165,7 +2165,7 @@ public class player : MonoBehaviour
         SpriteRenderer spriteRenderer = renderSpriteRenderer;
         Audios = new GameObject("Audios");
         Audios.transform.position = new Vector3(20000f, 0f, 0f);
-        Material PPmaterial = new Material(Shader.Find("CustomShader2"));
+        Material PPmaterial = new Material(Shader.Find("CustomShader_PP"));
         PPmaterial.SetTexture("_RenderTex", renderTexture);
         Texture2D black = Resources.Load<Texture2D>("black");
         spriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, black.width, black.height), new Vector2(0.5f, 0.5f), 1);
@@ -3261,7 +3261,7 @@ public class player : MonoBehaviour
             GameObject renderTextureChara = new GameObject(ADVCharaID + "_RT");
             CacheGameObject(ADVCharaID + "_RT", renderTextureChara);
             renderTextureChara.transform.SetParent(renderTextureObj.transform);
-            renderTextureChara.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader1"));
+            renderTextureChara.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
             renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, camera.targetTexture);
             renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("noise-good"));
             renderTextureChara.GetComponent<MeshRenderer>().material.SetVector(_NoiseTextureParam, new Vector4(0, 0, 0.5f, 0.5f));
@@ -4433,7 +4433,7 @@ public class player : MonoBehaviour
             else { meshRenderer.sortingOrder = (isCharaBehind ? -1000 : 0) + sortingOrder; }
             meshFilter.mesh = efClone.GetComponent<MeshFilter>().sharedMesh;
             MsbMaterialHandler efMaterialHandler = msbHandler.m_MsbMaterialHandlerArray.First(param => param.m_Name == efClone.GetComponent<MeshRenderer>().sharedMaterial.name);
-            Material material = new Material(Shader.Find("CustomShader1"));
+            Material material = new Material(Shader.Find("CustomShader_EF"));
             switch (efMaterialHandler.m_Src.m_BlendMode)
             {
                 case 1:
@@ -4494,7 +4494,7 @@ public class player : MonoBehaviour
                 {
                     efMaterialHandler = msbHandler.m_MsbMaterialHandlerArray.First(param => param.m_Name == efCloneObject.GetComponent<MeshRenderer>().sharedMaterial.name);
                 }
-                Material material = new Material(Shader.Find("CustomShader1"));
+                Material material = new Material(Shader.Find("CustomShader_EF"));
                 switch (efMaterialHandler.m_Src.m_BlendMode)
                 {
                     case 1:
@@ -4538,7 +4538,7 @@ public class player : MonoBehaviour
                 meshRenderer.sortingOrder = isCharaBehind ? -1099 : -99;
                 meshRenderer.enabled = false;
                 meshFilter.mesh = efCloneObject.GetComponent<MeshFilter>().sharedMesh;
-                Material material = new Material(Shader.Find("CustomShader1"));
+                Material material = new Material(Shader.Find("CustomShader_EF"));
                 MsbMaterialHandler efMaterialHandler = msbHandler.m_MsbMaterialHandlerArray.First(param => param.m_Name == efCloneObject.GetComponent<MeshRenderer>().sharedMaterial.name);
                 switch (efMaterialHandler.m_Src.m_BlendMode)
                 {
@@ -6531,7 +6531,7 @@ public class player : MonoBehaviour
             texture.wrapMode = TextureWrapMode.Clamp;
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
             SpriteRenderer spriteRenderer = bg.AddComponent<SpriteRenderer>();
-            spriteRenderer.material = new Material(Shader.Find("CustomShader1"));
+            spriteRenderer.material = new Material(Shader.Find("CustomShader_COMMON"));
             spriteRenderer.material.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("Noise_perlin"));
             spriteRenderer.material.SetTexture("_Texture_Level", Resources.Load<Texture2D>("Noise_perlin"));
             spriteRenderer.sprite = sprite;
@@ -7089,7 +7089,7 @@ public class player : MonoBehaviour
             texture.wrapMode = TextureWrapMode.Clamp;
             Sprite sprite1 = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1);
             SpriteRenderer spriteRenderer = sprite.AddComponent<SpriteRenderer>();
-            spriteRenderer.material = new Material(Shader.Find("CustomShader1"));
+            spriteRenderer.material = new Material(Shader.Find("CustomShader_COMMON"));
             spriteRenderer.sprite = sprite1;
             spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
             spriteRenderer.sortingOrder = -700 + (int)ID;
