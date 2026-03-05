@@ -39,7 +39,8 @@ Shader "CustomShader_EF"
     SubShader
     {
         Tags {"Queue" = "Transparent" "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" }
-        Blend [_BlendSrc] [_BlendDst], One OneMinusSrcAlpha
+        Blend [_BlendSrc] [_BlendDst]
+        //Blend [_BlendSrc] [_BlendDst], One OneMinusSrcAlpha
         //Blend SrcAlpha OneMinusSrcAlpha
         Cull Off
         ZWrite Off
@@ -135,7 +136,7 @@ Shader "CustomShader_EF"
             float dist_to_line(float2 p, float2 origin, float2 n_unit)
             {
                 float2 n_perp = float2(-n_unit.y, n_unit.x);
-                return abs(dot(n_perp, p - origin)); // 与 wiki 公式等价
+                return abs(dot(n_perp, p - origin));
             }
 
             half4 UnlitFragment(Varyings i) : SV_Target

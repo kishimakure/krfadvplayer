@@ -2167,6 +2167,7 @@ public class player : MonoBehaviour
         RenderTexture renderTexture = new RenderTexture(1920, 1080, 24);
         rendercamera.targetTexture = renderTexture;
         rendercamera.backgroundColor = new Color(0f, 0f, 0f, 1f);
+        rendercamera.cullingMask = 1 << LayerMask.NameToLayer("Main");
         Render = new GameObject("Render");
         Render.transform.position = new Vector3(-20000f, 0f, 0f);
         Render.transform.localScale = new Vector3(25f / 36f, 25f / 36f, 1f);
@@ -2188,6 +2189,7 @@ public class player : MonoBehaviour
         ImageRenderer.sprite = Sprite.Create(white, new Rect(0, 0, white.width, white.height), new Vector2(0.5f, 0.5f), 1);
         ImageRenderer.sortingOrder = -3;
         ImageRenderer.color = new Color(0f, 0f, 0f, 1f);
+        image.layer = LayerMask.NameToLayer("Main");
         renderTexture.Create();
         mainCamera.transform.position = new Vector3(-20000f, 0f, -10f);
         mainCamera.orthographic = true;
@@ -2356,7 +2358,7 @@ public class player : MonoBehaviour
         cameraEfObj.transform.SetParent(camerasObj.transform);
         RenderTexture renderTextureEffect = new RenderTexture(4000, 2250, 24);
         Camera cameraEf = cameraEfObj.AddComponent<Camera>();
-        cameraEf.transform.position = new Vector3(0f, -10000f, -10000f);
+        cameraEf.transform.position = new Vector3(0f, 0f, -10000f);
         cameraEf.orthographic = true;
         cameraEf.orthographicSize = 375;
         cameraEf.nearClipPlane = 0.3f;
@@ -2368,7 +2370,7 @@ public class player : MonoBehaviour
         cameraEfCBObj.transform.SetParent(camerasObj.transform);
         RenderTexture renderTextureEffectCB = new RenderTexture(4000, 2250, 24);
         Camera cameraEfCB = cameraEfCBObj.AddComponent<Camera>();
-        cameraEfCB.transform.position = new Vector3(0f, -10000f, -10000f);
+        cameraEfCB.transform.position = new Vector3(0f, 0f, -10000f);
         cameraEfCB.orthographic = true;
         cameraEfCB.orthographicSize = 375;
         cameraEfCB.nearClipPlane = 0.3f;
@@ -2385,21 +2387,25 @@ public class player : MonoBehaviour
         RTEf.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
         RTEf.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, cameraEf.targetTexture);
         RTEf.GetComponent<MeshRenderer>().material.SetInt(_BlendSrc, 1);
+        RTEf.GetComponent<MeshRenderer>().material.SetInt(_BlendDst, 10);
         RTEf.GetComponent<MeshRenderer>().sortingOrder = -99;
         RTEf.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
         rectTransform = RTEf.AddComponent<RectTransform>();
         rectTransform.localScale = new Vector3(1f, 1f, 1f);
         rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
+        RTEf.layer = LayerMask.NameToLayer("Main");
         GameObject RTEfCB = new GameObject("Effect_CharaBehind_RT");
         RTEfCB.transform.SetParent(RTEfObj.transform);
         RTEfCB.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
         RTEfCB.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, cameraEfCB.targetTexture);
         RTEfCB.GetComponent<MeshRenderer>().material.SetInt(_BlendSrc, 1);
+        RTEfCB.GetComponent<MeshRenderer>().material.SetInt(_BlendDst, 10);
         RTEfCB.GetComponent<MeshRenderer>().sortingOrder = -1099;
         RTEfCB.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
         rectTransform = RTEfCB.AddComponent<RectTransform>();
         rectTransform.localScale = new Vector3(1f, 1f, 1f);
         rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
+        RTEfCB.layer = LayerMask.NameToLayer("Main");
         particleObj = new GameObject("Particle");
         particleObj.transform.position = new Vector3(0f, 0f, 0f);
         if (useCustomJson)
@@ -3324,6 +3330,7 @@ public class player : MonoBehaviour
             rectTransform = renderTextureChara.AddComponent<RectTransform>();
             rectTransform.localScale = new Vector3(1f, 1f, 1f);
             rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
+            renderTextureChara.layer = LayerMask.NameToLayer("Main");
         }
     }
     private void CharaSetPosition(string ADVCharaID, float x, float y)
@@ -4571,7 +4578,7 @@ public class player : MonoBehaviour
                 efObject.transform.localPosition = efCloneObject.transform.localPosition;
                 efObject.transform.localRotation = efCloneObject.transform.localRotation;
                 efObject.transform.localScale = efCloneObject.transform.localScale;
-                efObject.layer = isCharaBehind ? 31 : 30;
+                efObject.layer = isCharaBehind ? 25 : 24;
             }
             else
             {
@@ -5176,7 +5183,7 @@ public class player : MonoBehaviour
         {
             ptclUnits.Add(ptcl.Key, new List<GameObject>());
         }
-        Vector3 shift = new Vector3(0f, -10000f, 0f);
+        Vector3 shift = new Vector3(0f, 0f, 0f);
         if (!isLoop)
         {
             while (timeElapsed < animtime)
@@ -5380,7 +5387,6 @@ public class player : MonoBehaviour
                 particleUnitParamsCache[gameObject] = particleUnitParams;
                 particleUnitParams.m_Index = -1;
                 gameObject.transform.SetParent(ptclRoot.transform);
-                gameObject.layer = isCharaBehind ? 31 : 30;
                 ptclUnits[ptclDummy].Add(gameObject);
             }
             for (int i = 0; i < ptclUnits[ptclDummy].Count; i++)
@@ -5400,6 +5406,7 @@ public class player : MonoBehaviour
                         particleUnitParams.meshRenderer = ptclUnit.AddComponent<MeshRenderer>();
                     }
                     particleUnitParams.meshRenderer.material = material;
+                    particleUnitParams.meshRenderer.sortingOrder = isCharaBehind ? -1099 : -99;
                     if (ptclUnit.GetComponent<MeshFilter>() == null)
                     {
                         ptclUnit.AddComponent<MeshFilter>().mesh = new Mesh();
@@ -5912,10 +5919,6 @@ public class player : MonoBehaviour
                                 if (tangent.sqrMagnitude < 1e-6f) tangent = Vector3.right;
                                 Vector3 normal = Vector3.Cross(tangent.normalized, Vector3.forward).normalized;
                                 float halfWidth = prim.widths[j] * 0.5f;
-                                if(i==0 && j==0)
-                                {
-                                    Debug.Log("centerPos: " + centerPos + " normal: " + normal + " halfWidth: " + halfWidth);
-                                }
                                 int vIndex = j * 2;
                                 vertices[vIndex]     = centerPos + normal * halfWidth;
                                 vertices[vIndex + 1] = centerPos - normal * halfWidth;
@@ -6578,6 +6581,7 @@ public class player : MonoBehaviour
             bg.AddComponent<RectTransform>();
             bg.AddComponent<BGProperties>();
             bgCoroutinesDict.Add(ID, new Dictionary<string, Coroutine> { { "scale", null }, { "scroll", null }, { "Distortion", null } });
+            bg.layer = LayerMask.NameToLayer("Main");
         }
         string bgPath = FileNameWithoutExt;
         bg.transform.SetParent(canvas.transform);
@@ -7136,6 +7140,7 @@ public class player : MonoBehaviour
             sprite.transform.SetParent(canvas.transform);
             sprite.AddComponent<SpriteProperties>();
             spriteCoroutinesDict.Add(ID, new Dictionary<string, Coroutine> { { "scale", null }, { "pos", null }, { "color", null }, { "fade", null } });
+            sprite.layer = LayerMask.NameToLayer("Main");
         }
         SpriteProperties spriteProperties = sprite.GetComponent<SpriteProperties>();
         spriteProperties.ID = ID;

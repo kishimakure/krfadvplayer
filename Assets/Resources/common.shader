@@ -132,7 +132,7 @@ Shader "CustomShader_COMMON"
             float dist_to_line(float2 p, float2 origin, float2 n_unit)
             {
                 float2 n_perp = float2(-n_unit.y, n_unit.x);
-                return abs(dot(n_perp, p - origin)); // 与 wiki 公式等价
+                return abs(dot(n_perp, p - origin));
             }
 
             half4 UnlitFragment(Varyings i) : SV_Target
