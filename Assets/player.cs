@@ -1118,6 +1118,8 @@ public class player : MonoBehaviour
     private voices Voices;
     private GameObject Render;
     private RenderTexture renderTexture;
+    private RenderTexture bgTexture;
+    private GameObject bgPrimObj;
     private SpriteRenderer renderSpriteRenderer;
     private GameObject image;
     private SpriteRenderer imageSpriteRenderer;
@@ -1180,6 +1182,10 @@ public class player : MonoBehaviour
     private static readonly int _ProgressRate = Shader.PropertyToID("_ProgressRate");
     private static readonly int _NoiseTextureParam = Shader.PropertyToID("_NoiseTextureParam");
     private static readonly int _Level = Shader.PropertyToID("_Level");
+    private static readonly int _DistortionLevel = Shader.PropertyToID("_DistortionLevel");
+    private static readonly int _EnableDistortion = Shader.PropertyToID("_EnableDistortion");
+    private static readonly int _ColorBlend = Shader.PropertyToID("_ColorBlend");
+    private static readonly int _EnableColorBlend = Shader.PropertyToID("_EnableColorBlend");
     private Dictionary<GameObject, ParticleObjectParams> particleObjectParamsCache = new Dictionary<GameObject, ParticleObjectParams>();
     private Dictionary<GameObject, ParticleUnitParams> particleUnitParamsCache = new Dictionary<GameObject, ParticleUnitParams>();
     private Transform cachedMainCameraTransform;
@@ -2357,6 +2363,33 @@ public class player : MonoBehaviour
         SetCamera("Camera_Main", 6, "Main", CameraClearFlags.Depth);
         renderTextureObj = new GameObject("RenderTextures");
         renderTextureObj.transform.position = new Vector3(0f, 0f, 0f);
+        bgTexture = new RenderTexture(4000, 2250, 24);
+        GameObject bgPrim = new GameObject("Camera_BG_Prim");
+        bgPrim.transform.SetParent(camerasObj.transform);
+        Camera bgPrimCamera = bgPrim.AddComponent<Camera>();
+        bgPrimCamera.transform.position = new Vector3(0f, 0f, -10000f);
+        bgPrimCamera.orthographic = true;
+        bgPrimCamera.orthographicSize = 375;
+        bgPrimCamera.nearClipPlane = 0.3f;
+        bgPrimCamera.farClipPlane = 200000f;
+        bgPrimCamera.backgroundColor = new Color(0f, 0f, 0f, 0f);
+        bgPrimCamera.cullingMask = 1 << LayerMask.NameToLayer("BG_Prim");
+        bgPrimCamera.targetTexture = bgTexture;
+        bgPrimObj = new GameObject("BG_Prim");
+        bgPrimObj.transform.SetParent(renderTextureObj.transform);
+        bgPrimObj.transform.position = new Vector3(0f, 0f, 0f);
+        MeshFilter bgPrimMeshFilter = bgPrimObj.AddComponent<MeshFilter>();
+        bgPrimMeshFilter.mesh = CreateMesh(4000f/3f, 2250f/3f, new Vector2(0.5f, 0.5f));
+        MeshRenderer bgPrimRenderer = bgPrimObj.AddComponent<MeshRenderer>();
+        Material bgPrimMaterial = new Material(Shader.Find("CustomShader_COMMON"));
+        bgPrimMaterial.SetTexture(_MainTex, bgTexture);
+        bgPrimMaterial.SetInt(_BlendSrc, 1);
+        bgPrimMaterial.SetInt(_BlendDst, 10);
+        bgPrimMaterial.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("Noise_perlin"));
+        bgPrimMaterial.SetTexture("_Texture_Level", Resources.Load<Texture2D>("Noise_perlin"));
+        bgPrimRenderer.material = bgPrimMaterial;
+        bgPrimRenderer.sortingOrder = -3;
+        bgPrimObj.layer = LayerMask.NameToLayer("BG");
         particleObj = new GameObject("Particle");
         particleObj.transform.position = new Vector3(0f, 0f, 0f);
         if (useCustomJson)
@@ -2469,15 +2502,11 @@ public class player : MonoBehaviour
         EffectPreset = new string[3];
         renderSpriteRenderer.material.SetFloat("_EnableColorBlend", 0);
         preRead = true;
-        if (DistortionNoiseYOffsetChangeCoroutine != null) { StopCoroutine(DistortionNoiseYOffsetChangeCoroutine); }
-        DistortionNoiseYOffsetChangeCoroutine = StartCoroutine(DistortionNoiseYOffsetChange());
+        if (BGDistortionCoroutine != null) { StopCoroutine(BGDistortionCoroutine); }
+        BGDistortionCoroutine = StartCoroutine(BGDistortion());
         warpPreparing.Clear();
         warpPrepared.Clear();
         warpping.Clear();
-        foreach (Transform transform in renderTextureObj.GetComponentsInChildren<Transform>()[1..])
-        {
-            Destroy(transform.gameObject);
-        }
     }
     private IEnumerator StartingLoading()
     {
@@ -2896,11 +2925,8 @@ public class player : MonoBehaviour
     private Dictionary<string, float[,]> CaptionSecDelay = new Dictionary<string, float[,]> { { "BG", new float[2, 2] { { 0.2f, 0 }, { 0.2f, 0f } } }, { "Text", new float[2, 2] { { 0.2f, 0.2f }, { 0.2f, 0f } } } };
     private Dictionary<string, int[]> CaptionCurveType = new Dictionary<string, int[]> { { "BG", new int[2] { 0, 0 } }, { "Text", new int[2] { 2, 1 } } };
     private string CaptionTextScript = "";
-    private uint EnableDistortion = 0;
-    private float DistortionLevel = 0f;
-    private float DistortionNoiseYOffset = 0f;
     private Coroutine DistortionLevelChangeCoroutine;
-    private Coroutine DistortionNoiseYOffsetChangeCoroutine;
+    private Coroutine BGDistortionCoroutine;
     private List<string> warpPreparing = new List<string>();
     private List<string> warpPrepared = new List<string>();
     private List<string> warpping = new List<string>();
@@ -6137,37 +6163,30 @@ public class player : MonoBehaviour
     }
     private IEnumerator DistorsionLevel_BGChange(float Value, float Sec)
     {
-        float start = DistortionLevel;
+        Material mat = bgPrimObj.GetComponent<MeshRenderer>().material;
+        float start = mat.GetFloat(_DistortionLevel);
+        float DistortionLevel = start;
         yield return null;
         float timeElapsed = 0f;
         while (timeElapsed < Sec)
         {
             timeElapsed += Time.deltaTime;
             DistortionLevel = Mathf.Lerp(start, Value, timeElapsed / Sec);
+            mat.SetFloat(_DistortionLevel, DistortionLevel);
             yield return null;
         }
         DistortionLevel = Value;
+        mat.SetFloat(_DistortionLevel, DistortionLevel);
     }
-    private IEnumerator DistortionNoiseYOffsetChange()
+    private IEnumerator BGDistortion()
     {
+        Material mat = bgPrimObj.GetComponent<MeshRenderer>().material;
+        float DistortionNoiseYOffset = 0;
         while (true)
         {
             DistortionNoiseYOffset += Time.deltaTime;
             DistortionNoiseYOffset %= 1;
-            yield return null;
-        }
-    }
-    private IEnumerator BGDistortion(GameObject bg)
-    {
-        if (bg == null) { yield break; }
-        SpriteRenderer spriteRenderer = bg.GetComponent<SpriteRenderer>();
-        Material mat = spriteRenderer.material;
-        while (true)
-        {
-            if (bg == null) { yield break; }
-            mat.SetFloat("_EnableDistortion", EnableDistortion);
-            mat.SetFloat("_DistortionLevel", DistortionLevel);
-            mat.SetVector(_NoiseTextureParam, new Vector4(0f, DistortionNoiseYOffset, 1f, 1f));
+            mat.SetVector(_NoiseTextureParam, new Vector4(0, DistortionNoiseYOffset, 1, 1));
             yield return null;
         }
     }
@@ -6558,14 +6577,12 @@ public class player : MonoBehaviour
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
             SpriteRenderer spriteRenderer = bg.AddComponent<SpriteRenderer>();
             spriteRenderer.material = new Material(Shader.Find("CustomShader_COMMON"));
-            spriteRenderer.material.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("Noise_perlin"));
-            spriteRenderer.material.SetTexture("_Texture_Level", Resources.Load<Texture2D>("Noise_perlin"));
             spriteRenderer.sprite = sprite;
             spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
             bg.AddComponent<RectTransform>();
             bg.AddComponent<BGProperties>();
             bgCoroutinesDict.Add(ID, new Dictionary<string, Coroutine> { { "scale", null }, { "scroll", null }, { "Distortion", null } });
-            bg.layer = LayerMask.NameToLayer("BG");
+            bg.layer = LayerMask.NameToLayer("BG_Prim");
         }
         string bgPath = FileNameWithoutExt;
         bg.transform.SetParent(canvas.transform);
@@ -6579,7 +6596,6 @@ public class player : MonoBehaviour
         bgRect.anchorMin = new Vector2(0.5f, 0.5f);
         bgRect.localPosition = new Vector3(0f, 0f, 0f);
         bgRect.localScale = new Vector3(0.6510415f, 0.6510415f, 1f);
-        bgCoroutinesDict[ID]["Distortion"] = StartCoroutine(BGDistortion(bg));
     }
     private void SetCharaShotPosition(int ADVCharaPos, int ADVCharaPos2, int ADVCharaPos3, int ADVCharaPos4, int ADVCharaPos5)
     {
@@ -7712,7 +7728,7 @@ public class player : MonoBehaviour
     }
     private void SetPP_ColorBlendColor(uint R, uint G, uint B)
     {
-        renderSpriteRenderer.material.SetColor("_ColorBlend", new Color(R / 255f, G / 255f, B / 255f, 1f));
+        renderSpriteRenderer.material.SetColor(_ColorBlend, new Color(R / 255f, G / 255f, B / 255f, 1f));
     }
     private void SetPP_ColorBlendLevel(float Value, float Sec)
     {
@@ -7720,7 +7736,7 @@ public class player : MonoBehaviour
     }
     private void Enable_PP_ColorBlend(uint Enable)
     {
-        renderSpriteRenderer.material.SetFloat("_EnableColorBlend", Enable);
+        renderSpriteRenderer.material.SetFloat(_EnableColorBlend, Enable);
     }
     private void SetDistorsionLevel_BG(float Value, float Sec)
     {
@@ -7729,7 +7745,7 @@ public class player : MonoBehaviour
     }
     private void EnableDistorsion_BG(uint Enable)
     {
-        EnableDistortion = Enable;
+        bgPrimObj.GetComponent<MeshRenderer>().material.SetFloat(_EnableDistortion, Enable);
     }
     private void WarpPrepare(string ADVCharaID, float Sec)
     {
