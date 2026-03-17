@@ -14,8 +14,8 @@ using UnityEditor.Rendering;
 using UnityEngine.Rendering.Universal;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
-using UnityEngine.UIElements;
 using System.Text;
+using UnityEngine.EventSystems;
 #if !UNITY_EDITOR
 using UnityEngine.Rendering;
 using UnityEngine.Scripting;
@@ -1057,10 +1057,20 @@ public class CharaProperties
 }
 public class player : MonoBehaviour
 {
+#if UNITY_WEBGL
+    [DllImport("__Internal")]
+    private static extern void SetWebTitle(string title);
+    [DllImport("__Internal")]
+    public static extern string GetPlaylistFromLocalStorage();
+
+    [DllImport("__Internal")]
+    public static extern void ClearPlaylistInLocalStorage();
+#else
     [DllImport("user32.dll")]
     private static extern bool SetWindowText(System.IntPtr hWnd, string text);
     [DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
+#endif
     public string host;
     public List<int> ADVIDs;
     public bool auto = false;
@@ -1076,6 +1086,7 @@ public class player : MonoBehaviour
     public float SEVolume = 1f;
     public float VoiceVolume = 1f;
     public bool enableParticle = false;
+    private bool netError = false;
     private Font font;
     private int ADVID;
     private int ADVIndex;
@@ -1258,7 +1269,7 @@ public class player : MonoBehaviour
                 attempt++;
                 if (attempt == Attempt)
                 {
-                    Debug.Log("クロモン！");
+                    netError = true;
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1285,7 +1296,7 @@ public class player : MonoBehaviour
                 attempt++;
                 if (attempt == Attempt)
                 {
-                    Debug.Log("クロモン！");
+                    netError = true;
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1298,7 +1309,11 @@ public class player : MonoBehaviour
         int attempt = 0;
         while (attempt < Attempt)
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.AUDIOQUEUE);
+#else
             UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, type == "ogg" ? AudioType.OGGVORBIS : AudioType.WAV);
+#endif
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -1312,7 +1327,7 @@ public class player : MonoBehaviour
                 attempt++;
                 if (attempt == Attempt)
                 {
-                    Debug.Log("クロモン！");
+                    netError = true;
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1329,8 +1344,9 @@ public class player : MonoBehaviour
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
-                AssetBundle bundle = AssetBundle.LoadFromMemory(request.downloadHandler.data);
-                webAssetBundle[name] = bundle;
+                AssetBundleCreateRequest bundleRequest = AssetBundle.LoadFromMemoryAsync(request.downloadHandler.data);
+                yield return bundleRequest;
+                webAssetBundle[name] = bundleRequest.assetBundle;
                 LoadedAssets.Add(name);
                 break;
             }
@@ -1339,7 +1355,7 @@ public class player : MonoBehaviour
                 attempt++;
                 if (attempt == Attempt)
                 {
-                    Debug.Log("クロモン！");
+                    netError = true;
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1368,7 +1384,7 @@ public class player : MonoBehaviour
             LoadedPacks.Add(name);
             foreach (string file in StandPics.Params.First(param => param.Name == name).Files)
             {
-                LoadingIEnumerators.Add(name + "_" + file, DownloadTexture(name + "_" + file, Path.Join(host, @"\standpic\" + name + "_" + file + ".png")));
+                LoadingIEnumerators.Add(name + "_" + file, DownloadTexture(name + "_" + file, $"{host}/standpic/{name}_{file}.png"));
             }
         }
     }
@@ -1381,22 +1397,22 @@ public class player : MonoBehaviour
             {
                 if (file.EndsWith(".json"))
                 {
-                    LoadingIEnumerators.Add(name + @"\" + file, DownloadText(name + @"\" + file, Path.Join(host, @"\ef_adv\" + name + @"\" + file)));
+                    LoadingIEnumerators.Add(name + @"\" + file, DownloadText(name + @"\" + file, $"{host}/ef_adv/{name}/{file}"));
                 }
                 else
                 {
-                    LoadingIEnumerators.Add(name + @"\" + file, DownloadTexture(name + @"\" + file, Path.Join(host, @"\ef_adv\" + name + @"\" + file)));
+                    LoadingIEnumerators.Add(name + @"\" + file, DownloadTexture(name + @"\" + file, $"{host}/ef_adv/{name}/{file}"));
                 }
             }
             string PackName = advEffectList.m_Params.First(param => param.m_EffectID == name).m_PackName;
             if (PackName == "")
             {
-                LoadingIEnumerators.Add(name, DownloadAssetBundle(name, Path.Join(host, @"\ef_adv\ab\" + name.ToLower() + ".assetbundle")));
+                LoadingIEnumerators.Add(name, DownloadAssetBundle(name, $"{host}/ef_adv/ab/{name.ToLower()}.assetbundle"));
                 foreach (string CueID in advEffectList.m_Params.First(param => param.m_EffectID == name).m_CueIDs)
                 {
                     if (!LoadingIEnumerators.ContainsKey(CueID))
                     {
-                        LoadingIEnumerators.Add(CueID, DownloadAudio(CueID, Path.Join(host, @"\se\" + CueID + ".wav"), "wav"));
+                        LoadingIEnumerators.Add(CueID, DownloadAudio(CueID, $"{host}/se/{CueID}.wav", "wav"));
                     }
                 }
                 StartCoroutine(GetGameObject(name, name));
@@ -1405,7 +1421,7 @@ public class player : MonoBehaviour
             {
                 if (!LoadingIEnumerators.ContainsKey(PackName))
                 {
-                    LoadingIEnumerators.Add(PackName, DownloadAssetBundle(PackName, Path.Join(host, @"\ef_adv\ab\" + PackName.ToLower() + ".assetbundle")));
+                    LoadingIEnumerators.Add(PackName, DownloadAssetBundle(PackName, $"{host}/ef_adv/ab/{PackName.ToLower()}.assetbundle"));
                 }
                 StartCoroutine(GetGameObject(name, PackName));
             }
@@ -1419,20 +1435,34 @@ public class player : MonoBehaviour
             if (Voices.Params.First(param => param.Name == name).VoiceLabels.FirstOrDefault(param => param.VoiceLabel == voicelabel) == null) { return; }
             foreach (string file in Voices.Params.First(param => param.Name == name).VoiceLabels.First(param => param.VoiceLabel == voicelabel).Choices)
             {
-                LoadingIEnumerators.Add(name + @"\voice_" + voicelabel + "_" + file, DownloadAudio(name + @"\voice_" + voicelabel + "_" + file, Path.Join(host, @"\voice\" + name + @"\voice_" + voicelabel + "_" + file + "." + audioMode), audioMode));
+                LoadingIEnumerators.Add(name + @"\voice_" + voicelabel + "_" + file, DownloadAudio(name + @"\voice_" + voicelabel + "_" + file, $"{host}/voice/{name}/voice_{voicelabel}_{file}.{audioMode}", audioMode));
             }
         }
     }
     private IEnumerator DownloadJson(string url, int ADVID, int index)
     {
-        UnityWebRequest request = UnityWebRequest.Get(url);
-        yield return request.SendWebRequest();
-        if (request.result == UnityWebRequest.Result.Success)
+        int attempt = 0;
+        while (attempt < Attempt)
         {
-            string json = request.downloadHandler.text;
-            Jsons[ADVID][index] = json;
+            UnityWebRequest request = UnityWebRequest.Get(url);
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string json = request.downloadHandler.text;
+                Jsons[ADVID][index] = json;
+                break;
+            }
+            else
+            {
+                attempt++;
+                if (attempt == Attempt)
+                {
+                    netError = true;
+                    break;
+                }
+                yield return new WaitForSeconds(AttemptDelay);
+            }
         }
-        else { yield return StartCoroutine(DownloadJson(url, ADVID, index)); }
     }
     private IEnumerator LoadJson(int ADVID)
     {
@@ -1444,14 +1474,14 @@ public class player : MonoBehaviour
         }
         if (advlistParams.m_ScriptName != "")
         {
-            string filePath = Path.Join(host, @"\advscript\" + advcategory + @"\ADVScript_" + advcategory + "_" + advlistParams.m_ScriptName + ".json");
+            string filePath = $"{host}/advscript/{advcategory}/ADVScript_{advcategory}_{advlistParams.m_ScriptName}.json";
             Jsons.Add(ADVID, new string[2]);
             Coroutine coroutine1 = StartCoroutine(DownloadJson(filePath, ADVID, 0));
             yield return coroutine1;
             advScript = JsonConvert.DeserializeObject<advscript>(Jsons[ADVID][0]);
             advScripts.Add(ADVID, advScript);
             //Debug.Log(advScript.m_Name);
-            string textfilePath = Path.Join(host, @"\advscript\" + advcategory + @"\ADVScriptText_" + advcategory + "_" + advlistParams.m_ScriptTextName + ".json");
+            string textfilePath = $"{host}/advscript/{advcategory}/ADVScriptText_{advcategory}_{advlistParams.m_ScriptTextName}.json";
             Coroutine coroutine2 = StartCoroutine(DownloadJson(textfilePath, ADVID, 1));
             yield return coroutine2;
             advScriptText = JsonConvert.DeserializeObject<advscripttext>(Jsons[ADVID][1]);
@@ -1460,14 +1490,14 @@ public class player : MonoBehaviour
         }
         else
         {
-            string scriptPath = Path.Join(host, @"\comic\ComicScript_" + advlistParams.m_ComicGroupName + ".json");
+            string scriptPath = $"{host}/comic/ComicScript_{advlistParams.m_ComicGroupName}.json";
             Jsons.Add(ADVID, new string[2]);
             Coroutine coroutine1 = StartCoroutine(DownloadJson(scriptPath, ADVID, 0));
             yield return coroutine1;
             comicScript = JsonConvert.DeserializeObject<comicscript>(Jsons[ADVID][0]);
             comicScripts.Add(ADVID, comicScript);
             //Debug.Log(comicScript.m_Name);
-            string spriteListPath = Path.Join(host, @"\comic\ComicSpriteList_" + advlistParams.m_ComicGroupName + ".json");
+            string spriteListPath = $"{host}/comic/ComicSpriteList_{advlistParams.m_ComicGroupName}.json";
             Coroutine coroutine2 = StartCoroutine(DownloadJson(spriteListPath, ADVID, 1));
             yield return coroutine2;
             comicSpriteList = JsonConvert.DeserializeObject<comicspritelist>(Jsons[ADVID][1]);
@@ -1495,7 +1525,7 @@ public class player : MonoBehaviour
                 case "BGVisible":
                     if (!LoadingIEnumerators.ContainsKey(func.m_value2))
                     {
-                        LoadingIEnumerators.Add(func.m_value2, DownloadTexture(func.m_value2, Path.Join(host, @"\bg\" + func.m_value2 + ".png")));
+                        LoadingIEnumerators.Add(func.m_value2, DownloadTexture(func.m_value2, $"{host}/bg/{func.m_value2}.png"));
                     }
                     break;
                 case "CharaIn":
@@ -1632,7 +1662,7 @@ public class player : MonoBehaviour
                 case "SpriteSet":
                     if (!LoadingIEnumerators.ContainsKey(func.m_value2))
                     {
-                        LoadingIEnumerators.Add(func.m_value2, DownloadTexture(func.m_value2, Path.Join(host, @"\sprite\" + func.m_value2 + ".png")));
+                        LoadingIEnumerators.Add(func.m_value2, DownloadTexture(func.m_value2, $"{host}/sprite/{func.m_value2}.png"));
                     }
                     break;
                 case "SetCaptionBGSprite":
@@ -1640,7 +1670,7 @@ public class player : MonoBehaviour
                     {
                         if (!LoadingIEnumerators.ContainsKey(func.m_value1))
                         {
-                            LoadingIEnumerators.Add(func.m_value1, DownloadTexture(func.m_value1, Path.Join(host, @"\sprite\" + func.m_value1 + ".png")));
+                            LoadingIEnumerators.Add(func.m_value1, DownloadTexture(func.m_value1, $"{host}/sprite/{func.m_value1}.png"));
                         }
                     }
                     break;
@@ -1715,7 +1745,7 @@ public class player : MonoBehaviour
                     {
                         if (!LoadingIEnumerators.ContainsKey(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel))
                         {
-                            LoadingIEnumerators.Add(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, DownloadAudio(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, Path.Join(host, @"\cuesheet\" + advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel + "." + audioMode), audioMode));
+                            LoadingIEnumerators.Add(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, DownloadAudio(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, $"{host}/cuesheet/{advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet}_{textparam.m_voiceLabel}.{audioMode}", audioMode));
                         }
                     }
                     if (func.argNum == 3)
@@ -1795,13 +1825,13 @@ public class player : MonoBehaviour
                 case "PlayBGM":
                     if (!LoadingIEnumerators.ContainsKey(func.m_value1))
                     {
-                        LoadingIEnumerators.Add(func.m_value1, DownloadAudio(func.m_value1, Path.Join(host, @"\bgm\" + func.m_value1 + ".wav"), "wav"));
+                        LoadingIEnumerators.Add(func.m_value1, DownloadAudio(func.m_value1, $"{host}/bgm/{func.m_value1}.wav", "wav"));
                     }
                     break;
                 case "PlaySE":
                     if (!LoadingIEnumerators.ContainsKey(func.m_value1))
                     {
-                        LoadingIEnumerators.Add(func.m_value1, DownloadAudio(func.m_value1, Path.Join(host, @"\se\" + func.m_value1 + ".wav"), "wav"));
+                        LoadingIEnumerators.Add(func.m_value1, DownloadAudio(func.m_value1, $"{host}/se/{func.m_value1}.wav", "wav"));
                     }
                     break;
                 case "PlayVOICE":
@@ -1829,7 +1859,7 @@ public class player : MonoBehaviour
                 case "PlayFULLVOICE":
                     if (!LoadingIEnumerators.ContainsKey(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1))
                     {
-                        LoadingIEnumerators.Add(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, DownloadAudio(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, Path.Join(host, @"\cuesheet\" + advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1 + "." + audioMode), audioMode));
+                        LoadingIEnumerators.Add(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, DownloadAudio(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, $"{host}/cuesheet/{advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet}_{func.m_value1}.{audioMode}", audioMode));
                     }
                     break;
                 default:
@@ -1865,7 +1895,7 @@ public class player : MonoBehaviour
                             case "se":
                                 if (!LoadingIEnumerators.ContainsKey(command[1]))
                                 {
-                                    LoadingIEnumerators.Add(command[1], DownloadAudio(command[1], Path.Join(host, @"\se\" + command[1] + ".wav"), "wav"));
+                                    LoadingIEnumerators.Add(command[1], DownloadAudio(command[1], $"{host}/se/{command[1]}.wav", "wav"));
                                 }
                                 break;
                             case "emo":
@@ -1965,7 +1995,7 @@ public class player : MonoBehaviour
     {
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\script\ADVList.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/script/ADVList.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -1976,7 +2006,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\script\ADVCharacterList.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/script/ADVCharacterList.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -1987,7 +2017,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\script\ADVMotionList.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/script/ADVMotionList.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -1998,7 +2028,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\script\ADVEmotionList.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/script/ADVEmotionList.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2009,7 +2039,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\charavoice.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/charavoice.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2020,7 +2050,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\script\ADVTextTagArg.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/script/ADVTextTagArg.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2031,7 +2061,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\effectlist.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/effectlist.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2042,7 +2072,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\customadv.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/customadv.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2057,7 +2087,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\standpics.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/standpics.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2068,7 +2098,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\effects.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/effects.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2079,7 +2109,7 @@ public class player : MonoBehaviour
         }
         while (true)
         {
-            UnityWebRequest request = UnityWebRequest.Get(Path.Join(host, @"\voices.json"));
+            UnityWebRequest request = UnityWebRequest.Get($"{host}/voices.json");
             yield return request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -2134,6 +2164,26 @@ public class player : MonoBehaviour
     }
     void Start()
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        Application.targetFrameRate = -1;
+        host = "https://assets.krf-adv.com/adv";
+        audioMode = "ogg";
+        globalFont = "ja";
+        useCustomJson = false;
+        Attempt = 3;
+        AttemptDelay = 1f;
+        string jsonStr = GetPlaylistFromLocalStorage();
+        ADVIDs = JsonConvert.DeserializeObject<List<int>>(jsonStr);
+        BGMVolume = Mathf.Clamp(ADVIDs[0] / 100f, 0f, 1f);
+        SEVolume = Mathf.Clamp(ADVIDs[1] / 100f, 0f, 1f);
+        VoiceVolume = Mathf.Clamp(ADVIDs[2] / 100f, 0f, 1f);
+        ADVIDs.RemoveRange(0, 3);
+        ClearPlaylistInLocalStorage();
+#elif UNITY_EDITOR
+        Application.targetFrameRate = 60;
+        host = "https://assets.krf-adv.com/adv";
+        DebugMode = true;
+#else
         Application.targetFrameRate = 60;
         string ParametersPath = Path.Combine(Application.streamingAssetsPath, "Params.json");
         string paramjson = File.ReadAllText(ParametersPath);
@@ -2148,6 +2198,7 @@ public class player : MonoBehaviour
             SEVolume = Mathf.Clamp(parameters.Volume.SE / 100f, 0f, 1f);
             VoiceVolume = Mathf.Clamp(parameters.Volume.Voice / 100f, 0f, 1f);
         }
+#endif
         switch (globalFont)
         {
             case "ja":
@@ -2160,8 +2211,11 @@ public class player : MonoBehaviour
                 font = Resources.Load<Font>("DynamicFont");
                 break;
         }
+#if UNITY_WEBGL
+#else
         Screen.fullScreen = false;
         Screen.SetResolution(parameters.Width, 9 * parameters.Width / 16, false);
+#endif
         Camera mainCamera = Camera.main;
         cachedMainCameraTransform = mainCamera.transform;
         renderTexture = new RenderTexture(1920, 1080, 24);
@@ -2376,7 +2430,7 @@ public class player : MonoBehaviour
         bgPrimCamera.cullingMask = 1 << LayerMask.NameToLayer("BG_Prim");
         bgPrimCamera.targetTexture = bgTexture;
         bgPrimObj = new GameObject("BG_Prim");
-        bgPrimObj.transform.SetParent(renderTextureObj.transform);
+        bgPrimObj.transform.SetParent(Render.transform);
         bgPrimObj.transform.position = new Vector3(0f, 0f, 0f);
         MeshFilter bgPrimMeshFilter = bgPrimObj.AddComponent<MeshFilter>();
         bgPrimMeshFilter.mesh = CreateMesh(4000f/3f, 2250f/3f, new Vector2(0.5f, 0.5f));
@@ -2507,6 +2561,10 @@ public class player : MonoBehaviour
         warpPreparing.Clear();
         warpPrepared.Clear();
         warpping.Clear();
+        foreach (Transform transform in renderTextureObj.GetComponentsInChildren<Transform>()[1..])
+        {
+            Destroy(transform.gameObject);
+        }
     }
     private IEnumerator StartingLoading()
     {
@@ -2553,7 +2611,9 @@ public class player : MonoBehaviour
             if (ADVIDs[1] == advList.m_Params.Count)
             {
                 ADVIDs = new List<int> { 0 };
+#if !UNITY_WEBGL
                 Application.Quit();
+#endif
 #if UNITY_EDITOR
                 EditorApplication.isPlaying = false;
 #endif
@@ -2619,7 +2679,11 @@ public class player : MonoBehaviour
             ADVID = ADVIDs[ADVIndex];
         }
         Debug.Log(ADVID);
+#if UNITY_WEBGL && !UNITY_EDITOR
+    SetWebTitle("krfadvplayer - " + ADVID.ToString());
+#elif !UNITY_EDITOR
         SetWindowText(GetActiveWindow(), "krfadvplayer - " + ADVID.ToString());
+#endif
         advScript = advScripts[ADVID];
         advScriptText = advScriptTexts[ADVID];
         StartCoroutine(autoSpin());
@@ -2648,7 +2712,9 @@ public class player : MonoBehaviour
         }
         else
         {
+#if !UNITY_WEBGL
             Application.Quit();
+#endif
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
 #endif
@@ -6436,7 +6502,7 @@ public class player : MonoBehaviour
         {
             if (obj == null) { yield break; }
             timeElapsed += Time.deltaTime;
-            float volume = Mathf.Lerp(1f, 0f, timeElapsed / FadeOutSec);
+            float volume = Mathf.Lerp(BGMVolume, 0f, timeElapsed / FadeOutSec);
             audioSource.volume = volume;
             yield return null;
         }
@@ -8222,10 +8288,12 @@ public class player : MonoBehaviour
     void Update()
     {
         Time.timeScale = TimeScale;
+#if !UNITY_WEBGL
         if (Input.GetKeyDown(KeyCode.F11))
         {
             Screen.fullScreen = !Screen.fullScreen;
         }
+#endif
         if (JsonLoading)
         {
             return;
@@ -8235,7 +8303,9 @@ public class player : MonoBehaviour
             StopAllCoroutines();
             StartCoroutine(StartingLoading());
             StartLoading = false;
+#if !UNITY_WEBGL
             SetWindowText(GetActiveWindow(), "krfadvplayer");
+#endif
         }
         if (Playing)
         {
@@ -8300,7 +8370,9 @@ public class player : MonoBehaviour
                         }
                         ADVID = ADVIDs[ADVIndex];
                     }
+#if !UNITY_WEBGL
                     SetWindowText(GetActiveWindow(), "krfadvplayer - " + ADVID.ToString());
+#endif
                     advScript = advScripts[ADVID];
                     advScriptText = advScriptTexts[ADVID];
                     SetUp();

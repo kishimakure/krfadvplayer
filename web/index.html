@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja-JP">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>krfadvplayer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="krf-menu-ui">
+        <div class="krf-panel">
+            <h1 class="krf-title">krfadvplayer</h1>
+            
+            <div class="krf-columns-area">
+                <div class="krf-list-col" id="col1-types"></div>
+                
+                <div class="krf-list-col" id="col2-subtypes"></div>
+                
+                <div class="krf-list-col" id="col3-advids"></div>
+            </div>
+
+            <div class="krf-action-bar">
+                <span id="selected-count">0 / 50</span>
+                <button id="btn-start-engine" class="krf-play-btn" disabled></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="unity-container" style="display: none;">
+        <canvas id="unity-canvas"></canvas>
+    </div>
+
+    <script>
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/web.loader.js";
+        var config = {
+            dataUrl: buildUrl + "/web.data.br",
+            frameworkUrl: buildUrl + "/web.framework.js.br",
+            codeUrl: buildUrl + "/web.wasm.br",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "ADVWindow",
+            productName: "krfadvplayer",
+            productVersion: "1.0"
+        };
+
+        var canvas = document.querySelector("#unity-canvas");
+        var btnStart = document.querySelector("#btn-start-engine");
+        var menuUi = document.querySelector("#krf-menu-ui");
+        var unityContainer = document.querySelector("#unity-container");
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            btnStart.disabled = false;
+            btnStart.innerHTML = "▶ 启动播放器";
+        };
+        document.body.appendChild(script);
+        const col1 = document.getElementById('col1-types');
+        const col2 = document.getElementById('col2-subtypes');
+        const col3 = document.getElementById('col3-advids');
+        const selectedCountText = document.querySelector("#selected-count");
+        let selectedAdvs = [10,10,10];
+        let webAdvList = {};
+        fetch('webadvlist.json')
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                webAdvList = data;
+                RenderColumn1();
+            })
+            .catch(error => {
+                console.error(error);
+                col1.innerHTML = "<div style='color:red; padding:10px;'>无法加载剧情列表，请检查 webadvlist.json</div>";
+            });
+
+        function RenderColumn1() {
+            col1.innerHTML = '';
+            col2.innerHTML = '';
+            col3.innerHTML = '';
+
+            webAdvList.Params.forEach(typeName => {
+                let btn = document.createElement('button');
+                btn.className = 'krf-list-btn';
+                btn.innerText = typeName.Category;
+                btn.onclick = () => {
+                    Array.from(col1.children).forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    RenderColumn2(typeName.Subclasses);
+                };
+                col1.appendChild(btn);
+            });
+        }
+
+        function RenderColumn2(subClasses) {
+            col2.innerHTML = '';
+            col3.innerHTML = '';
+
+            subClasses.forEach(subType => {
+                let btn = document.createElement('button');
+                btn.className = 'krf-list-btn';
+                btn.innerText = subType.Name;
+                btn.onclick = () => {
+                    Array.from(col2.children).forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    RenderColumn3(subType.Scenarios);
+                };
+                col2.appendChild(btn);
+            });
+        }
+
+        function RenderColumn3(scenarios) {
+            col3.innerHTML = '';
+
+            scenarios.forEach(scenario => {
+                let advId = scenario.AdvID;
+                let advTitle = scenario.Title;
+
+                let label = document.createElement('label');
+                label.className = 'krf-checkbox-item';
+                
+                let checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = advId;
+                
+                if (selectedAdvs.includes(parseInt(advId))) {
+                    checkbox.checked = true;
+                }
+
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        if (selectedAdvs.length >= 50) {
+                            this.checked = false;
+                            return;
+                        }
+                        selectedAdvs.push(parseInt(this.value));
+                    } else {
+                        selectedAdvs = selectedAdvs.filter(val => val !== parseInt(this.value));
+                    }
+                    selectedCountText.innerText = selectedAdvs.length + " / 50";
+                });
+
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(" " + advTitle));
+                col3.appendChild(label);
+            });
+        }
+
+        btnStart.addEventListener("click", () => {
+            if (selectedAdvs.length === 0) {
+                return;
+            }
+            localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
+            menuUi.style.display = "none";
+            unityContainer.style.display = "block";
+
+            createUnityInstance(canvas, config, (progress) => {
+            }).then((unityInstance) => {
+            }).catch((message) => {
+                alert(message);
+            });
+        });
+  </script>
+</body>
+</html>

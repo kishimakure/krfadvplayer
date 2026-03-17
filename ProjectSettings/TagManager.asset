@@ -26,17 +26,17 @@ TagManager:
   - Chara8
   - Chara9
   - Chara10
-  - Chara11
-  - Chara12
-  - Chara13
-  - Chara14
-  - Chara15
-  - Chara16
-  - Chara17
-  - Chara18
-  - Chara19
-  - Effect
+  - 
+  - 
+  - BG_Prim
+  - BG
   - Effect_CharaBehind
+  - Chara
+  - Sprite
+  - Effect
+  - Caption
+  - Main
+  - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0

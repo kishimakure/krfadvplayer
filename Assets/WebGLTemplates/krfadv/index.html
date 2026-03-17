@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja-JP">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>krfadvplayer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="krf-menu-ui">
+        <div class="krf-panel">
+            <h1 class="krf-title">krfadvplayer</h1>
+
+            <div class="krf-columns-area">
+                <div class="krf-list-col" id="col1-types">
+                    <div class="krf-col-header">分类</div>
+                    <div class="krf-col-body" id="col1-body"></div>
+                </div>
+                <div class="krf-list-col" id="col2-subtypes">
+                    <div class="krf-col-header">子分类</div>
+                    <div class="krf-col-body" id="col2-body"></div>
+                </div>
+                <div class="krf-list-col" id="col3-advids">
+                    <div class="krf-col-header">剧情</div>
+                    <div class="krf-col-body" id="col3-body"></div>
+                </div>
+            </div>
+
+            <div class="krf-bottom-bar">
+                <div class="krf-volume-group">
+                    <div class="krf-volume-item">
+                        <label for="vol-bgm">BGM</label>
+                        <input type="range" id="vol-bgm" min="0" max="100" value="100">
+                        <span class="krf-vol-value" id="vol-bgm-val">100</span>
+                    </div>
+                    <div class="krf-volume-item">
+                        <label for="vol-se">SE</label>
+                        <input type="range" id="vol-se" min="0" max="100" value="100">
+                        <span class="krf-vol-value" id="vol-se-val">100</span>
+                    </div>
+                    <div class="krf-volume-item">
+                        <label for="vol-voice">Voice</label>
+                        <input type="range" id="vol-voice" min="0" max="100" value="100">
+                        <span class="krf-vol-value" id="vol-voice-val">100</span>
+                    </div>
+                </div>
+
+                <div class="krf-action-bar">
+                    <span id="selected-count">已选 0 条</span>
+                    <button id="btn-start-engine" class="krf-play-btn" disabled>加载中…</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="unity-container" style="display: none;">
+        <canvas id="unity-canvas"></canvas>
+    </div>
+
+    <script>
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+        var config = {
+            dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+            frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+            codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "{{{ COMPANY_NAME }}}",
+            productName: "{{{ PRODUCT_NAME }}}",
+            productVersion: "{{{ PRODUCT_VERSION }}}"
+        };
+
+        var canvas = document.querySelector("#unity-canvas");
+        var btnStart = document.querySelector("#btn-start-engine");
+        var menuUi = document.querySelector("#krf-menu-ui");
+        var unityContainer = document.querySelector("#unity-container");
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            btnStart.disabled = false;
+            btnStart.textContent = "\u25B6 启动播放器";
+        };
+        document.body.appendChild(script);
+
+        const col1 = document.getElementById('col1-body');
+        const col2 = document.getElementById('col2-body');
+        const col3 = document.getElementById('col3-body');
+        const selectedCountText = document.querySelector("#selected-count");
+
+        /* --- Volume sliders --- */
+        const volBgm   = document.getElementById('vol-bgm');
+        const volSe    = document.getElementById('vol-se');
+        const volVoice = document.getElementById('vol-voice');
+        const volBgmVal   = document.getElementById('vol-bgm-val');
+        const volSeVal    = document.getElementById('vol-se-val');
+        const volVoiceVal = document.getElementById('vol-voice-val');
+
+        function updateSliderTrack(slider) {
+            const pct = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.setProperty('--pct', pct + '%');
+        }
+
+        volBgm.addEventListener('input',   () => { volBgmVal.textContent   = volBgm.value;   updateSliderTrack(volBgm);   updateVolumes(); });
+        volSe.addEventListener('input',    () => { volSeVal.textContent    = volSe.value;    updateSliderTrack(volSe);    updateVolumes(); });
+        volVoice.addEventListener('input', () => { volVoiceVal.textContent = volVoice.value;  updateSliderTrack(volVoice); updateVolumes(); });
+        [volBgm, volSe, volVoice].forEach(updateSliderTrack);
+
+        /* First 3 elements of selectedAdvs = volume * 0.1 */
+        let selectedAdvs = [
+            parseInt(volBgm.value)   * 0.1,
+            parseInt(volSe.value)    * 0.1,
+            parseInt(volVoice.value) * 0.1
+        ];
+
+        function updateVolumes() {
+            selectedAdvs[0] = parseInt(volBgm.value)   * 0.1;
+            selectedAdvs[1] = parseInt(volSe.value)    * 0.1;
+            selectedAdvs[2] = parseInt(volVoice.value) * 0.1;
+        }
+
+        function getAdvCount() {
+            return selectedAdvs.length - 3;
+        }
+
+        function updateCountText() {
+            selectedCountText.textContent = "已选 " + getAdvCount() + " 条";
+        }
+
+        /* --- Data loading --- */
+        let webAdvList = {};
+        fetch('webadvlist.json')
+            .then(r => r.json())
+            .then(data => { webAdvList = data; RenderColumn1(); })
+            .catch(err => {
+                console.error(err);
+                col1.innerHTML = "<div style='color:#e74c3c;padding:12px'>无法加载剧情列表</div>";
+            });
+
+        /* --- Render columns --- */
+        function RenderColumn1() {
+            col1.innerHTML = '';
+            col2.innerHTML = '<div class="krf-col-placeholder">← 请先选择分类</div>';
+            col3.innerHTML = '<div class="krf-col-placeholder">← 请先选择子分类</div>';
+
+            webAdvList.Params.forEach(typeName => {
+                let btn = document.createElement('button');
+                btn.className = 'krf-list-btn';
+                btn.textContent = typeName.Category;
+                btn.onclick = () => {
+                    Array.from(col1.children).forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    RenderColumn2(typeName.Subclasses);
+                };
+                col1.appendChild(btn);
+            });
+        }
+
+        function RenderColumn2(subClasses) {
+            col2.innerHTML = '';
+            col3.innerHTML = '<div class="krf-col-placeholder">← 请先选择子分类</div>';
+
+            subClasses.forEach(subType => {
+                let btn = document.createElement('button');
+                btn.className = 'krf-list-btn';
+                btn.textContent = subType.Name;
+                btn.onclick = () => {
+                    Array.from(col2.children).forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    RenderColumn3(subType.Scenarios);
+                };
+                col2.appendChild(btn);
+            });
+        }
+
+        function RenderColumn3(scenarios) {
+            col3.innerHTML = '';
+
+            scenarios.forEach(scenario => {
+                let advId = parseInt(scenario.AdvID);
+                let advTitle = scenario.Title;
+
+                let label = document.createElement('label');
+                label.className = 'krf-checkbox-item';
+
+                let checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = advId;
+
+                if (selectedAdvs.indexOf(advId) > 2) {
+                    checkbox.checked = true;
+                }
+
+                checkbox.addEventListener('change', function () {
+                    let val = parseInt(this.value);
+                    if (this.checked) {
+                        if (getAdvCount() >= 50) { this.checked = false; return; }
+                        selectedAdvs.push(val);
+                    } else {
+                        selectedAdvs = selectedAdvs.slice(0, 3).concat(
+                            selectedAdvs.slice(3).filter(v => v !== val)
+                        );
+                    }
+                    updateCountText();
+                });
+
+                let span = document.createElement('span');
+                span.textContent = advTitle;
+
+                label.appendChild(checkbox);
+                label.appendChild(span);
+                col3.appendChild(label);
+            });
+        }
+
+        /* --- Launch --- */
+        btnStart.addEventListener("click", () => {
+            if (getAdvCount() === 0) return;
+            localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
+            menuUi.style.display = "none";
+            unityContainer.style.display = "block";
+
+            createUnityInstance(canvas, config, (progress) => {
+            }).then((unityInstance) => {
+            }).catch((message) => {
+                alert(message);
+            });
+        });
+    </script>
+</body>
+</html>
