@@ -1,48 +1,110 @@
 <!DOCTYPE html>
-<html lang="ja-JP">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>krfadvplayer</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico">
 </head>
 <body>
     <div id="krf-menu-ui">
         <div class="krf-panel">
             <h1 class="krf-title">krfadvplayer</h1>
-            
+
             <div class="krf-columns-area">
-                <div class="krf-list-col" id="col1-types"></div>
-                
-                <div class="krf-list-col" id="col2-subtypes"></div>
-                
-                <div class="krf-list-col" id="col3-advids"></div>
+                <div class="krf-list-col" id="col1-types">
+                    <div class="krf-col-header">Category</div>
+                    <div class="krf-col-body" id="col1-body"></div>
+                </div>
+                <div class="krf-list-col" id="col2-subtypes">
+                    <div class="krf-col-header">Subcategory</div>
+                    <div class="krf-col-body" id="col2-body"></div>
+                </div>
+                <div class="krf-list-col" id="col3-advids">
+                    <div class="krf-col-header">Scenarios</div>
+                    <div class="krf-col-body" id="col3-body"></div>
+                </div>
+                <div class="krf-list-col" id="col4-selected">
+                    <div class="krf-col-header">Selected</div>
+                    <div class="krf-col-body" id="col4-body">
+                        <div class="krf-col-placeholder">No scenarios selected</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="krf-action-bar">
-                <span id="selected-count">0 / 50</span>
-                <button id="btn-start-engine" class="krf-play-btn" disabled></button>
+            <div class="krf-bottom-bar">
+                <div class="krf-volume-group">
+                    <div class="krf-volume-item">
+                        <label for="vol-bgm">BGM</label>
+                        <input type="range" id="vol-bgm" min="0" max="100" value="100">
+                        <span class="krf-vol-value" id="vol-bgm-val">100</span>
+                    </div>
+                    <div class="krf-volume-item">
+                        <label for="vol-se">SE</label>
+                        <input type="range" id="vol-se" min="0" max="100" value="100">
+                        <span class="krf-vol-value" id="vol-se-val">100</span>
+                    </div>
+                    <div class="krf-volume-item">
+                        <label for="vol-voice">Voice</label>
+                        <input type="range" id="vol-voice" min="0" max="100" value="100">
+                        <span class="krf-vol-value" id="vol-voice-val">100</span>
+                    </div>
+                </div>
+
+                <div class="krf-action-bar">
+                    <span id="selected-count">0 selected</span>
+                    <button id="btn-start-engine" class="krf-play-btn" disabled>Loading...</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="unity-container" style="display: none;">
         <canvas id="unity-canvas"></canvas>
+        <div id="loading-overlay">
+            <!-- Normal loading state -->
+            <div class="loading-box" id="loading-box">
+                <div class="loading-title">krfadvplayer</div>
+                <div class="loading-bar-track">
+                    <div class="loading-bar-fill" id="loading-bar-fill"></div>
+                </div>
+                <div class="loading-text" id="loading-text">Checking environment...</div>
+            </div>
+            <!-- Ad blocker blocked state (hidden by default) -->
+            <div class="adblocker-blocked" id="adblocker-blocked" style="display:none;">
+                <div class="adblocker-icon">&#9888;</div>
+                <div class="adblocker-title">Ad Blocker Detected</div>
+                <div class="adblocker-desc">
+                    Your ad blocker is blocking resources containing <strong>&quot;adv&quot;</strong> in the URL.<br>
+                    This application requires access to <code>assets.krf-adv.com</code> to function.
+                </div>
+                <div class="adblocker-steps">
+                    <strong>Please:</strong>
+                    <ol>
+                        <li>Disable your ad blocker for this site</li>
+                        <li>Reload the page</li>
+                    </ol>
+                </div>
+                <button class="adblocker-reload-btn" onclick="location.reload()">Reload Page</button>
+            </div>
+        </div>
     </div>
 
     <script>
         var buildUrl = "Build";
         var loaderUrl = buildUrl + "/web.loader.js";
         var config = {
-            dataUrl: buildUrl + "/web.data.br",
-            frameworkUrl: buildUrl + "/web.framework.js.br",
-            codeUrl: buildUrl + "/web.wasm.br",
+            dataUrl: buildUrl + "/web.data",
+            frameworkUrl: buildUrl + "/web.framework.js",
+            codeUrl: buildUrl + "/web.wasm",
             streamingAssetsUrl: "StreamingAssets",
             companyName: "ADVWindow",
             productName: "krfadvplayer",
             productVersion: "1.0"
         };
 
+        
         var canvas = document.querySelector("#unity-canvas");
         var btnStart = document.querySelector("#btn-start-engine");
         var menuUi = document.querySelector("#krf-menu-ui");
@@ -51,37 +113,151 @@
         script.src = loaderUrl;
         script.onload = () => {
             btnStart.disabled = false;
-            btnStart.innerHTML = "▶ 启动播放器";
+            btnStart.textContent = "\u25B6 START";
         };
         document.body.appendChild(script);
-        const col1 = document.getElementById('col1-types');
-        const col2 = document.getElementById('col2-subtypes');
-        const col3 = document.getElementById('col3-advids');
+
+        const col1 = document.getElementById('col1-body');
+        const col2 = document.getElementById('col2-body');
+        const col3 = document.getElementById('col3-body');
+        const col4 = document.getElementById('col4-body');
         const selectedCountText = document.querySelector("#selected-count");
-        let selectedAdvs = [10,10,10];
+
+        /* --- Volume sliders --- */
+        const volBgm   = document.getElementById('vol-bgm');
+        const volSe    = document.getElementById('vol-se');
+        const volVoice = document.getElementById('vol-voice');
+        const volBgmVal   = document.getElementById('vol-bgm-val');
+        const volSeVal    = document.getElementById('vol-se-val');
+        const volVoiceVal = document.getElementById('vol-voice-val');
+
+        function updateSliderTrack(slider) {
+            const pct = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.setProperty('--pct', pct + '%');
+        }
+
+        volBgm.addEventListener('input',   () => { volBgmVal.textContent   = volBgm.value;   updateSliderTrack(volBgm);   updateVolumes(); });
+        volSe.addEventListener('input',    () => { volSeVal.textContent    = volSe.value;    updateSliderTrack(volSe);    updateVolumes(); });
+        volVoice.addEventListener('input', () => { volVoiceVal.textContent = volVoice.value;  updateSliderTrack(volVoice); updateVolumes(); });
+        [volBgm, volSe, volVoice].forEach(updateSliderTrack);
+
+        /* First 3 elements of selectedAdvs = volume * 0.5 */
+        let selectedAdvs = [
+            parseInt(volBgm.value)   * 0.5,
+            parseInt(volSe.value)    * 0.5,
+            parseInt(volVoice.value) * 0.5
+        ];
+
+        /* Map advId -> title for the selected column */
+        let advTitleMap = {};
+
+        function updateVolumes() {
+            selectedAdvs[0] = parseInt(volBgm.value)   * 0.5;
+            selectedAdvs[1] = parseInt(volSe.value)    * 0.5;
+            selectedAdvs[2] = parseInt(volVoice.value) * 0.5;
+        }
+
+        function getAdvCount() {
+            return selectedAdvs.length - 3;
+        }
+
+        function updateCountText() {
+            selectedCountText.textContent = getAdvCount() + " selected";
+        }
+
+        /* --- Render selected column (col4) --- */
+        function renderSelectedColumn() {
+            col4.innerHTML = '';
+            const advIds = selectedAdvs.slice(3);
+            if (advIds.length === 0) {
+                col4.innerHTML = '<div class="krf-col-placeholder">No scenarios selected</div>';
+                return;
+            }
+            advIds.forEach(advId => {
+                let item = document.createElement('div');
+                item.className = 'krf-selected-item';
+
+                let titleSpan = document.createElement('span');
+                titleSpan.className = 'krf-selected-title';
+                titleSpan.textContent = advTitleMap[advId] || ('ADV ' + advId);
+
+                let idSpan = document.createElement('span');
+                idSpan.className = 'krf-selected-advid';
+                idSpan.textContent = advId;
+
+                let removeBtn = document.createElement('button');
+                removeBtn.className = 'krf-remove-btn';
+                removeBtn.textContent = '\u00D7';
+                removeBtn.title = 'Remove';
+                removeBtn.onclick = () => {
+                    selectedAdvs = selectedAdvs.slice(0, 3).concat(
+                        selectedAdvs.slice(3).filter(v => v !== advId)
+                    );
+                    updateCountText();
+                    renderSelectedColumn();
+                    refreshCol3Checkboxes();
+                    refreshCol2Checkboxes();
+                };
+
+                item.appendChild(titleSpan);
+                item.appendChild(idSpan);
+                item.appendChild(removeBtn);
+                col4.appendChild(item);
+            });
+        }
+
+        /* Refresh col3 checkbox states without re-rendering */
+        function refreshCol3Checkboxes() {
+            col3.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedAdvs.indexOf(parseInt(cb.value)) > 2;
+            });
+        }
+
+        /* Refresh col2 "select-all" checkbox states */
+        function refreshCol2Checkboxes() {
+            col2.querySelectorAll('.krf-subtype-row').forEach(row => {
+                const cb = row.querySelector('input[type="checkbox"]');
+                if (!cb) return;
+                const scenarioIds = JSON.parse(cb.dataset.scenarioIds || '[]');
+                const allSelected = scenarioIds.length > 0 && scenarioIds.every(id => selectedAdvs.indexOf(id) > 2);
+                const someSelected = scenarioIds.some(id => selectedAdvs.indexOf(id) > 2);
+                cb.checked = allSelected;
+                cb.indeterminate = someSelected && !allSelected;
+            });
+        }
+
+        /* --- Data loading --- */
         let webAdvList = {};
         fetch('webadvlist.json')
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                webAdvList = data;
-                RenderColumn1();
-            })
-            .catch(error => {
-                console.error(error);
-                col1.innerHTML = "<div style='color:red; padding:10px;'>无法加载剧情列表，请检查 webadvlist.json</div>";
+            .then(r => r.json())
+            .then(data => { webAdvList = data; buildTitleMap(); RenderColumn1(); })
+            .catch(err => {
+                console.error(err);
+                col1.innerHTML = "<div style='color:#e74c3c;padding:12px'>Failed to load scenario list</div>";
             });
 
+        /* Build advId -> title lookup map */
+        function buildTitleMap() {
+            if (!webAdvList.Params) return;
+            webAdvList.Params.forEach(cat => {
+                cat.Subclasses.forEach(sub => {
+                    sub.Scenarios.forEach(sc => {
+                        advTitleMap[parseInt(sc.AdvID)] = sc.Title;
+                    });
+                });
+            });
+        }
+
+        /* --- Render columns --- */
         function RenderColumn1() {
             col1.innerHTML = '';
-            col2.innerHTML = '';
-            col3.innerHTML = '';
+            col2.innerHTML = '<div class="krf-col-placeholder">\u2190 Select a category</div>';
+            col3.innerHTML = '<div class="krf-col-placeholder">\u2190 Select a subcategory</div>';
 
             webAdvList.Params.forEach(typeName => {
                 let btn = document.createElement('button');
                 btn.className = 'krf-list-btn';
-                btn.innerText = typeName.Category;
+                btn.textContent = typeName.Category;
                 btn.onclick = () => {
                     Array.from(col1.children).forEach(c => c.classList.remove('active'));
                     btn.classList.add('active');
@@ -93,18 +269,63 @@
 
         function RenderColumn2(subClasses) {
             col2.innerHTML = '';
-            col3.innerHTML = '';
+            col3.innerHTML = '<div class="krf-col-placeholder">\u2190 Select a subcategory</div>';
 
-            subClasses.forEach(subType => {
+            const sorted = subClasses.slice().sort((a, b) => (a.ID || 0) - (b.ID || 0));
+            sorted.forEach(subType => {
+                let row = document.createElement('div');
+                row.className = 'krf-subtype-row';
+
+                /* Select-all checkbox */
+                let checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'krf-subtype-checkbox';
+                const scenarioIds = subType.Scenarios.map(sc => parseInt(sc.AdvID));
+                checkbox.dataset.scenarioIds = JSON.stringify(scenarioIds);
+
+                /* Check initial state */
+                const allSel = scenarioIds.length > 0 && scenarioIds.every(id => selectedAdvs.indexOf(id) > 2);
+                const someSel = scenarioIds.some(id => selectedAdvs.indexOf(id) > 2);
+                checkbox.checked = allSel;
+                checkbox.indeterminate = someSel && !allSel;
+
+                checkbox.addEventListener('change', function (e) {
+                    e.stopPropagation();
+                    if (this.checked) {
+                        /* Add all scenarios not yet selected */
+                        scenarioIds.forEach(id => {
+                            advTitleMap[id] = advTitleMap[id] || ('ADV ' + id);
+                            if (selectedAdvs.indexOf(id) <= 2) {
+                                if (getAdvCount() < 50) {
+                                    selectedAdvs.push(id);
+                                }
+                            }
+                        });
+                    } else {
+                        /* Remove all scenarios of this subcategory */
+                        const removeSet = new Set(scenarioIds);
+                        selectedAdvs = selectedAdvs.slice(0, 3).concat(
+                            selectedAdvs.slice(3).filter(v => !removeSet.has(v))
+                        );
+                    }
+                    updateCountText();
+                    renderSelectedColumn();
+                    refreshCol3Checkboxes();
+                    refreshCol2Checkboxes();
+                });
+
                 let btn = document.createElement('button');
-                btn.className = 'krf-list-btn';
-                btn.innerText = subType.Name;
+                btn.className = 'krf-list-btn krf-subtype-btn';
+                btn.textContent = subType.Name;
                 btn.onclick = () => {
-                    Array.from(col2.children).forEach(c => c.classList.remove('active'));
-                    btn.classList.add('active');
+                    col2.querySelectorAll('.krf-subtype-row').forEach(r => r.classList.remove('active'));
+                    row.classList.add('active');
                     RenderColumn3(subType.Scenarios);
                 };
-                col2.appendChild(btn);
+
+                row.appendChild(checkbox);
+                row.appendChild(btn);
+                col2.appendChild(row);
             });
         }
 
@@ -112,53 +333,124 @@
             col3.innerHTML = '';
 
             scenarios.forEach(scenario => {
-                let advId = scenario.AdvID;
+                let advId = parseInt(scenario.AdvID);
                 let advTitle = scenario.Title;
+                advTitleMap[advId] = advTitle;
 
                 let label = document.createElement('label');
                 label.className = 'krf-checkbox-item';
-                
+
                 let checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.value = advId;
-                
-                if (selectedAdvs.includes(parseInt(advId))) {
+
+                if (selectedAdvs.indexOf(advId) > 2) {
                     checkbox.checked = true;
                 }
 
-                checkbox.addEventListener('change', function() {
+                checkbox.addEventListener('change', function () {
+                    let val = parseInt(this.value);
                     if (this.checked) {
-                        if (selectedAdvs.length >= 50) {
-                            this.checked = false;
-                            return;
-                        }
-                        selectedAdvs.push(parseInt(this.value));
+                        if (getAdvCount() >= 50) { this.checked = false; return; }
+                        selectedAdvs.push(val);
                     } else {
-                        selectedAdvs = selectedAdvs.filter(val => val !== parseInt(this.value));
+                        selectedAdvs = selectedAdvs.slice(0, 3).concat(
+                            selectedAdvs.slice(3).filter(v => v !== val)
+                        );
                     }
-                    selectedCountText.innerText = selectedAdvs.length + " / 50";
+                    updateCountText();
+                    renderSelectedColumn();
+                    refreshCol2Checkboxes();
                 });
 
+                let span = document.createElement('span');
+                span.className = 'krf-selected-title';
+                span.textContent = advTitle;
+
+                let idSpan = document.createElement('span');
+                idSpan.className = 'krf-selected-advid';
+                idSpan.textContent = advId;
+
                 label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(" " + advTitle));
+                label.appendChild(span);
+                label.appendChild(idSpan);
                 col3.appendChild(label);
             });
         }
 
+        /* --- Launch --- */
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingBarFill = document.getElementById('loading-bar-fill');
+        const loadingText    = document.getElementById('loading-text');
+
         btnStart.addEventListener("click", () => {
-            if (selectedAdvs.length === 0) {
-                return;
-            }
+            if (getAdvCount() === 0) return;
             localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
             menuUi.style.display = "none";
             unityContainer.style.display = "block";
 
-            createUnityInstance(canvas, config, (progress) => {
-            }).then((unityInstance) => {
-            }).catch((message) => {
-                alert(message);
+            /* First check for ad blocker, then decide whether to load */
+            detectAdBlocker().then(blocked => {
+                if (blocked) {
+                    /* Show full error page, do NOT load WebGL */
+                    document.getElementById('loading-box').style.display = 'none';
+                    document.getElementById('adblocker-blocked').style.display = 'flex';
+                    return;
+                }
+                /* No ad blocker — proceed with WebGL loading */
+                loadingText.textContent = 'Initializing...';
+                createUnityInstance(canvas, config, (progress) => {
+                    const pct = Math.round(progress * 100);
+                    loadingBarFill.style.width = pct + '%';
+                    loadingText.textContent = 'Loading... ' + pct + '%';
+                }).then((unityInstance) => {
+                    loadingOverlay.style.display = 'none';
+                }).catch((message) => {
+                    loadingText.textContent = 'Error: ' + message;
+                    loadingBarFill.style.background = '#d32f2f';
+                });
             });
         });
-  </script>
+
+        /* --- Ad blocker detection --- */
+        function detectAdBlocker() {
+            /*
+             * Probe a URL containing "adv" that ad blockers will block.
+             * - Normal: server returns 403/404 → fetch succeeds → not blocked
+             * - Ad blocker: request is killed → fetch throws → blocked
+             *
+             * We also create a hidden <img> as a secondary probe, since some
+             * ad blockers only intercept certain request types.
+             *
+             * Returns Promise<boolean> — true if ad blocker detected.
+             */
+            return new Promise(resolve => {
+                let settled = false;
+                const settle = (blocked) => {
+                    if (settled) return;
+                    settled = true;
+                    resolve(blocked);
+                };
+
+                /* Probe 1: fetch */
+                fetch('https://assets.krf-adv.com/adv/advscript/Story/ADVScript_Story_001_002.json', {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    cache: 'no-store'
+                })
+                .then(() => settle(false))
+                .catch(() => settle(true));
+
+                /* Probe 2: hidden image (backup) */
+                const img = new Image();
+                img.onload = () => settle(false);
+                img.onerror = () => { /* Fires for both 404 and blocked; fetch probe takes priority */ };
+                img.src = 'https://assets.krf-adv.com/adv/probe_' + Date.now() + '.gif';
+
+                /* Timeout: if nothing responds in 4s, assume blocked */
+                setTimeout(() => settle(true), 4000);
+            });
+        }
+    </script>
 </body>
 </html>
