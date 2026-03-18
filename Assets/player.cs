@@ -1089,6 +1089,7 @@ public class player : MonoBehaviour
     public float VoiceVolume = 1f;
     public bool enableParticle = false;
     private bool netError = false;
+    private const int SIDE_LENGTH = 2048;
     private Font font;
     private int ADVID;
     private int ADVIndex;
@@ -2131,7 +2132,7 @@ public class player : MonoBehaviour
         {
             return meshCache[meshParams];
         }
-        Mesh mesh = new Mesh { name = "Quad1920x1080" };
+        Mesh mesh = new Mesh { name = $"Quad{width}x{height}" };
         float x0 = -width * pivot.x;
         float x1 = width * (1 - pivot.x);
         float y0 = -height * pivot.y;
@@ -2221,7 +2222,7 @@ public class player : MonoBehaviour
 #endif
         Camera mainCamera = Camera.main;
         cachedMainCameraTransform = mainCamera.transform;
-        renderTexture = new RenderTexture(1920, 1080, 24);
+        renderTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
         Render = new GameObject("Render");
         Render.transform.position = new Vector3(-20000f, 0f, 0f);
         Render.transform.localScale = new Vector3(25f / 36f, 25f / 36f, 1f);
@@ -2289,7 +2290,7 @@ public class player : MonoBehaviour
         RectTransform windowTransform = ADVWindow.AddComponent<RectTransform>();
         windowTransform.anchorMax = new Vector2(0.5f, 0f);
         windowTransform.anchorMin = new Vector2(0.5f, 0f);
-        windowTransform.localPosition = new Vector3(0f, -200f, 0f);
+        windowTransform.anchoredPosition = new Vector2(0f, -100f);
         windowTransform.sizeDelta = new Vector2(960f, 180f);
         windowTransform.localScale = new Vector3(1f, 1f, 1f);
         Image windowRenderer = ADVWindow.AddComponent<Image>();
@@ -2298,7 +2299,7 @@ public class player : MonoBehaviour
         Sprite windowSprite = Sprite.Create(windowTexture, new Rect(0, 0, windowTexture.width, windowTexture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(16, 16, 16, 16));
         windowRenderer.sprite = windowSprite;
         windowRenderer.type = Image.Type.Sliced;
-        windowRenderer.color = new Color(1f, 1f, 1f, 1f);
+        windowRenderer.color = new Color(1f, 1f, 1f, 0f);
         GameObject ADVTalkerLabelBG = new GameObject("ADVTalkerLabelBG");
         ADVTalkerLabelBG.transform.SetParent(ADVWindow.transform);
         RectTransform talkerTransform = ADVTalkerLabelBG.AddComponent<RectTransform>();
@@ -2311,7 +2312,7 @@ public class player : MonoBehaviour
         Sprite talkerSprite = Sprite.Create(talkerTexture, new Rect(0, 0, talkerTexture.width, talkerTexture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(104, 14, 34, 10));
         talkerImage.sprite = talkerSprite;
         talkerImage.type = Image.Type.Sliced;
-        talkerImage.color = new Color(1f, 1f, 1f, 1f);
+        talkerImage.color = new Color(1f, 1f, 1f, 0f);
         ADVAutoLabelBG = new GameObject("ADVAutoLabelBG");
         ADVAutoLabelBG.transform.SetParent(ADVWindow.transform);
         RectTransform autoLabelTransform = ADVAutoLabelBG.AddComponent<RectTransform>();
@@ -2324,7 +2325,7 @@ public class player : MonoBehaviour
         Sprite autoLabelSprite = Sprite.Create(autoLabelTexture, new Rect(0, 0, autoLabelTexture.width, autoLabelTexture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(23, 23, 23, 23));
         autoLabelImage.sprite = autoLabelSprite;
         autoLabelImage.type = Image.Type.Sliced;
-        autoLabelImage.color = new Color(1f, 1f, 1f, 1f);
+        autoLabelImage.color = new Color(1f, 1f, 1f, 0f);
         ADVAutoIcon = new GameObject("ADVAutoIcon");
         ADVAutoIcon.transform.SetParent(ADVAutoLabelBG.transform);
         RectTransform autoIconTransform = ADVAutoIcon.AddComponent<RectTransform>();
@@ -2360,7 +2361,7 @@ public class player : MonoBehaviour
         PenTexture.wrapMode = TextureWrapMode.Clamp;
         Sprite PenSprite = Sprite.Create(PenTexture, new Rect(0, 0, PenTexture.width, PenTexture.height), new Vector2(0.5f, 0.5f), 100f);
         PenImage.sprite = PenSprite;
-        PenImage.color = new Color(1f, 1f, 1f, 1f);
+        PenImage.color = new Color(1f, 1f, 1f, 0f);
         ADVPenShadow = new GameObject("ADVPenShadow");
         ADVPenShadow.transform.SetParent(ADVWindow.transform);
         RectTransform PenShadowTransform = ADVPenShadow.AddComponent<RectTransform>();
@@ -2372,7 +2373,7 @@ public class player : MonoBehaviour
         PenShadowTexture.wrapMode = TextureWrapMode.Clamp;
         Sprite PenShadowSprite = Sprite.Create(PenShadowTexture, new Rect(0, 0, PenShadowTexture.width, PenShadowTexture.height), new Vector2(0.5f, 0.5f), 100f);
         PenShadowImage.sprite = PenShadowSprite;
-        PenShadowImage.color = new Color(1f, 1f, 1f, 1f);
+        PenShadowImage.color = new Color(1f, 1f, 1f, 0f);
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(ADVWindow.transform);
         RectTransform textTransform = textObj.AddComponent<RectTransform>();
@@ -2410,7 +2411,7 @@ public class player : MonoBehaviour
             cameras.Add(newCamera);
             newCamera.transform.position = new Vector3(0f, 10000f, -10000f);
             newCamera.orthographic = true;
-            newCamera.orthographicSize = 375;
+            newCamera.orthographicSize = 2000f / 3f;
             newCamera.nearClipPlane = 0.3f;
             newCamera.farClipPlane = 200000f;
             newCamera.backgroundColor = new Color(0f, 0f, 0f, 0f);
@@ -2425,13 +2426,13 @@ public class player : MonoBehaviour
         SetCamera("Camera_Main", 6, "Main", CameraClearFlags.Depth);
         renderTextureObj = new GameObject("RenderTextures");
         renderTextureObj.transform.position = new Vector3(0f, 0f, 0f);
-        bgTexture = new RenderTexture(4000, 2250, 24);
+        bgTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
         GameObject bgPrim = new GameObject("Camera_BG_Prim");
         bgPrim.transform.SetParent(camerasObj.transform);
         Camera bgPrimCamera = bgPrim.AddComponent<Camera>();
         bgPrimCamera.transform.position = new Vector3(0f, 0f, -10000f);
         bgPrimCamera.orthographic = true;
-        bgPrimCamera.orthographicSize = 375;
+        bgPrimCamera.orthographicSize = 2000f / 3f;
         bgPrimCamera.nearClipPlane = 0.3f;
         bgPrimCamera.farClipPlane = 200000f;
         bgPrimCamera.backgroundColor = new Color(0f, 0f, 0f, 0f);
@@ -2441,7 +2442,7 @@ public class player : MonoBehaviour
         bgPrimObj.transform.SetParent(Render.transform);
         bgPrimObj.transform.position = new Vector3(0f, 0f, 0f);
         MeshFilter bgPrimMeshFilter = bgPrimObj.AddComponent<MeshFilter>();
-        bgPrimMeshFilter.mesh = CreateMesh(4000f/3f, 2250f/3f, new Vector2(0.5f, 0.5f));
+        bgPrimMeshFilter.mesh = CreateMesh(4000f/3f, 4000f/3f, new Vector2(0.5f, 0.5f));
         MeshRenderer bgPrimRenderer = bgPrimObj.AddComponent<MeshRenderer>();
         Material bgPrimMaterial = new Material(Shader.Find("CustomShader_COMMON"));
         bgPrimMaterial.SetTexture(_MainTex, bgTexture);
@@ -2492,9 +2493,9 @@ public class player : MonoBehaviour
         Texture2D scTexture = Resources.Load<Texture2D>("SceneChange");
         scTexture.wrapMode = TextureWrapMode.Clamp;
         Sprite scSprite = Sprite.Create(scTexture, new Rect(0, 0, scTexture.width, scTexture.height), new Vector2(0.5f, 0.5f), 1);
-        for (int i = -3; i <= 3; i++)
+        for (int i = -4; i <= 4; i++)
         {
-            for (float j = 1.5f; j >= -1.5f; j--)
+            for (float j = 3.5f; j >= -3.5f; j--)
             {
                 GameObject sc = new GameObject(i.ToString() + "," + j.ToString());
                 SpriteRenderer scRenderer = sc.AddComponent<SpriteRenderer>();
@@ -2514,7 +2515,7 @@ public class player : MonoBehaviour
         UniversalAdditionalCameraData cameraData = newCameraComponent.GetUniversalAdditionalCameraData();
         newCameraComponent.transform.position = new Vector3(0f, 0f, -10000f);
         newCameraComponent.orthographic = true;
-        newCameraComponent.orthographicSize = 375;
+        newCameraComponent.orthographicSize = 2000f / 3f;
         newCameraComponent.nearClipPlane = 0.3f;
         newCameraComponent.farClipPlane = 200000f;
         newCameraComponent.backgroundColor = new Color(0f, 0f, 0f, (depth == 0) ? 1f : 0f);
@@ -2708,13 +2709,13 @@ public class player : MonoBehaviour
     }
     private IEnumerator EndingLoading()
     {
-        for (float i = 4.5f; i >= -4.5f; i--)
+        for (float i = 7.5f; i >= -7.5f; i--)
         {
-            for (float j = i >= 1.5 ? -3f : -1.5f - i; j <= (i >= -1.5f ? 1.5f - i : 3f); j++)
+            for (float j = (i >= 0.5 ? -4f : -3.5f - i); j <= (i >= -0.5f ? 3.5f - i : 4f); j++)
             {
                 float x = j;
                 float y = i + j;
-                StartCoroutine(FlipSceneChange(x, y, Mathf.Pow(2, 0.5f), 0f, 0.03f));
+                StartCoroutine(FlipSceneChange(x, y, false, 0.03f));
             }
             yield return new WaitForSeconds(0.03f);
         }
@@ -2744,8 +2745,11 @@ public class player : MonoBehaviour
         SpriteRenderer KuromonRenderer = DLKuromon.AddComponent<SpriteRenderer>();
         KuromonRenderer.sprite = KuromonSprite;
         KuromonRenderer.sortingOrder = -1;
-        DLKuromon.transform.SetParent(SceneChange.transform);
-        DLKuromon.transform.localPosition = new Vector3(768f, -384f, 0f);
+        DLKuromon.transform.SetParent(textCanvas.transform);
+        RectTransform dlkuromonTransform = DLKuromon.AddComponent<RectTransform>();
+        dlkuromonTransform.anchorMax = new Vector2(1f, 0f);
+        dlkuromonTransform.anchorMin = new Vector2(1f, 0f);
+        dlkuromonTransform.anchoredPosition = new Vector3(576f - 2000f / 3f, -288.75f + 375f, 0f);
         GameObject Loading = new GameObject("Loading");
         Texture2D LoadingTexture = Resources.Load<Texture2D>("Loading");
         LoadingTexture.wrapMode = TextureWrapMode.Clamp;
@@ -2753,8 +2757,8 @@ public class player : MonoBehaviour
         SpriteRenderer LoadingRenderer = Loading.AddComponent<SpriteRenderer>();
         LoadingRenderer.sprite = LoadingSprite;
         LoadingRenderer.sortingOrder = -1;
-        Loading.transform.SetParent(SceneChange.transform);
-        Loading.transform.localPosition = new Vector3(540f, -432f, 0f);
+        Loading.transform.SetParent(DLKuromon.transform);
+        Loading.transform.localPosition = new Vector3(-171f, -36f, 0f);
         Texture2D DotTexture = Resources.Load<Texture2D>("LoadingDot");
         DotTexture.wrapMode = TextureWrapMode.Clamp;
         Sprite DotSprite = Sprite.Create(DotTexture, new Rect(0, 0, DotTexture.width, DotTexture.height), new Vector2(0.5f, 0.5f), 1);
@@ -2762,25 +2766,25 @@ public class player : MonoBehaviour
         SpriteRenderer Dot1Renderer = Dot1.AddComponent<SpriteRenderer>();
         Dot1Renderer.sprite = DotSprite;
         Dot1Renderer.sortingOrder = -1;
-        Dot1.transform.SetParent(SceneChange.transform);
-        Dot1.transform.localPosition = new Vector3(634f, -438f, 0f);
+        Dot1.transform.SetParent(DLKuromon.transform);
+        Dot1.transform.localPosition = new Vector3(-100.5f, -40.5f, 0f);
         GameObject Dot2 = new GameObject("Dot2");
         SpriteRenderer Dot2Renderer = Dot2.AddComponent<SpriteRenderer>();
         Dot2Renderer.sprite = DotSprite;
         Dot2Renderer.sortingOrder = -1;
-        Dot2.transform.SetParent(SceneChange.transform);
-        Dot2.transform.localPosition = new Vector3(644f, -438f, 0f);
+        Dot2.transform.SetParent(DLKuromon.transform);
+        Dot2.transform.localPosition = new Vector3(-93f, -40.5f, 0f);
         GameObject Dot3 = new GameObject("Dot3");
         SpriteRenderer Dot3Renderer = Dot3.AddComponent<SpriteRenderer>();
         Dot3Renderer.sprite = DotSprite;
         Dot3Renderer.sortingOrder = -1;
-        Dot3.transform.SetParent(SceneChange.transform);
-        Dot3.transform.localPosition = new Vector3(654f, -438f, 0f);
+        Dot3.transform.SetParent(DLKuromon.transform);
+        Dot3.transform.localPosition = new Vector3(-85.5f, -40.5f, 0f);
         float timeElapsed = 0f;
         GameObject Loaded = new GameObject("Loaded");
-        Loaded.transform.SetParent(SceneChange.transform);
+        Loaded.transform.SetParent(DLKuromon.transform);
         RectTransform loadedTransform = Loaded.AddComponent<RectTransform>();
-        loadedTransform.localPosition = new Vector3(-300f, 0f, 0f);
+        loadedTransform.localPosition = new Vector3(-801f, 288.75f, 0f);
         loadedTransform.sizeDelta = new Vector2(1000f, 1000f);
         loadedTransform.localScale = new Vector3(1f, 1f, 1f);
         Text loadedText = Loaded.AddComponent<Text>();
@@ -2792,9 +2796,9 @@ public class player : MonoBehaviour
         loadedText.alignment = TextAnchor.LowerLeft;
         loadedText.verticalOverflow = VerticalWrapMode.Overflow;
         GameObject ToLoad = new GameObject("ToLoad");
-        ToLoad.transform.SetParent(SceneChange.transform);
+        ToLoad.transform.SetParent(DLKuromon.transform);
         RectTransform toloadTransform = ToLoad.AddComponent<RectTransform>();
-        toloadTransform.localPosition = new Vector3(500f, 0f, 0f);
+        toloadTransform.localPosition = new Vector3(-201f, 288.75f, 0f);
         toloadTransform.sizeDelta = new Vector2(1000f, 1000f);
         toloadTransform.localScale = new Vector3(1f, 1f, 1f);
         Text toloadText = ToLoad.AddComponent<Text>();
@@ -2892,25 +2896,27 @@ public class player : MonoBehaviour
         }
         Loaded.SetActive(false);
         Destroy(DLKuromon);
-        Destroy(Loading);
-        Destroy(Dot1);
-        Destroy(Dot2);
-        Destroy(Dot3);
-        for (float i = 4.5f; i >= -4.5f; i--)
+        for (float i = 7.5f; i >= -7.5f; i--)
         {
-            for (float j = i >= 1.5 ? -3f : -1.5f - i; j <= (i >= -1.5f ? 1.5f - i : 3f); j++)
+            for (float j = (i >= 0.5 ? -4f : -3.5f - i); j <= (i >= -0.5f ? 3.5f - i : 4f); j++)
             {
                 float x = j;
                 float y = i + j;
-                StartCoroutine(FlipSceneChange(x, y, 0f, Mathf.Pow(2, 0.5f), 0.03f));
+                StartCoroutine(FlipSceneChange(x, y, true, 0.03f));
             }
             yield return new WaitForSeconds(0.03f);
         }
     }
-    private IEnumerator FlipSceneChange(float x, float y, float wStart, float wEnd, float time)
+    private IEnumerator FlipSceneChange(float x, float y, bool flipOff, float time)
     {
         GameObject sc = GameObject.Find(x.ToString() + "," + y.ToString());
+        float wStart = flipOff ? 0f : Mathf.Pow(2, 0.5f);
+        float wEnd = flipOff ? Mathf.Pow(2, 0.5f) : 0f;
         float timeElapsed = 0f;
+        if (!flipOff)
+        {
+            sc.GetComponent<SpriteRenderer>().enabled = true;
+        }
         while (timeElapsed < time)
         {
             timeElapsed += Time.deltaTime;
@@ -2918,6 +2924,10 @@ public class player : MonoBehaviour
             yield return null;
         }
         sc.transform.localRotation = new Quaternion(1f, 1f, 0f, wEnd);
+        if (flipOff)
+        {
+            sc.GetComponent<SpriteRenderer>().enabled = false;
+        }
     }
     private bool Talking = false;
     private bool TalkQuickEnd = false;
@@ -3393,7 +3403,7 @@ public class player : MonoBehaviour
             charaPriorityMid.Add(ADVCharaID);
         }
         Camera camera = cameras[layerID];
-        RenderTexture renderTexture = new RenderTexture(4000, 2250, 24);
+        RenderTexture renderTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
         camera.targetTexture = renderTexture;
         if (FindCached(ADVCharaID + "_RT") != null)
         {
@@ -3408,7 +3418,7 @@ public class player : MonoBehaviour
             renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, camera.targetTexture);
             renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("noise-good"));
             renderTextureChara.GetComponent<MeshRenderer>().material.SetVector(_NoiseTextureParam, new Vector4(0, 0, 0.5f, 0.5f));
-            renderTextureChara.AddComponent<MeshFilter>().mesh = CreateMesh(1333.33f, 750f, new Vector2(0.5f, 0.5f));
+            renderTextureChara.AddComponent<MeshFilter>().mesh = CreateMesh(4000f/3f, 4000f/3f, new Vector2(0.5f, 0.5f));
             rectTransform = renderTextureChara.AddComponent<RectTransform>();
             rectTransform.localScale = new Vector3(1f, 1f, 1f);
             rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
@@ -4093,7 +4103,7 @@ public class player : MonoBehaviour
         float sec = 0.2f;
         RectTransform rectTransform = ADVWindow.GetComponent<RectTransform>();
         Vector2 start = rectTransform.anchoredPosition;
-        Vector2 end = new Vector3(0f, isVisible ? 100f : -200f, 0f);
+        Vector2 end = new Vector3(0f, isVisible ? 100f : -100f, 0f);
         int CurveType = isVisible ? 2 : 1;
         Image[] cachedImages = ADVWindow.transform.GetComponentsInChildren<Image>();
         float starta = cachedImages.Length > 0 ? cachedImages[0].color.a : 0f;
@@ -8359,13 +8369,15 @@ public class player : MonoBehaviour
     {
 #if UNITY_WEBGL
         float currentAspect = (float)Screen.width / Screen.height;
-        if (currentAspect >= 16f/9f)
+        if (currentAspect >= 16f / 9f)
         {
             canvasScaler.matchWidthOrHeight = 1f; 
+            Camera.main.orthographicSize = 375f;
         }
         else
         {
             canvasScaler.matchWidthOrHeight = 0f; 
+            Camera.main.orthographicSize = 375f * (16f / 9f) / currentAspect;
         }
 #endif
         Time.timeScale = TimeScale;
