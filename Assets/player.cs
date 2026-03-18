@@ -1065,6 +1065,8 @@ public class player : MonoBehaviour
 
     [DllImport("__Internal")]
     public static extern void ClearPlaylistInLocalStorage();
+    [DllImport("__Internal")]
+    private static extern void ReturnToMenu();
 #else
     [DllImport("user32.dll")]
     private static extern bool SetWindowText(System.IntPtr hWnd, string text);
@@ -1113,17 +1115,18 @@ public class player : MonoBehaviour
     private Canvas canvas;
     private GameObject effectCanvasObj;
     private Canvas effectCanvas;
-    private GameObject textCanvasObj;
+    private GameObject ADVWindow;
     private Canvas textCanvas;
+    private CanvasScaler canvasScaler;
     private GameObject renderTextureObj;
     private GameObject camerasObj;
     private List<Camera> cameras = new List<Camera>();
     private GameObject particleObj;
     private bool hasCharaName = false;
-    private SpriteRenderer talkerRenderer;
-    private SpriteRenderer autoLabelRenderer;
-    private SpriteRenderer autoIconRenderer;
-    private SpriteRenderer AUTORenderer;
+    private Image talkerImage;
+    private Image autoLabelImage;
+    private Image autoIconImage;
+    private Image autoImage;
     private standpics StandPics;
     private standpics Effects;
     private voices Voices;
@@ -2274,14 +2277,104 @@ public class player : MonoBehaviour
         effectTransform.sizeDelta = new Vector2(4000f / 3f, 750f);
         effectTransform.anchorMax = new Vector2(0f, 0f);
         effectTransform.anchorMin = new Vector2(0f, 0f);
-        textCanvasObj = new GameObject("TextCanvas");
+        GameObject textCanvasObj = new GameObject("TextCanvas");
         textCanvas = textCanvasObj.AddComponent<Canvas>();
-        textCanvas.renderMode = RenderMode.WorldSpace;
+        textCanvas.renderMode = RenderMode.ScreenSpaceCamera;
         textCanvas.worldCamera = mainCamera;
-        RectTransform rectTransform = textCanvasObj.GetComponent<RectTransform>();
-        rectTransform.position = new Vector3(-20000f, -381f, 0f);
+        canvasScaler = textCanvasObj.AddComponent<CanvasScaler>();
+        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        canvasScaler.referenceResolution = new Vector2(1333.33f, 750f);
+        ADVWindow = new GameObject("ADVWindow");
+        ADVWindow.transform.SetParent(textCanvasObj.transform);
+        RectTransform windowTransform = ADVWindow.AddComponent<RectTransform>();
+        windowTransform.anchorMax = new Vector2(0.5f, 0f);
+        windowTransform.anchorMin = new Vector2(0.5f, 0f);
+        windowTransform.localPosition = new Vector3(0f, -200f, 0f);
+        windowTransform.sizeDelta = new Vector2(960f, 180f);
+        windowTransform.localScale = new Vector3(1f, 1f, 1f);
+        Image windowRenderer = ADVWindow.AddComponent<Image>();
+        Texture2D windowTexture = Resources.Load<Texture2D>("ADVWindow");
+        windowTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite windowSprite = Sprite.Create(windowTexture, new Rect(0, 0, windowTexture.width, windowTexture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(16, 16, 16, 16));
+        windowRenderer.sprite = windowSprite;
+        windowRenderer.type = Image.Type.Sliced;
+        windowRenderer.color = new Color(1f, 1f, 1f, 1f);
+        GameObject ADVTalkerLabelBG = new GameObject("ADVTalkerLabelBG");
+        ADVTalkerLabelBG.transform.SetParent(ADVWindow.transform);
+        RectTransform talkerTransform = ADVTalkerLabelBG.AddComponent<RectTransform>();
+        talkerTransform.localPosition = new Vector3(-367f, 104f, 0f);
+        talkerTransform.sizeDelta = new Vector2(437f, 69f);
+        talkerTransform.localScale = new Vector3(1f, 1f, 1f);
+        talkerImage = ADVTalkerLabelBG.AddComponent<Image>();
+        Texture2D talkerTexture = Resources.Load<Texture2D>("ADVTalkerLabelBG");
+        talkerTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite talkerSprite = Sprite.Create(talkerTexture, new Rect(0, 0, talkerTexture.width, talkerTexture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(104, 14, 34, 10));
+        talkerImage.sprite = talkerSprite;
+        talkerImage.type = Image.Type.Sliced;
+        talkerImage.color = new Color(1f, 1f, 1f, 1f);
+        ADVAutoLabelBG = new GameObject("ADVAutoLabelBG");
+        ADVAutoLabelBG.transform.SetParent(ADVWindow.transform);
+        RectTransform autoLabelTransform = ADVAutoLabelBG.AddComponent<RectTransform>();
+        autoLabelTransform.localPosition = new Vector3(356f, 140.625f, 0f);
+        autoLabelTransform.sizeDelta = new Vector2(256f, 49f);
+        autoLabelTransform.localScale = new Vector3(1f, 1f, 1f);
+        autoLabelImage = ADVAutoLabelBG.AddComponent<Image>();
+        Texture2D autoLabelTexture = Resources.Load<Texture2D>("ADVAutoLabelBG");
+        autoLabelTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite autoLabelSprite = Sprite.Create(autoLabelTexture, new Rect(0, 0, autoLabelTexture.width, autoLabelTexture.height), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(23, 23, 23, 23));
+        autoLabelImage.sprite = autoLabelSprite;
+        autoLabelImage.type = Image.Type.Sliced;
+        autoLabelImage.color = new Color(1f, 1f, 1f, 1f);
+        ADVAutoIcon = new GameObject("ADVAutoIcon");
+        ADVAutoIcon.transform.SetParent(ADVAutoLabelBG.transform);
+        RectTransform autoIconTransform = ADVAutoIcon.AddComponent<RectTransform>();
+        autoIconTransform.localPosition = new Vector3(-79f, 0f, 0f);
+        autoIconTransform.sizeDelta = new Vector2(20f, 25f);
+        autoIconTransform.localScale = new Vector3(1.8f, 1.8f, 1f);
+        autoIconImage = ADVAutoIcon.AddComponent<Image>();
+        Texture2D autoIconTexture = Resources.Load<Texture2D>("ADVAutoIcon");
+        autoIconTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite autoIconSprite = Sprite.Create(autoIconTexture, new Rect(0, 0, autoIconTexture.width, autoIconTexture.height), new Vector2(0.5f, 0.5f), 100f);
+        autoIconImage.sprite = autoIconSprite;
+        autoIconImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, 0f);
+        GameObject AUTO = new GameObject("AUTO");
+        AUTO.transform.SetParent(ADVAutoLabelBG.transform);
+        RectTransform AUTOTransform = AUTO.AddComponent<RectTransform>();
+        AUTOTransform.localPosition = new Vector3(27f, 0f, 0f);
+        AUTOTransform.sizeDelta = new Vector2(98f, 27f);
+        AUTOTransform.localScale = new Vector3(1f, 1f, 1f);
+        autoImage = AUTO.AddComponent<Image>();
+        Texture2D AUTOTexture = Resources.Load<Texture2D>("AUTO");
+        AUTOTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite AUTOSprite = Sprite.Create(AUTOTexture, new Rect(0, 0, AUTOTexture.width, AUTOTexture.height), new Vector2(0.5f, 0.5f), 100f);
+        autoImage.sprite = AUTOSprite;
+        autoImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, 0f);
+        ADVPen = new GameObject("ADVPen");
+        ADVPen.transform.SetParent(ADVWindow.transform);
+        RectTransform PenTransform = ADVPen.AddComponent<RectTransform>();
+        PenTransform.localPosition = new Vector3(464f, 10f, 0f);
+        PenTransform.sizeDelta = new Vector2(92f, 93f);
+        PenTransform.localScale = new Vector3(1f, 1f, 1f);
+        Image PenImage = ADVPen.AddComponent<Image>();
+        Texture2D PenTexture = Resources.Load<Texture2D>("ADVPen");
+        PenTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite PenSprite = Sprite.Create(PenTexture, new Rect(0, 0, PenTexture.width, PenTexture.height), new Vector2(0.5f, 0.5f), 100f);
+        PenImage.sprite = PenSprite;
+        PenImage.color = new Color(1f, 1f, 1f, 1f);
+        ADVPenShadow = new GameObject("ADVPenShadow");
+        ADVPenShadow.transform.SetParent(ADVWindow.transform);
+        RectTransform PenShadowTransform = ADVPenShadow.AddComponent<RectTransform>();
+        PenShadowTransform.localPosition = new Vector3(440f, -43f, 0f);
+        PenShadowTransform.sizeDelta = new Vector2(50f, 10f);
+        PenShadowTransform.localScale = new Vector3(0.7f, 1f, 1f);
+        Image PenShadowImage = ADVPenShadow.AddComponent<Image>();
+        Texture2D PenShadowTexture = Resources.Load<Texture2D>("ADVPenShadow");
+        PenShadowTexture.wrapMode = TextureWrapMode.Clamp;
+        Sprite PenShadowSprite = Sprite.Create(PenShadowTexture, new Rect(0, 0, PenShadowTexture.width, PenShadowTexture.height), new Vector2(0.5f, 0.5f), 100f);
+        PenShadowImage.sprite = PenShadowSprite;
+        PenShadowImage.color = new Color(1f, 1f, 1f, 1f);
         GameObject textObj = new GameObject("Text");
-        textObj.transform.SetParent(textCanvas.transform);
+        textObj.transform.SetParent(ADVWindow.transform);
         RectTransform textTransform = textObj.AddComponent<RectTransform>();
         textTransform.localPosition = new Vector3(30f, 0f, 0f);
         textTransform.sizeDelta = new Vector2(900f, 96f);
@@ -2294,7 +2387,7 @@ public class player : MonoBehaviour
         CanvasGroup textGroup = textObj.AddComponent<CanvasGroup>();
         textGroup.alpha = 0f;
         GameObject nameObj = new GameObject("Name");
-        nameObj.transform.SetParent(textCanvas.transform);
+        nameObj.transform.SetParent(ADVWindow.transform);
         RectTransform nameTransform = nameObj.AddComponent<RectTransform>();
         nameTransform.localPosition = new Vector3(-379f, 105.5f, 0f);
         nameTransform.sizeDelta = new Vector2(900f, 96f);
@@ -2307,91 +2400,6 @@ public class player : MonoBehaviour
         name.alignment = TextAnchor.MiddleCenter;
         CanvasGroup nameGroup = nameObj.AddComponent<CanvasGroup>();
         nameGroup.alpha = 0f;
-        GameObject ADVWindow = new GameObject("ADVWindow");
-        ADVWindow.transform.SetParent(textCanvasObj.transform);
-        RectTransform windowTransform = ADVWindow.AddComponent<RectTransform>();
-        windowTransform.localPosition = new Vector3(0f, 6f, 0f);
-        SpriteRenderer windowRenderer = ADVWindow.AddComponent<SpriteRenderer>();
-        Texture2D windowTexture = Resources.Load<Texture2D>("ADVWindow");
-        windowTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite windowSprite = Sprite.Create(windowTexture, new Rect(0, 0, windowTexture.width, windowTexture.height), new Vector2(0.5f, 0.5f), 1f, 0, SpriteMeshType.FullRect, new Vector4(16, 16, 16, 16));
-        windowRenderer.sprite = windowSprite;
-        windowRenderer.drawMode = SpriteDrawMode.Sliced;
-        windowRenderer.size = new Vector2(960f, 180f);
-        windowRenderer.sortingOrder = -2;
-        windowRenderer.color = new Color(1f, 1f, 1f, 0f);
-        GameObject ADVTalkerLabelBG = new GameObject("ADVTalkerLabelBG");
-        ADVTalkerLabelBG.transform.SetParent(textCanvasObj.transform);
-        RectTransform talkerTransform = ADVTalkerLabelBG.AddComponent<RectTransform>();
-        talkerTransform.localPosition = new Vector3(-367f, 104f, 0f);
-        talkerRenderer = ADVTalkerLabelBG.AddComponent<SpriteRenderer>();
-        Texture2D talkerTexture = Resources.Load<Texture2D>("ADVTalkerLabelBG");
-        talkerTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite talkerSprite = Sprite.Create(talkerTexture, new Rect(0, 0, talkerTexture.width, talkerTexture.height), new Vector2(0.5f, 0.5f), 1f, 0, SpriteMeshType.FullRect, new Vector4(104, 14, 34, 10));
-        talkerRenderer.sprite = talkerSprite;
-        talkerRenderer.drawMode = SpriteDrawMode.Sliced;
-        talkerRenderer.size = new Vector2(437f, 69f);
-        talkerRenderer.sortingOrder = -1;
-        talkerRenderer.color = new Color(1f, 1f, 1f, 0f);
-        ADVAutoLabelBG = new GameObject("ADVAutoLabelBG");
-        ADVAutoLabelBG.transform.SetParent(textCanvasObj.transform);
-        RectTransform autoLabelTransform = ADVAutoLabelBG.AddComponent<RectTransform>();
-        autoLabelTransform.localPosition = new Vector3(356f, 140.625f, 0f);
-        autoLabelRenderer = ADVAutoLabelBG.AddComponent<SpriteRenderer>();
-        Texture2D autoLabelTexture = Resources.Load<Texture2D>("ADVAutoLabelBG");
-        autoLabelTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite autoLabelSprite = Sprite.Create(autoLabelTexture, new Rect(0, 0, autoLabelTexture.width, autoLabelTexture.height), new Vector2(0.5f, 0.5f), 1f, 0, SpriteMeshType.FullRect, new Vector4(23, 23, 23, 23));
-        autoLabelRenderer.sprite = autoLabelSprite;
-        autoLabelRenderer.drawMode = SpriteDrawMode.Sliced;
-        autoLabelRenderer.size = new Vector2(256f, 49f);
-        autoLabelRenderer.sortingOrder = -2;
-        autoLabelRenderer.color = new Color(1f, 1f, 1f, 0f);
-        ADVAutoIcon = new GameObject("ADVAutoIcon");
-        ADVAutoIcon.transform.SetParent(ADVAutoLabelBG.transform);
-        RectTransform autoIconTransform = ADVAutoIcon.AddComponent<RectTransform>();
-        autoIconTransform.localPosition = new Vector3(-79f, 0f, 0f);
-        autoIconTransform.localScale = new Vector3(1.8f, 1.8f, 1f);
-        autoIconRenderer = ADVAutoIcon.AddComponent<SpriteRenderer>();
-        Texture2D autoIconTexture = Resources.Load<Texture2D>("ADVAutoIcon");
-        autoIconTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite autoIconSprite = Sprite.Create(autoIconTexture, new Rect(0, 0, autoIconTexture.width, autoIconTexture.height), new Vector2(0.5f, 0.5f), 1);
-        autoIconRenderer.sprite = autoIconSprite;
-        autoIconRenderer.sortingOrder = -1;
-        autoIconRenderer.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, 0f);
-        GameObject AUTO = new GameObject("AUTO");
-        AUTO.transform.SetParent(ADVAutoLabelBG.transform);
-        RectTransform AUTOTransform = AUTO.AddComponent<RectTransform>();
-        AUTOTransform.localPosition = new Vector3(27f, 0f, 0f);
-        AUTORenderer = AUTO.AddComponent<SpriteRenderer>();
-        Texture2D AUTOTexture = Resources.Load<Texture2D>("AUTO");
-        AUTOTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite AUTOSprite = Sprite.Create(AUTOTexture, new Rect(0, 0, AUTOTexture.width, AUTOTexture.height), new Vector2(0.5f, 0.5f), 1);
-        AUTORenderer.sprite = AUTOSprite;
-        AUTORenderer.sortingOrder = -1;
-        AUTORenderer.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, 0f);
-        ADVPen = new GameObject("ADVPen");
-        ADVPen.transform.SetParent(textCanvas.transform);
-        RectTransform PenTransform = ADVPen.AddComponent<RectTransform>();
-        PenTransform.localPosition = new Vector3(464f, 10f, 0f);
-        SpriteRenderer PenRenderer = ADVPen.AddComponent<SpriteRenderer>();
-        Texture2D PenTexture = Resources.Load<Texture2D>("ADVPen");
-        PenTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite PenSprite = Sprite.Create(PenTexture, new Rect(0, 0, PenTexture.width, PenTexture.height), new Vector2(0.5f, 0.5f), 1);
-        PenRenderer.sprite = PenSprite;
-        PenRenderer.sortingOrder = -1;
-        PenRenderer.color = new Color(1f, 1f, 1f, 0f);
-        ADVPenShadow = new GameObject("ADVPenShadow");
-        ADVPenShadow.transform.SetParent(textCanvas.transform);
-        RectTransform PenShadowTransform = ADVPenShadow.AddComponent<RectTransform>();
-        PenShadowTransform.localPosition = new Vector3(440f, -43f, 0f);
-        PenShadowTransform.localScale = new Vector3(0.7f, 1f, 1f);
-        SpriteRenderer PenShadowRenderer = ADVPenShadow.AddComponent<SpriteRenderer>();
-        Texture2D PenShadowTexture = Resources.Load<Texture2D>("ADVPenShadow");
-        PenShadowTexture.wrapMode = TextureWrapMode.Clamp;
-        Sprite PenShadowSprite = Sprite.Create(PenShadowTexture, new Rect(0, 0, PenShadowTexture.width, PenShadowTexture.height), new Vector2(0.5f, 0.5f), 1);
-        PenShadowRenderer.sprite = PenShadowSprite;
-        PenShadowRenderer.sortingOrder = -1;
-        PenShadowRenderer.color = new Color(1f, 1f, 1f, 0f);
         canvas.sortingOrder = -3;
         camerasObj = new GameObject("Cameras");
         for (int i = 0; i < 10; i++)
@@ -2613,6 +2621,8 @@ public class player : MonoBehaviour
                 ADVIDs = new List<int> { 0 };
 #if !UNITY_WEBGL
                 Application.Quit();
+#else
+                ReturnToMenu();
 #endif
 #if UNITY_EDITOR
                 EditorApplication.isPlaying = false;
@@ -2670,8 +2680,10 @@ public class player : MonoBehaviour
             ADVIndex++;
             if (ADVIndex == ADVIDs.Count)
             {
-                advScript = new advscript();
-                advScript.m_Params = new List<advscript_Params> { new advscript_Params() };
+                advScript = new advscript
+                {
+                    m_Params = new List<advscript_Params> { new advscript_Params() }
+                };
                 advScript.m_Params[0].FuncParam = new List<class_FuncParam>();
                 advScriptText = new advscripttext();
                 yield break;
@@ -2714,6 +2726,8 @@ public class player : MonoBehaviour
         {
 #if !UNITY_WEBGL
             Application.Quit();
+#else
+            ReturnToMenu();
 #endif
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
@@ -3292,8 +3306,10 @@ public class player : MonoBehaviour
             chara = new GameObject(ADVCharaID);
             CacheGameObject(ADVCharaID, chara);
         }
-        Texture2D texture = new Texture2D(0, 0);
-        texture.wrapMode = TextureWrapMode.Clamp;
+        Texture2D texture = new Texture2D(0, 0)
+        {
+            wrapMode = TextureWrapMode.Clamp
+        };
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, 0, 0), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
         SpriteRenderer spriteRenderer = chara.GetComponent<SpriteRenderer>();
         if (spriteRenderer == null)
@@ -3867,12 +3883,12 @@ public class player : MonoBehaviour
             CanvasMoveCoroutine = StartCoroutine(ToggleCanvas(true));
             textCanvasVisible = true;
         }
-        Transform labelTransform = textCanvas.transform.Find("ADVTalkerLabelBG");
+        Transform labelTransform = ADVWindow.transform.Find("ADVTalkerLabelBG");
         hasCharaName = !isEmpty;
-        Transform textTransform = textCanvas.transform.Find("Text");
+        Transform textTransform = ADVWindow.transform.Find("Text");
         GameObject textObj = textTransform.gameObject;
         Text text = textObj.GetComponent<Text>();
-        Transform nameTransform = textCanvas.transform.Find("Name");
+        Transform nameTransform = ADVWindow.transform.Find("Name");
         GameObject nameObj = nameTransform.gameObject;
         Text name = nameObj.GetComponent<Text>();
         bool tagging = false;
@@ -3900,9 +3916,9 @@ public class player : MonoBehaviour
         int nameOffset = name.text.Length < 6 ? 0 : (18 * (name.text.Length - 6) + 8);
         nameTransform.localPosition = new Vector3(-379f + nameOffset, 105.5f, 0f);
         labelTransform.gameObject.GetComponent<RectTransform>().localPosition = new Vector3(-367f + nameOffset, 104f, 0f);
-        SpriteRenderer labelSR = labelTransform.gameObject.GetComponent<SpriteRenderer>();
-        labelSR.size = new Vector2(437f + nameOffset * 2, 69f);
-        labelSR.color = new Color(1f, 1f, 1f, isEmpty ? 0 : textObj.GetComponent<CanvasGroup>().alpha);
+        Image labelImage = labelTransform.gameObject.GetComponent<Image>();
+        labelImage.rectTransform.sizeDelta = new Vector2(437f + nameOffset * 2, 69f);
+        labelImage.color = new Color(1f, 1f, 1f, isEmpty ? 0 : textObj.GetComponent<CanvasGroup>().alpha);
         foreach (GameObject ruby in rubys)
         {
             Destroy(ruby);
@@ -4075,13 +4091,13 @@ public class player : MonoBehaviour
     private IEnumerator ToggleCanvas(bool isVisible)
     {
         float sec = 0.2f;
-        RectTransform rectTransform = textCanvas.GetComponent<RectTransform>();
+        RectTransform rectTransform = ADVWindow.GetComponent<RectTransform>();
         Vector2 start = rectTransform.anchoredPosition;
-        Vector2 end = new Vector3(-20000f, isVisible ? -281f : -381f, 0f);
+        Vector2 end = new Vector3(0f, isVisible ? 100f : -200f, 0f);
         int CurveType = isVisible ? 2 : 1;
-        SpriteRenderer[] cachedSpriteRenderers = textCanvas.transform.GetComponentsInChildren<SpriteRenderer>();
-        float starta = cachedSpriteRenderers.Length > 0 ? cachedSpriteRenderers[0].color.a : 0f;
-        CanvasGroup[] cachedCanvasGroups = textCanvas.transform.GetComponentsInChildren<CanvasGroup>();
+        Image[] cachedImages = ADVWindow.transform.GetComponentsInChildren<Image>();
+        float starta = cachedImages.Length > 0 ? cachedImages[0].color.a : 0f;
+        CanvasGroup[] cachedCanvasGroups = ADVWindow.transform.GetComponentsInChildren<CanvasGroup>();
         yield return null;
         float timeElapsed = 0f;
         while (timeElapsed < sec)
@@ -4091,34 +4107,34 @@ public class player : MonoBehaviour
             float y_axis = Mathf.Lerp(start[1], end[1], Ease(timeElapsed / sec, CurveType));
             rectTransform.anchoredPosition = new Vector3(x_axis, y_axis, 0f);
             float a = Mathf.Lerp(starta, isVisible ? 1 : 0, Ease(timeElapsed / sec, CurveType));
-            foreach (SpriteRenderer spriteRenderer in cachedSpriteRenderers)
+            foreach (Image image in cachedImages)
             {
-                spriteRenderer.color = new Color(1f, 1f, 1f, a);
+                image.color = new Color(1f, 1f, 1f, a);
             }
             foreach (CanvasGroup canvasGroup in cachedCanvasGroups)
             {
                 if (canvasGroup == null) { continue; }
                 canvasGroup.alpha = a;
             }
-            talkerRenderer.color = new Color(1f, 1f, 1f, hasCharaName ? a : 0f);
-            autoLabelRenderer.color = new Color(1f, 1f, 1f, a);
-            autoIconRenderer.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, a);
-            AUTORenderer.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, a);
+            talkerImage.color = new Color(1f, 1f, 1f, hasCharaName ? a : 0f);
+            autoLabelImage.color = new Color(1f, 1f, 1f, a);
+            autoIconImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, a);
+            autoImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, a);
             yield return null;
         }
-        foreach (SpriteRenderer spriteRenderer in cachedSpriteRenderers)
+        foreach (Image image in cachedImages)
         {
-            spriteRenderer.color = new Color(1f, 1f, 1f, isVisible ? 1 : 0);
+            image.color = new Color(1f, 1f, 1f, isVisible ? 1 : 0);
         }
         foreach (CanvasGroup canvasGroup in cachedCanvasGroups)
         {
             if (canvasGroup == null) { continue; }
             canvasGroup.alpha = isVisible ? 1 : 0;
         }
-        talkerRenderer.color = new Color(1f, 1f, 1f, hasCharaName ? (isVisible ? 1 : 0) : 0f);
-        autoLabelRenderer.color = new Color(1f, 1f, 1f, isVisible ? 1 : 0);
-        autoIconRenderer.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, isVisible ? 1 : 0);
-        AUTORenderer.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, isVisible ? 1 : 0);
+        talkerImage.color = new Color(1f, 1f, 1f, hasCharaName ? (isVisible ? 1 : 0) : 0f);
+        autoLabelImage.color = new Color(1f, 1f, 1f, isVisible ? 1 : 0);
+        autoIconImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, isVisible ? 1 : 0);
+        autoImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, isVisible ? 1 : 0);
         rectTransform.anchoredPosition = end;
     }
     private IEnumerator CharaMoting(string ADVCharaID, string MotID)
@@ -4758,49 +4774,61 @@ public class player : MonoBehaviour
                 string objname = positionCurvesArray.data.path.Length == 0 ? ef.name : positionCurvesArray.data.path.Contains('/') ? positionCurvesArray.data.path[(positionCurvesArray.data.path.LastIndexOf('/') + 1)..] : positionCurvesArray.data.path;
                 foreach (Curve3Array keyframe in positionCurvesArray.data.curve.m_Curve.Array)
                 {
-                    Keyframe keyframex = new(keyframe.data.time, keyframe.data.value.x);
-                    keyframex.inTangent = keyframe.data.inSlope.x;
-                    keyframex.outTangent = keyframe.data.outSlope.x;
-                    keyframex.inWeight = keyframe.data.inWeight.x;
-                    keyframex.outWeight = keyframe.data.outWeight.x;
-                    keyframex.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframex = new(keyframe.data.time, keyframe.data.value.x)
+                    {
+                        inTangent = keyframe.data.inSlope.x,
+                        outTangent = keyframe.data.outSlope.x,
+                        inWeight = keyframe.data.inWeight.x,
+                        outWeight = keyframe.data.outWeight.x,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["positionx"].AddKey(keyframex);
-                    Keyframe keyframey = new(keyframe.data.time, keyframe.data.value.y);
-                    keyframey.inTangent = keyframe.data.inSlope.y;
-                    keyframey.outTangent = keyframe.data.outSlope.y;
-                    keyframey.inWeight = keyframe.data.inWeight.y;
-                    keyframey.outWeight = keyframe.data.outWeight.y;
-                    keyframey.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframey = new(keyframe.data.time, keyframe.data.value.y)
+                    {
+                        inTangent = keyframe.data.inSlope.y,
+                        outTangent = keyframe.data.outSlope.y,
+                        inWeight = keyframe.data.inWeight.y,
+                        outWeight = keyframe.data.outWeight.y,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["positiony"].AddKey(keyframey);
-                    Keyframe keyframez = new(keyframe.data.time, keyframe.data.value.z);
-                    keyframez.inTangent = keyframe.data.inSlope.z;
-                    keyframez.outTangent = keyframe.data.outSlope.z;
-                    keyframez.inWeight = keyframe.data.inWeight.z;
-                    keyframez.outWeight = keyframe.data.outWeight.z;
-                    keyframez.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframez = new(keyframe.data.time, keyframe.data.value.z)
+                    {
+                        inTangent = keyframe.data.inSlope.z,
+                        outTangent = keyframe.data.outSlope.z,
+                        inWeight = keyframe.data.inWeight.z,
+                        outWeight = keyframe.data.outWeight.z,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["positionz"].AddKey(keyframez);
                     if (isLoop && keyframe.data.time == 0)
                     {
-                        keyframex = new(animtime + 1 / sampleRate, keyframe.data.value.x);
-                        keyframex.inTangent = keyframe.data.inSlope.x;
-                        keyframex.outTangent = keyframe.data.outSlope.x;
-                        keyframex.inWeight = keyframe.data.inWeight.x;
-                        keyframex.outWeight = keyframe.data.outWeight.x;
-                        keyframex.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframex = new(animtime + 1 / sampleRate, keyframe.data.value.x)
+                        {
+                            inTangent = keyframe.data.inSlope.x,
+                            outTangent = keyframe.data.outSlope.x,
+                            inWeight = keyframe.data.inWeight.x,
+                            outWeight = keyframe.data.outWeight.x,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["positionx"].AddKey(keyframex);
-                        keyframey = new(animtime + 1 / sampleRate, keyframe.data.value.y);
-                        keyframey.inTangent = keyframe.data.inSlope.y;
-                        keyframey.outTangent = keyframe.data.outSlope.y;
-                        keyframey.inWeight = keyframe.data.inWeight.y;
-                        keyframey.outWeight = keyframe.data.outWeight.y;
-                        keyframey.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframey = new(animtime + 1 / sampleRate, keyframe.data.value.y)
+                        {
+                            inTangent = keyframe.data.inSlope.y,
+                            outTangent = keyframe.data.outSlope.y,
+                            inWeight = keyframe.data.inWeight.y,
+                            outWeight = keyframe.data.outWeight.y,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["positiony"].AddKey(keyframey);
-                        keyframez = new(animtime + 1 / sampleRate, keyframe.data.value.z);
-                        keyframez.inTangent = keyframe.data.inSlope.z;
-                        keyframez.outTangent = keyframe.data.outSlope.z;
-                        keyframez.inWeight = keyframe.data.inWeight.z;
-                        keyframez.outWeight = keyframe.data.outWeight.z;
-                        keyframez.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframez = new(animtime + 1 / sampleRate, keyframe.data.value.z)
+                        {
+                            inTangent = keyframe.data.inSlope.z,
+                            outTangent = keyframe.data.outSlope.z,
+                            inWeight = keyframe.data.inWeight.z,
+                            outWeight = keyframe.data.outWeight.z,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["positionz"].AddKey(keyframez);
                     }
                 }
@@ -4810,63 +4838,79 @@ public class player : MonoBehaviour
                 string objname = rotationCurvesArray.data.path.Length == 0 ? ef.name : rotationCurvesArray.data.path.Contains('/') ? rotationCurvesArray.data.path[(rotationCurvesArray.data.path.LastIndexOf('/') + 1)..] : rotationCurvesArray.data.path;
                 foreach (Curve4Array keyframe in rotationCurvesArray.data.curve.m_Curve.Array)
                 {
-                    Keyframe keyframex = new(keyframe.data.time, keyframe.data.value.x);
-                    keyframex.inTangent = keyframe.data.inSlope.x;
-                    keyframex.outTangent = keyframe.data.outSlope.x;
-                    keyframex.inWeight = keyframe.data.inWeight.x;
-                    keyframex.outWeight = keyframe.data.outWeight.x;
-                    keyframex.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframex = new(keyframe.data.time, keyframe.data.value.x)
+                    {
+                        inTangent = keyframe.data.inSlope.x,
+                        outTangent = keyframe.data.outSlope.x,
+                        inWeight = keyframe.data.inWeight.x,
+                        outWeight = keyframe.data.outWeight.x,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["rotationx"].AddKey(keyframex);
-                    Keyframe keyframey = new(keyframe.data.time, keyframe.data.value.y);
-                    keyframey.inTangent = keyframe.data.inSlope.y;
-                    keyframey.outTangent = keyframe.data.outSlope.y;
-                    keyframey.inWeight = keyframe.data.inWeight.y;
-                    keyframey.outWeight = keyframe.data.outWeight.y;
-                    keyframey.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframey = new(keyframe.data.time, keyframe.data.value.y)
+                    {
+                        inTangent = keyframe.data.inSlope.y,
+                        outTangent = keyframe.data.outSlope.y,
+                        inWeight = keyframe.data.inWeight.y,
+                        outWeight = keyframe.data.outWeight.y,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["rotationy"].AddKey(keyframey);
-                    Keyframe keyframez = new(keyframe.data.time, keyframe.data.value.z);
-                    keyframez.inTangent = keyframe.data.inSlope.z;
-                    keyframez.outTangent = keyframe.data.outSlope.z;
-                    keyframez.inWeight = keyframe.data.inWeight.z;
-                    keyframez.outWeight = keyframe.data.outWeight.z;
-                    keyframez.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframez = new(keyframe.data.time, keyframe.data.value.z)
+                    {
+                        inTangent = keyframe.data.inSlope.z,
+                        outTangent = keyframe.data.outSlope.z,
+                        inWeight = keyframe.data.inWeight.z,
+                        outWeight = keyframe.data.outWeight.z,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["rotationz"].AddKey(keyframez);
-                    Keyframe keyframew = new(keyframe.data.time, keyframe.data.value.w);
-                    keyframew.inTangent = keyframe.data.inSlope.w;
-                    keyframew.outTangent = keyframe.data.outSlope.w;
-                    keyframew.inWeight = keyframe.data.inWeight.w;
-                    keyframew.outWeight = keyframe.data.outWeight.w;
-                    keyframew.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframew = new(keyframe.data.time, keyframe.data.value.w)
+                    {
+                        inTangent = keyframe.data.inSlope.w,
+                        outTangent = keyframe.data.outSlope.w,
+                        inWeight = keyframe.data.inWeight.w,
+                        outWeight = keyframe.data.outWeight.w,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["rotationw"].AddKey(keyframew);
                     if (isLoop && keyframe.data.time == 0)
                     {
-                        keyframex = new(animtime + 1 / sampleRate, keyframe.data.value.x);
-                        keyframex.inTangent = keyframe.data.inSlope.x;
-                        keyframex.outTangent = keyframe.data.outSlope.x;
-                        keyframex.inWeight = keyframe.data.inWeight.x;
-                        keyframex.outWeight = keyframe.data.outWeight.x;
-                        keyframex.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframex = new(animtime + 1 / sampleRate, keyframe.data.value.x)
+                        {
+                            inTangent = keyframe.data.inSlope.x,
+                            outTangent = keyframe.data.outSlope.x,
+                            inWeight = keyframe.data.inWeight.x,
+                            outWeight = keyframe.data.outWeight.x,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["rotationx"].AddKey(keyframex);
-                        keyframey = new(animtime + 1 / sampleRate, keyframe.data.value.y);
-                        keyframey.inTangent = keyframe.data.inSlope.y;
-                        keyframey.outTangent = keyframe.data.outSlope.y;
-                        keyframey.inWeight = keyframe.data.inWeight.y;
-                        keyframey.outWeight = keyframe.data.outWeight.y;
-                        keyframey.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframey = new(animtime + 1 / sampleRate, keyframe.data.value.y)
+                        {
+                            inTangent = keyframe.data.inSlope.y,
+                            outTangent = keyframe.data.outSlope.y,
+                            inWeight = keyframe.data.inWeight.y,
+                            outWeight = keyframe.data.outWeight.y,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["rotationy"].AddKey(keyframey);
-                        keyframez = new(animtime + 1 / sampleRate, keyframe.data.value.z);
-                        keyframez.inTangent = keyframe.data.inSlope.z;
-                        keyframez.outTangent = keyframe.data.outSlope.z;
-                        keyframez.inWeight = keyframe.data.inWeight.z;
-                        keyframez.outWeight = keyframe.data.outWeight.z;
-                        keyframez.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframez = new(animtime + 1 / sampleRate, keyframe.data.value.z)
+                        {
+                            inTangent = keyframe.data.inSlope.z,
+                            outTangent = keyframe.data.outSlope.z,
+                            inWeight = keyframe.data.inWeight.z,
+                            outWeight = keyframe.data.outWeight.z,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["rotationz"].AddKey(keyframez);
-                        keyframew = new(keyframe.data.time, keyframe.data.value.w);
-                        keyframew.inTangent = keyframe.data.inSlope.w;
-                        keyframew.outTangent = keyframe.data.outSlope.w;
-                        keyframew.inWeight = keyframe.data.inWeight.w;
-                        keyframew.outWeight = keyframe.data.outWeight.w;
-                        keyframew.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframew = new(keyframe.data.time, keyframe.data.value.w)
+                        {
+                            inTangent = keyframe.data.inSlope.w,
+                            outTangent = keyframe.data.outSlope.w,
+                            inWeight = keyframe.data.inWeight.w,
+                            outWeight = keyframe.data.outWeight.w,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["rotationw"].AddKey(keyframew);
                     }
                 }
@@ -4876,49 +4920,61 @@ public class player : MonoBehaviour
                 string objname = scaleCurvesArray.data.path.Length == 0 ? ef.name : scaleCurvesArray.data.path.Contains('/') ? scaleCurvesArray.data.path[(scaleCurvesArray.data.path.LastIndexOf('/') + 1)..] : scaleCurvesArray.data.path;
                 foreach (Curve3Array keyframe in scaleCurvesArray.data.curve.m_Curve.Array)
                 {
-                    Keyframe keyframex = new(keyframe.data.time, keyframe.data.value.x);
-                    keyframex.inTangent = keyframe.data.inSlope.x;
-                    keyframex.outTangent = keyframe.data.outSlope.x;
-                    keyframex.inWeight = keyframe.data.inWeight.x;
-                    keyframex.outWeight = keyframe.data.outWeight.x;
-                    keyframex.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframex = new(keyframe.data.time, keyframe.data.value.x)
+                    {
+                        inTangent = keyframe.data.inSlope.x,
+                        outTangent = keyframe.data.outSlope.x,
+                        inWeight = keyframe.data.inWeight.x,
+                        outWeight = keyframe.data.outWeight.x,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["scalex"].AddKey(keyframex);
-                    Keyframe keyframey = new(keyframe.data.time, keyframe.data.value.y);
-                    keyframey.inTangent = keyframe.data.inSlope.y;
-                    keyframey.outTangent = keyframe.data.outSlope.y;
-                    keyframey.inWeight = keyframe.data.inWeight.y;
-                    keyframey.outWeight = keyframe.data.outWeight.y;
-                    keyframey.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframey = new(keyframe.data.time, keyframe.data.value.y)
+                    {
+                        inTangent = keyframe.data.inSlope.y,
+                        outTangent = keyframe.data.outSlope.y,
+                        inWeight = keyframe.data.inWeight.y,
+                        outWeight = keyframe.data.outWeight.y,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["scaley"].AddKey(keyframey);
-                    Keyframe keyframez = new(keyframe.data.time, keyframe.data.value.z);
-                    keyframez.inTangent = keyframe.data.inSlope.z;
-                    keyframez.outTangent = keyframe.data.outSlope.z;
-                    keyframez.inWeight = keyframe.data.inWeight.z;
-                    keyframez.outWeight = keyframe.data.outWeight.z;
-                    keyframez.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                    Keyframe keyframez = new(keyframe.data.time, keyframe.data.value.z)
+                    {
+                        inTangent = keyframe.data.inSlope.z,
+                        outTangent = keyframe.data.outSlope.z,
+                        inWeight = keyframe.data.inWeight.z,
+                        outWeight = keyframe.data.outWeight.z,
+                        weightedMode = (WeightedMode)keyframe.data.weightedMode
+                    };
                     animCurves[objname]["scalez"].AddKey(keyframez);
                     if (isLoop && keyframe.data.time == 0)
                     {
-                        keyframex = new(animtime + 1 / sampleRate, keyframe.data.value.x);
-                        keyframex.inTangent = keyframe.data.inSlope.x;
-                        keyframex.outTangent = keyframe.data.outSlope.x;
-                        keyframex.inWeight = keyframe.data.inWeight.x;
-                        keyframex.outWeight = keyframe.data.outWeight.x;
-                        keyframex.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframex = new(animtime + 1 / sampleRate, keyframe.data.value.x)
+                        {
+                            inTangent = keyframe.data.inSlope.x,
+                            outTangent = keyframe.data.outSlope.x,
+                            inWeight = keyframe.data.inWeight.x,
+                            outWeight = keyframe.data.outWeight.x,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["scalex"].AddKey(keyframex);
-                        keyframey = new(animtime + 1 / sampleRate, keyframe.data.value.y);
-                        keyframey.inTangent = keyframe.data.inSlope.y;
-                        keyframey.outTangent = keyframe.data.outSlope.y;
-                        keyframey.inWeight = keyframe.data.inWeight.y;
-                        keyframey.outWeight = keyframe.data.outWeight.y;
-                        keyframey.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframey = new(animtime + 1 / sampleRate, keyframe.data.value.y)
+                        {
+                            inTangent = keyframe.data.inSlope.y,
+                            outTangent = keyframe.data.outSlope.y,
+                            inWeight = keyframe.data.inWeight.y,
+                            outWeight = keyframe.data.outWeight.y,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["scaley"].AddKey(keyframey);
-                        keyframez = new(animtime + 1 / sampleRate, keyframe.data.value.z);
-                        keyframez.inTangent = keyframe.data.inSlope.z;
-                        keyframez.outTangent = keyframe.data.outSlope.z;
-                        keyframez.inWeight = keyframe.data.inWeight.z;
-                        keyframez.outWeight = keyframe.data.outWeight.z;
-                        keyframez.weightedMode = (WeightedMode)keyframe.data.weightedMode;
+                        keyframez = new(animtime + 1 / sampleRate, keyframe.data.value.z)
+                        {
+                            inTangent = keyframe.data.inSlope.z,
+                            outTangent = keyframe.data.outSlope.z,
+                            inWeight = keyframe.data.inWeight.z,
+                            outWeight = keyframe.data.outWeight.z,
+                            weightedMode = (WeightedMode)keyframe.data.weightedMode
+                        };
                         animCurves[objname]["scalez"].AddKey(keyframez);
                     }
                 }
@@ -5063,9 +5119,11 @@ public class player : MonoBehaviour
                     keyframes.Add(new Dictionary<Keyframe, int>());
                     foreach (KeyData keyData in componentCurve.m_KeyDatas)
                     {
-                        Keyframe keyframe = new(keyData.m_Frame / sampleRate, keyData.m_Value * isNegative[count]);
-                        keyframe.inTangent = keyData.m_LeftDerivative;
-                        keyframe.outTangent = keyData.m_RightDerivative;
+                        Keyframe keyframe = new(keyData.m_Frame / sampleRate, keyData.m_Value * isNegative[count])
+                        {
+                            inTangent = keyData.m_LeftDerivative,
+                            outTangent = keyData.m_RightDerivative
+                        };
                         keyframes[keyframes.Count - 1].Add(keyframe, keyData.m_CtrlType);
                     }
                     count++;
@@ -5077,9 +5135,11 @@ public class player : MonoBehaviour
                 keyframesnew.Add(new List<Keyframe>());
                 for (int j = 0; j < keyframes[i].Count; j++)
                 {
-                    Keyframe keyframe = new Keyframe(keyframes[i].Keys.ToArray()[j].time, keyframes[i].Keys.ToArray()[j].value);
-                    keyframe.inTangent = keyframes[i].Keys.ToArray()[j].inTangent;
-                    keyframe.outTangent = keyframes[i].Keys.ToArray()[j].outTangent;
+                    Keyframe keyframe = new Keyframe(keyframes[i].Keys.ToArray()[j].time, keyframes[i].Keys.ToArray()[j].value)
+                    {
+                        inTangent = keyframes[i].Keys.ToArray()[j].inTangent,
+                        outTangent = keyframes[i].Keys.ToArray()[j].outTangent
+                    };
                     if (keyframes[i].Values.ToArray()[j] == 0)
                     {
                         if (j > 0)
@@ -5437,13 +5497,15 @@ public class player : MonoBehaviour
                 particleObjectParams.lines = new List<PrimPolyLine>();
                 for (int i = 0; i < rule.m_particleNum; i++)
                 {
-                    PrimPolyLine primPolyLine = new PrimPolyLine();
-                    primPolyLine.lines = new Line[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primPolyLine.widths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primPolyLine.UWidths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primPolyLine.positions = new Vector3[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primPolyLine.UVs = new Vector2[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
-                    primPolyLine.colors = new Color[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2];
+                    PrimPolyLine primPolyLine = new PrimPolyLine
+                    {
+                        lines = new Line[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2],
+                        widths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2],
+                        UWidths = new float[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2],
+                        positions = new Vector3[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2],
+                        UVs = new Vector2[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2],
+                        colors = new Color[rule.m_particleTypeParam.m_polyLine.m_jointNum + 2]
+                    };
                     particleObjectParams.lines.Add(primPolyLine);
                 }
             }
@@ -5605,9 +5667,11 @@ public class player : MonoBehaviour
                     particleUnitParams.m_velocity = particleObjectParams.m_Matrix.MultiplyVector(particleUnitParams.m_velocity);
                     if (rule.m_UsingAccelerationFlg == 1)
                     {
-                        particleUnitParams.m_AccelerationComponent = new AccelerationComponent();
-                        particleUnitParams.m_AccelerationComponent.m_acceleration = rule.m_AccelerationComponent.m_accelerationRange.Random() * coef;
-                        particleUnitParams.m_AccelerationComponent.m_dragForce = rule.m_AccelerationComponent.m_dragForceRange.Random();
+                        particleUnitParams.m_AccelerationComponent = new AccelerationComponent
+                        {
+                            m_acceleration = rule.m_AccelerationComponent.m_accelerationRange.Random() * coef,
+                            m_dragForce = rule.m_AccelerationComponent.m_dragForceRange.Random()
+                        };
                     }
                     if (rule.m_UsingRotationFlg == 1)
                     {
@@ -5621,9 +5685,11 @@ public class player : MonoBehaviour
                     }
                     if (rule.m_UsingUVAnimationFlg == 1)
                     {
-                        particleUnitParams.m_UVAnimationComponent = new UVAnimationComponent();
-                        particleUnitParams.m_UVAnimationComponent.m_nowBlock = (rule.m_uvBlockNum != 0) && (rule.m_UVAnimationComponent.m_randomStartBlockFlg == 1) ? UnityEngine.Random.Range(0, rule.m_uvBlockNum) : 0;
-                        particleUnitParams.m_UVAnimationComponent.m_switchSec = rule.m_UVAnimationComponent.m_switchBlockSecRange.Random();
+                        particleUnitParams.m_UVAnimationComponent = new UVAnimationComponent
+                        {
+                            m_nowBlock = (rule.m_uvBlockNum != 0) && (rule.m_UVAnimationComponent.m_randomStartBlockFlg == 1) ? UnityEngine.Random.Range(0, rule.m_uvBlockNum) : 0,
+                            m_switchSec = rule.m_UVAnimationComponent.m_switchBlockSecRange.Random()
+                        };
                         particleUnitParams.m_UVAnimationComponent.m_switchSecWork = particleUnitParams.m_UVAnimationComponent.m_switchSec;
                         particleUnitParams.m_uvRect = rule.m_uvRect_TopBlock;
 
@@ -5690,9 +5756,11 @@ public class player : MonoBehaviour
                     }
                     if (rule.m_UsingBlinkFlg == 1)
                     {
-                        particleUnitParams.m_BlinkComponent = new BlinkComponent();
-                        particleUnitParams.m_BlinkComponent.m_blinkRate = UnityEngine.Random.Range(0f, 1f);
-                        particleUnitParams.m_BlinkComponent.m_blinkSpeed = rule.m_BlinkComponent.m_blinkSpanSecRange.Random();
+                        particleUnitParams.m_BlinkComponent = new BlinkComponent
+                        {
+                            m_blinkRate = UnityEngine.Random.Range(0f, 1f),
+                            m_blinkSpeed = rule.m_BlinkComponent.m_blinkSpanSecRange.Random()
+                        };
                     }
                 }
                 if (!ptclUnit.activeSelf)
@@ -8268,17 +8336,19 @@ public class player : MonoBehaviour
     {
         if (!charaPropertiesDict.ContainsKey(ADVCharaID))
         {
-            CharaProperties charaProperties = new CharaProperties();
-            charaProperties.Fade = 0f;
-            charaProperties.Transparency = 1f;
-            charaProperties.FaceID = 0;
-            charaProperties.PoseID = 0;
-            charaProperties.Position = new Vector2(x, y);
-            charaProperties.Scale = 1f;
-            charaProperties.MotOffset = new Vector2(0f, 0f);
-            charaProperties.Angle = 0f;
-            charaProperties.RotateCenter = new Vector2(0f, 0f);
-            charaProperties.HDRFactor = 1f;
+            CharaProperties charaProperties = new CharaProperties
+            {
+                Fade = 0f,
+                Transparency = 1f,
+                FaceID = 0,
+                PoseID = 0,
+                Position = new Vector2(x, y),
+                Scale = 1f,
+                MotOffset = new Vector2(0f, 0f),
+                Angle = 0f,
+                RotateCenter = new Vector2(0f, 0f),
+                HDRFactor = 1f
+            };
             charaPropertiesDict.Add(ADVCharaID, charaProperties);
             charaCoroutinesDict.Add(ADVCharaID, new Dictionary<string, Coroutine>{
                 {"fade",null},{"move",null},{"mot",null},{"rotate",null},{"shake",null},{"transparency",null},{"destroy",null},
@@ -8287,9 +8357,51 @@ public class player : MonoBehaviour
     }
     void Update()
     {
+#if UNITY_WEBGL
+        float currentAspect = (float)Screen.width / Screen.height;
+        if (currentAspect >= 16f/9f)
+        {
+            canvasScaler.matchWidthOrHeight = 1f; 
+        }
+        else
+        {
+            canvasScaler.matchWidthOrHeight = 0f; 
+        }
+#endif
         Time.timeScale = TimeScale;
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+#if !UNITY_WEBGL && !UNITY_EDITOR
+            if (Screen.fullScreen)
+            {
+                Screen.fullScreen = false;
+            }
+            else
+            {
+                Application.Quit();
+            }
+#elif UNITY_WEBGL
+            if (Screen.fullScreen)
+            {
+                Screen.fullScreen = false;
+            }
+            else
+            {
+                ReturnToMenu();
+            }
+#elif UNITY_EDITOR
+             if (Screen.fullScreen)
+            {
+                Screen.fullScreen = false;
+            }
+             else
+            {
+                UnityEditor.EditorApplication.isPlaying = false;
+            }
+#endif
+        }
 #if !UNITY_WEBGL
-        if (Input.GetKeyDown(KeyCode.F11))
+        if (Input.GetKeyUp(KeyCode.F11))
         {
             Screen.fullScreen = !Screen.fullScreen;
         }

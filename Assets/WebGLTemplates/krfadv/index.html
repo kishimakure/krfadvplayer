@@ -109,6 +109,7 @@
         var menuUi = document.querySelector("#krf-menu-ui");
         var unityContainer = document.querySelector("#unity-container");
         var script = document.createElement("script");
+        var globalUnityInstance = null;
         script.src = loaderUrl;
         script.onload = () => {
             btnStart.disabled = false;
@@ -403,6 +404,7 @@
                     loadingBarFill.style.width = pct + '%';
                     loadingText.textContent = 'Loading... ' + pct + '%';
                 }).then((unityInstance) => {
+                    globalUnityInstance = unityInstance;
                     loadingOverlay.style.display = 'none';
                 }).catch((message) => {
                     loadingText.textContent = 'Error: ' + message;
@@ -450,6 +452,23 @@
                 setTimeout(() => settle(true), 4000);
             });
         }
+        window.onUnityExit = function() {
+            if (globalUnityInstance) {
+                loadingOverlay.style.display = 'flex';
+                loadingText.textContent = 'Clearing Memory...';
+                
+                globalUnityInstance.Quit().then(function() {
+                    globalUnityInstance = null;
+                    
+                    unityContainer.style.display = 'none';
+                    menuUi.style.display = 'flex';
+                    
+                    document.getElementById('loading-box').style.display = 'block';
+                    loadingBarFill.style.width = '0%';
+                    loadingText.textContent = 'Checking environment...';
+                });
+            }
+        };
     </script>
 </body>
 </html>

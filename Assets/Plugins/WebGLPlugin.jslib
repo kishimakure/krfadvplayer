@@ -14,6 +14,10 @@ mergeInto(LibraryManager.library, {
   },
   ClearPlaylistInLocalStorage: function () {
     localStorage.removeItem("ADVIDs");
+  },
+  ReturnToMenu: function () {
+    if (window.onUnityExit) {
+        window.onUnityExit();
+    }
   }
-
 });
