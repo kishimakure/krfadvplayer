@@ -1089,7 +1089,11 @@ public class player : MonoBehaviour
     public float VoiceVolume = 1f;
     public bool enableParticle = false;
     private bool netError = false;
-    private const int SIDE_LENGTH = 2048;
+    private string netErrorMessage = "";
+    private int SIDE_LENGTH = 1920;
+    private float FIXED_ASPECT = 9/16f;
+    private float ADVWindowState = 0f;
+    private const string SERVER_HOST = "https://assets.krf-adv.com/adv";
     private Font font;
     private int ADVID;
     private int ADVIndex;
@@ -1117,6 +1121,8 @@ public class player : MonoBehaviour
     private GameObject effectCanvasObj;
     private Canvas effectCanvas;
     private GameObject ADVWindow;
+    private RectTransform ADVWindowTransform;
+    private RectTransform DLKuromonTransform;
     private Canvas textCanvas;
     private CanvasScaler canvasScaler;
     private GameObject renderTextureObj;
@@ -1274,6 +1280,7 @@ public class player : MonoBehaviour
                 if (attempt == Attempt)
                 {
                     netError = true;
+                    netErrorMessage = $"Failed to download {name} after {Attempt} attempts.";
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1301,6 +1308,7 @@ public class player : MonoBehaviour
                 if (attempt == Attempt)
                 {
                     netError = true;
+                    netErrorMessage = $"Failed to download {name} after {Attempt} attempts.";
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1332,6 +1340,7 @@ public class player : MonoBehaviour
                 if (attempt == Attempt)
                 {
                     netError = true;
+                    netErrorMessage = $"Failed to download {name} after {Attempt} attempts.";
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1360,6 +1369,7 @@ public class player : MonoBehaviour
                 if (attempt == Attempt)
                 {
                     netError = true;
+                    netErrorMessage = $"Failed to download {name} after {Attempt} attempts.";
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1443,7 +1453,7 @@ public class player : MonoBehaviour
             }
         }
     }
-    private IEnumerator DownloadJson(string url, int ADVID, int index)
+    private IEnumerator DownloadJson(string url, int ADVID, int index, string name)
     {
         int attempt = 0;
         while (attempt < Attempt)
@@ -1462,6 +1472,7 @@ public class player : MonoBehaviour
                 if (attempt == Attempt)
                 {
                     netError = true;
+                    netErrorMessage = $"Failed to download {name} after {Attempt} attempts.";
                     break;
                 }
                 yield return new WaitForSeconds(AttemptDelay);
@@ -1480,14 +1491,22 @@ public class player : MonoBehaviour
         {
             string filePath = $"{host}/advscript/{advcategory}/ADVScript_{advcategory}_{advlistParams.m_ScriptName}.json";
             Jsons.Add(ADVID, new string[2]);
-            Coroutine coroutine1 = StartCoroutine(DownloadJson(filePath, ADVID, 0));
+            Coroutine coroutine1 = StartCoroutine(DownloadJson(filePath, ADVID, 0, $"ADVScript_{advlistParams.m_ScriptName}"));
             yield return coroutine1;
+            if (netError)
+            {
+                yield break;
+            }
             advScript = JsonConvert.DeserializeObject<advscript>(Jsons[ADVID][0]);
             advScripts.Add(ADVID, advScript);
             //Debug.Log(advScript.m_Name);
             string textfilePath = $"{host}/advscript/{advcategory}/ADVScriptText_{advcategory}_{advlistParams.m_ScriptTextName}.json";
-            Coroutine coroutine2 = StartCoroutine(DownloadJson(textfilePath, ADVID, 1));
+            Coroutine coroutine2 = StartCoroutine(DownloadJson(textfilePath, ADVID, 1, $"ADVScriptText_{advlistParams.m_ScriptTextName}"));
             yield return coroutine2;
+            if (netError)
+            {
+                yield break;
+            }
             advScriptText = JsonConvert.DeserializeObject<advscripttext>(Jsons[ADVID][1]);
             advScriptTexts.Add(ADVID, advScriptText);
             //Debug.Log(advScriptText.m_Name);
@@ -1496,14 +1515,22 @@ public class player : MonoBehaviour
         {
             string scriptPath = $"{host}/comic/ComicScript_{advlistParams.m_ComicGroupName}.json";
             Jsons.Add(ADVID, new string[2]);
-            Coroutine coroutine1 = StartCoroutine(DownloadJson(scriptPath, ADVID, 0));
+            Coroutine coroutine1 = StartCoroutine(DownloadJson(scriptPath, ADVID, 0, $"ComicScript_{advlistParams.m_ComicGroupName}"));
             yield return coroutine1;
+            if (netError)
+            {
+                yield break;
+            }
             comicScript = JsonConvert.DeserializeObject<comicscript>(Jsons[ADVID][0]);
             comicScripts.Add(ADVID, comicScript);
             //Debug.Log(comicScript.m_Name);
             string spriteListPath = $"{host}/comic/ComicSpriteList_{advlistParams.m_ComicGroupName}.json";
-            Coroutine coroutine2 = StartCoroutine(DownloadJson(spriteListPath, ADVID, 1));
+            Coroutine coroutine2 = StartCoroutine(DownloadJson(spriteListPath, ADVID, 1, $"ComicSpriteList_{advlistParams.m_ComicGroupName}"));
             yield return coroutine2;
+            if (netError)
+            {
+                yield break;
+            }
             comicSpriteList = JsonConvert.DeserializeObject<comicspritelist>(Jsons[ADVID][1]);
             comicSpriteLists.Add(ADVID, comicSpriteList);
             //Debug.Log(comicSpriteList.m_Name);
@@ -1512,6 +1539,10 @@ public class player : MonoBehaviour
     private IEnumerator Preload(int ADVID)
     {
         yield return StartCoroutine(LoadJson(ADVID));
+        if (netError)
+        {
+            yield break;
+        }
         if (!advScripts.ContainsKey(ADVID))
         {
             yield break;
@@ -2170,7 +2201,7 @@ public class player : MonoBehaviour
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
         Application.targetFrameRate = -1;
-        host = "https://assets.krf-adv.com/adv";
+        host = SERVER_HOST;
         audioMode = "ogg";
         globalFont = "ja";
         useCustomJson = false;
@@ -2181,11 +2212,24 @@ public class player : MonoBehaviour
         BGMVolume = Mathf.Clamp(ADVIDs[0] / 100f, 0f, 1f);
         SEVolume = Mathf.Clamp(ADVIDs[1] / 100f, 0f, 1f);
         VoiceVolume = Mathf.Clamp(ADVIDs[2] / 100f, 0f, 1f);
-        ADVIDs.RemoveRange(0, 3);
+        SIDE_LENGTH = ADVIDs[3];
+        Application.targetFrameRate = ADVIDs[4];
+        switch (ADVIDs[5])
+        {
+            case 0:
+                FIXED_ASPECT = 0f;
+                break;
+            case 1:
+                FIXED_ASPECT = 9f / 16f;
+                break;
+            default:
+                FIXED_ASPECT = 3f / 4f;
+                break;
+        }
+        ADVIDs.RemoveRange(0, 6);
         ClearPlaylistInLocalStorage();
 #elif UNITY_EDITOR
         Application.targetFrameRate = 60;
-        host = "https://assets.krf-adv.com/adv";
         DebugMode = true;
 #else
         Application.targetFrameRate = 60;
@@ -2218,14 +2262,21 @@ public class player : MonoBehaviour
 #if UNITY_WEBGL
 #else
         Screen.fullScreen = false;
-        Screen.SetResolution(parameters.Width, 9 * parameters.Width / 16, false);
+        if (FIXED_ASPECT == 0f)
+        {
+            Screen.SetResolution(parameters.Width, parameters.Height, false);
+        }
+        else
+        {
+            Screen.SetResolution(parameters.Width, (int)(parameters.Width * FIXED_ASPECT), false);
+        }
 #endif
         Camera mainCamera = Camera.main;
         cachedMainCameraTransform = mainCamera.transform;
-        renderTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
+        renderTexture = new RenderTexture(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT)), 24);
         Render = new GameObject("Render");
         Render.transform.position = new Vector3(-20000f, 0f, 0f);
-        Render.transform.localScale = new Vector3(25f / 36f, 25f / 36f, 1f);
+        Render.transform.localScale = new Vector3(1f, 1f, 1f);
         renderSpriteRenderer = Render.AddComponent<SpriteRenderer>();
         SpriteRenderer spriteRenderer = renderSpriteRenderer;
         Audios = new GameObject("Audios");
@@ -2234,23 +2285,38 @@ public class player : MonoBehaviour
         PPmaterial.SetTexture("_RenderTex", renderTexture);
         PPmaterial.SetInt(_BlendSrc, 1);
         PPmaterial.SetInt(_BlendDst, 10);
-        Texture2D black = Resources.Load<Texture2D>("black");
-        spriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, black.width, black.height), new Vector2(0.5f, 0.5f), 1);
+        Texture2D black = new Texture2D(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT)), TextureFormat.RGBA32, false);
+        Color[] fillPixels = new Color[SIDE_LENGTH * (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))];
+        for (int i = 0; i < fillPixels.Length; i++)
+        {
+            fillPixels[i] = Color.black;
+        }
+        black.SetPixels(fillPixels);
+        black.Apply();
+        spriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
         spriteRenderer.material = PPmaterial;
         spriteRenderer.sortingOrder = -3;
         image = new GameObject("Image");
         image.transform.SetParent(Render.transform);
         imageSpriteRenderer = image.AddComponent<SpriteRenderer>();
         SpriteRenderer ImageRenderer = imageSpriteRenderer;
-        Texture2D white = Resources.Load<Texture2D>("white");
-        ImageRenderer.sprite = Sprite.Create(white, new Rect(0, 0, white.width, white.height), new Vector2(0.5f, 0.5f), 1);
+        Texture2D white = new Texture2D(1000, (int)(1000 * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT)), TextureFormat.RGBA32, false);
+        Color[] fillPixelsWhite = new Color[1000 * (int)(1000 * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))];
+        for (int i = 0; i < fillPixelsWhite.Length; i++)
+        {
+            fillPixelsWhite[i] = Color.white;
+        }
+        white.SetPixels(fillPixelsWhite);
+        white.Apply();
+        ImageRenderer.sprite = Sprite.Create(white, new Rect(0, 0, 1000, (int)(1000 * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
         ImageRenderer.sortingOrder = -3;
         ImageRenderer.color = new Color(0f, 0f, 0f, 1f);
+        image.transform.localScale = new Vector3(1f, 1f, 1f) * (4f / 3f);
         image.layer = LayerMask.NameToLayer("Main");
         renderTexture.Create();
         mainCamera.transform.position = new Vector3(-20000f, 0f, -10f);
         mainCamera.orthographic = true;
-        mainCamera.orthographicSize = 375f;
+        mainCamera.orthographicSize = 540f;
         mainCamera.nearClipPlane = 0.3f;
         mainCamera.farClipPlane = 200000f;
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -2261,6 +2327,7 @@ public class player : MonoBehaviour
         canvas.renderMode = RenderMode.WorldSpace;
         canvas.worldCamera = mainCamera;
         canvas.transform.position = new Vector3(0f, 0f, 0f);
+        canvasObj.layer = LayerMask.NameToLayer("Caption");
         RectTransform canvasTransform = canvasObj.GetComponent<RectTransform>();
         canvasTransform.position = new Vector3(0f, 0f, 0f);
         canvasTransform.sizeDelta = new Vector2(4000f / 3f, 750f);
@@ -2284,15 +2351,45 @@ public class player : MonoBehaviour
         textCanvas.worldCamera = mainCamera;
         canvasScaler = textCanvasObj.AddComponent<CanvasScaler>();
         canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        canvasScaler.referenceResolution = new Vector2(1333.33f, 750f);
+        canvasScaler.referenceResolution = new Vector2(4000f / 3f, 4000f / 3f * (FIXED_ASPECT == 0f ? 9f / 16f : FIXED_ASPECT));
+        GameObject MaskObj = new GameObject("Mask");
+        MaskObj.transform.SetParent(textCanvasObj.transform);
+        MaskObj.AddComponent<RectMask2D>();
+        RectTransform maskTransform = MaskObj.GetComponent<RectTransform>();
+        maskTransform.anchorMin = Vector2.zero;
+        maskTransform.anchorMax = Vector2.one;
+        maskTransform.offsetMin = Vector2.zero;
+        maskTransform.offsetMax = Vector2.zero;
+        maskTransform.localScale = new Vector3(1f, 1f, 1f);
+        maskTransform.anchoredPosition = Vector2.zero;
+        maskTransform.localPosition = new Vector3(maskTransform.localPosition.x, maskTransform.localPosition.y, 0f);
+        AspectRatioFitter fitter = MaskObj.AddComponent<AspectRatioFitter>();
+        fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        fitter.aspectRatio = FIXED_ASPECT == 0f ? 1f : (1 / FIXED_ASPECT);
+        GameObject tilingObj = new GameObject("Tiling");
+        tilingObj.transform.SetParent(textCanvasObj.transform);
+        RectTransform tilingTransform = tilingObj.AddComponent<RectTransform>();
+        tilingTransform.anchorMin = new Vector2(0f, 0f);
+        tilingTransform.anchorMax = new Vector2(1f, 1f);
+        tilingTransform.offsetMin = Vector2.zero;
+        tilingTransform.offsetMax = Vector2.zero;
+        tilingTransform.anchoredPosition = new Vector2(0f, 0f);
+        tilingTransform.localPosition = new Vector3(tilingTransform.localPosition.x, tilingTransform.localPosition.y, 0f);
+        tilingTransform.localScale = new Vector3(1f, 1f, 1f) * (2f / 3f);
+        SpriteRenderer tilingRenderer = tilingObj.AddComponent<SpriteRenderer>();
+        tilingRenderer.color = new Color(1f, 1f, 1f, 1f);
+        Texture2D tilingTexture = Resources.Load<Texture2D>("aspect_scope");
+        tilingRenderer.sprite = Sprite.Create(tilingTexture, new Rect(0, 0, tilingTexture.width, tilingTexture.height), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+        tilingRenderer.drawMode = SpriteDrawMode.Tiled;
+        tilingRenderer.size = new Vector2(8192f, 8192f);
+        tilingRenderer.sortingOrder = -10000;
         ADVWindow = new GameObject("ADVWindow");
-        ADVWindow.transform.SetParent(textCanvasObj.transform);
-        RectTransform windowTransform = ADVWindow.AddComponent<RectTransform>();
-        windowTransform.anchorMax = new Vector2(0.5f, 0f);
-        windowTransform.anchorMin = new Vector2(0.5f, 0f);
-        windowTransform.anchoredPosition = new Vector2(0f, -100f);
-        windowTransform.sizeDelta = new Vector2(960f, 180f);
-        windowTransform.localScale = new Vector3(1f, 1f, 1f);
+        ADVWindow.transform.SetParent(MaskObj.transform);
+        ADVWindowTransform = ADVWindow.AddComponent<RectTransform>();
+        ADVWindowTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        ADVWindowTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        ADVWindowTransform.sizeDelta = new Vector2(960f, 180f);
+        ADVWindowTransform.localScale = new Vector3(1f, 1f, 1f);
         Image windowRenderer = ADVWindow.AddComponent<Image>();
         Texture2D windowTexture = Resources.Load<Texture2D>("ADVWindow");
         windowTexture.wrapMode = TextureWrapMode.Clamp;
@@ -2424,6 +2521,7 @@ public class player : MonoBehaviour
         SetCamera("Camera_Sprite", 4, "Sprite", CameraClearFlags.Depth);
         SetCamera("Camera_Caption", 5, "Caption", CameraClearFlags.Depth);
         SetCamera("Camera_Main", 6, "Main", CameraClearFlags.Depth);
+        SetCamera("Camera_SceneChange", 7, "SceneChange", CameraClearFlags.Depth);
         renderTextureObj = new GameObject("RenderTextures");
         renderTextureObj.transform.position = new Vector3(0f, 0f, 0f);
         bgTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
@@ -2485,7 +2583,7 @@ public class player : MonoBehaviour
             JsonLoading = false;
         }
         GameObject SceneChange = new GameObject("SceneChange");
-        SceneChange.transform.localPosition = new Vector3(-20000f, 0f, 0f);
+        SceneChange.transform.localPosition = new Vector3(0f, 0f, 0f);
         SceneChange.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
         Canvas scCanvas = SceneChange.AddComponent<Canvas>();
         scCanvas.renderMode = RenderMode.WorldSpace;
@@ -2505,6 +2603,7 @@ public class player : MonoBehaviour
                 sc.transform.localPosition = new Vector3(i * 256f, j * 256f, 0f);
                 sc.transform.localScale = new Vector3(1f, 1f, 1f);
                 sc.transform.localRotation = new Quaternion(1f, 1f, 0f, 0f);
+                sc.layer = LayerMask.NameToLayer("SceneChange");
             }
         }
     }
@@ -2515,7 +2614,7 @@ public class player : MonoBehaviour
         UniversalAdditionalCameraData cameraData = newCameraComponent.GetUniversalAdditionalCameraData();
         newCameraComponent.transform.position = new Vector3(0f, 0f, -10000f);
         newCameraComponent.orthographic = true;
-        newCameraComponent.orthographicSize = 2000f / 3f;
+        newCameraComponent.orthographicSize = 2000f / 3f * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT);
         newCameraComponent.nearClipPlane = 0.3f;
         newCameraComponent.farClipPlane = 200000f;
         newCameraComponent.backgroundColor = new Color(0f, 0f, 0f, (depth == 0) ? 1f : 0f);
@@ -2577,6 +2676,7 @@ public class player : MonoBehaviour
     }
     private IEnumerator StartingLoading()
     {
+        StartCoroutine(ADVWindowCycle());
         webText = new Dictionary<string, string>();
         foreach (Texture2D texture2D in webTexture.Values)
         {
@@ -2655,6 +2755,10 @@ public class player : MonoBehaviour
                 }
             }
         }
+        if (netError)
+        {
+            yield break;
+        }
         PreloadEnd = true;
         int maxConcurrentLoads = 20, currentActiveLoads = 0;
         Queue<IEnumerator> pendingQueue = new Queue<IEnumerator>(LoadingIEnumerators.Values);
@@ -2672,6 +2776,10 @@ public class player : MonoBehaviour
             yield return null; 
         }
         yield return coroutine;
+        if (netError)
+        {
+            yield break;
+        }
         SetUp();
         Playing = true;
         ADVIndex = 0;
@@ -2735,9 +2843,59 @@ public class player : MonoBehaviour
 #endif
         }
     }
+    private IEnumerator DLKuromonCycle()
+    {
+        Vector3 standardPosition = new Vector3(576f, -288.75f, 0f);
+        while (true)
+        {
+            if (DLKuromonTransform == null) yield break;
+            if (FIXED_ASPECT == 0f)
+            {
+                float screenAspect = (float)Screen.width / (float)Screen.height;
+                float dy = 0f;
+                if (screenAspect < 16f / 9f)
+                {
+                    dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * (750f / 2f);
+                    dy = dy < -875f / 3f ? -875f / 3f : dy;
+                }
+                DLKuromonTransform.anchoredPosition = standardPosition + new Vector3(0f, dy, 0f);
+            }
+            else
+            {
+                float dy = (9f / 16f - FIXED_ASPECT) * (2000f / 3f);
+                DLKuromonTransform.anchoredPosition = standardPosition + new Vector3(0f, dy, 0f);
+            }
+            DLKuromonTransform.localPosition = new Vector3(DLKuromonTransform.localPosition.x, DLKuromonTransform.localPosition.y, 0f);
+            yield return null;
+        }
+    }
+    private IEnumerator ADVWindowCycle()
+    {
+        while (true)
+        {
+            if (FIXED_ASPECT == 0f)
+            {
+                float screenAspect = (float)Screen.width / (float)Screen.height;
+                if (screenAspect < 16f / 9f)
+                {
+                    float dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * 3000f / 8f;
+                    ADVWindowTransform.anchoredPosition = new Vector3(0f, -100f - 375f + dy + ADVWindowState * 200f, 0f);
+                }
+                else
+                {
+                    ADVWindowTransform.anchoredPosition = new Vector3(0f, -100f - 375f + ADVWindowState * 200f, 0f);
+                }
+            }
+            else
+            {
+                ADVWindowTransform.anchoredPosition = new Vector3(0f, -100f - 2000f / 3f * FIXED_ASPECT + ADVWindowState * 200f, 0f);
+            }
+            ADVWindowTransform.localPosition = new Vector3(ADVWindowTransform.localPosition.x, ADVWindowTransform.localPosition.y, 0f);
+            yield return null;
+        }
+    }
     private IEnumerator LoadingStart()
     {
-        GameObject SceneChange = GameObject.Find("SceneChange");
         GameObject DLKuromon = new GameObject("DLKuromon");
         Texture2D KuromonTexture = Resources.Load<Texture2D>("DLKuromon");
         KuromonTexture.wrapMode = TextureWrapMode.Clamp;
@@ -2746,10 +2904,11 @@ public class player : MonoBehaviour
         KuromonRenderer.sprite = KuromonSprite;
         KuromonRenderer.sortingOrder = -1;
         DLKuromon.transform.SetParent(textCanvas.transform);
-        RectTransform dlkuromonTransform = DLKuromon.AddComponent<RectTransform>();
-        dlkuromonTransform.anchorMax = new Vector2(1f, 0f);
-        dlkuromonTransform.anchorMin = new Vector2(1f, 0f);
-        dlkuromonTransform.anchoredPosition = new Vector3(576f - 2000f / 3f, -288.75f + 375f, 0f);
+        DLKuromonTransform = DLKuromon.AddComponent<RectTransform>();
+        DLKuromonTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        DLKuromonTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        DLKuromonTransform.localScale = new Vector3(1f, 1f, 1f);
+        StartCoroutine(DLKuromonCycle());
         GameObject Loading = new GameObject("Loading");
         Texture2D LoadingTexture = Resources.Load<Texture2D>("Loading");
         LoadingTexture.wrapMode = TextureWrapMode.Clamp;
@@ -2759,6 +2918,7 @@ public class player : MonoBehaviour
         LoadingRenderer.sortingOrder = -1;
         Loading.transform.SetParent(DLKuromon.transform);
         Loading.transform.localPosition = new Vector3(-171f, -36f, 0f);
+        Loading.transform.localScale = new Vector3(1f, 1f, 1f);
         Texture2D DotTexture = Resources.Load<Texture2D>("LoadingDot");
         DotTexture.wrapMode = TextureWrapMode.Clamp;
         Sprite DotSprite = Sprite.Create(DotTexture, new Rect(0, 0, DotTexture.width, DotTexture.height), new Vector2(0.5f, 0.5f), 1);
@@ -2768,23 +2928,26 @@ public class player : MonoBehaviour
         Dot1Renderer.sortingOrder = -1;
         Dot1.transform.SetParent(DLKuromon.transform);
         Dot1.transform.localPosition = new Vector3(-100.5f, -40.5f, 0f);
+        Dot1.transform.localScale = new Vector3(1f, 1f, 1f);
         GameObject Dot2 = new GameObject("Dot2");
         SpriteRenderer Dot2Renderer = Dot2.AddComponent<SpriteRenderer>();
         Dot2Renderer.sprite = DotSprite;
         Dot2Renderer.sortingOrder = -1;
         Dot2.transform.SetParent(DLKuromon.transform);
         Dot2.transform.localPosition = new Vector3(-93f, -40.5f, 0f);
+        Dot2.transform.localScale = new Vector3(1f, 1f, 1f);
         GameObject Dot3 = new GameObject("Dot3");
         SpriteRenderer Dot3Renderer = Dot3.AddComponent<SpriteRenderer>();
         Dot3Renderer.sprite = DotSprite;
         Dot3Renderer.sortingOrder = -1;
         Dot3.transform.SetParent(DLKuromon.transform);
         Dot3.transform.localPosition = new Vector3(-85.5f, -40.5f, 0f);
+        Dot3.transform.localScale = new Vector3(1f, 1f, 1f);
         float timeElapsed = 0f;
         GameObject Loaded = new GameObject("Loaded");
         Loaded.transform.SetParent(DLKuromon.transform);
         RectTransform loadedTransform = Loaded.AddComponent<RectTransform>();
-        loadedTransform.localPosition = new Vector3(-801f, 288.75f, 0f);
+        loadedTransform.localPosition = new Vector3(-601f, 415f, 0f);
         loadedTransform.sizeDelta = new Vector2(1000f, 1000f);
         loadedTransform.localScale = new Vector3(1f, 1f, 1f);
         Text loadedText = Loaded.AddComponent<Text>();
@@ -2798,33 +2961,35 @@ public class player : MonoBehaviour
         GameObject ToLoad = new GameObject("ToLoad");
         ToLoad.transform.SetParent(DLKuromon.transform);
         RectTransform toloadTransform = ToLoad.AddComponent<RectTransform>();
-        toloadTransform.localPosition = new Vector3(-201f, 288.75f, 0f);
+        toloadTransform.localPosition = new Vector3(-201f, 415f, 0f);
         toloadTransform.sizeDelta = new Vector2(1000f, 1000f);
         toloadTransform.localScale = new Vector3(1f, 1f, 1f);
-        Text toloadText = ToLoad.AddComponent<Text>();
-        toloadText.font = font;
-        toloadText.fontSize = 16;
-        toloadText.lineSpacing = 0.8f;
-        toloadText.color = new Color(0.431372553f, 0.254901975f, 0.20784314f, 1f);
-        toloadText.text = "";
-        toloadText.alignment = TextAnchor.UpperLeft;
-        toloadText.verticalOverflow = VerticalWrapMode.Overflow;
         List<string> shown = new List<string>();
         while (!PreloadEnd)
         {
+            if (netError)
+            {
+                loadedText.text = netErrorMessage;
+                loadedText.color = new Color(1f, 0f, 0f, 1f);
+                yield break;
+            }
             loadedText.text = "Parsing script(" + (advScripts.Count + advScriptTexts.Count).ToString() + "/" + (ADVIDs.Count * 2).ToString() + ")...";
             yield return null;
         }
         loadedText.text = "";
         int lineLimit = 40;
-        List<string> toloadshown = new List<string>(LoadingIEnumerators.Keys);
-        int dotStatus = 0, newDotStatus = 0;
+        int dotStatus = 0, newDotStatus;
         Queue<string> loadedLinesQueue = new Queue<string>();
-        StringBuilder toloadBuilder = new StringBuilder();
         int processedAssetCount = 0; 
-        bool uiNeedsUpdate = false;
+        bool uiNeedsUpdate;
         while (shown.Count != LoadingIEnumerators.Count)
         {
+            if (netError)
+            {
+                loadedText.text = netErrorMessage;
+                loadedText.color = new Color(1f, 0f, 0f, 1f);
+                yield break;
+            }
             uiNeedsUpdate = false;
             while (processedAssetCount < LoadedAssets.Count)
             {
@@ -2839,10 +3004,6 @@ public class player : MonoBehaviour
                     {
                         loadedLinesQueue.Dequeue();
                     }
-                    if (toloadshown.Contains(asset))
-                    {
-                        toloadshown.Remove(asset);
-                    }
                     uiNeedsUpdate = true;
                 }
                 processedAssetCount++;
@@ -2850,18 +3011,6 @@ public class player : MonoBehaviour
             if (uiNeedsUpdate)
             {
                 loadedText.text = string.Join("\n", loadedLinesQueue);
-                toloadBuilder.Clear();
-                int toloadCount = 0;
-                foreach (string asset in toloadshown)
-                {
-                    toloadBuilder.AppendLine(asset);
-                    toloadCount++;
-                    if (toloadCount > lineLimit)
-                    {
-                        break;
-                    }
-                }
-                toloadText.text = toloadBuilder.ToString();
             }
             timeElapsed += Time.deltaTime;
             newDotStatus = (int)(timeElapsed * 4 % 4);
@@ -4101,9 +4250,8 @@ public class player : MonoBehaviour
     private IEnumerator ToggleCanvas(bool isVisible)
     {
         float sec = 0.2f;
-        RectTransform rectTransform = ADVWindow.GetComponent<RectTransform>();
-        Vector2 start = rectTransform.anchoredPosition;
-        Vector2 end = new Vector3(0f, isVisible ? 100f : -100f, 0f);
+        float start = ADVWindowState;
+        float end = isVisible ? 1f : 0f;
         int CurveType = isVisible ? 2 : 1;
         Image[] cachedImages = ADVWindow.transform.GetComponentsInChildren<Image>();
         float starta = cachedImages.Length > 0 ? cachedImages[0].color.a : 0f;
@@ -4113,9 +4261,7 @@ public class player : MonoBehaviour
         while (timeElapsed < sec)
         {
             timeElapsed += Time.deltaTime;
-            float x_axis = Mathf.Lerp(start[0], end[0], Ease(timeElapsed / sec, CurveType));
-            float y_axis = Mathf.Lerp(start[1], end[1], Ease(timeElapsed / sec, CurveType));
-            rectTransform.anchoredPosition = new Vector3(x_axis, y_axis, 0f);
+            ADVWindowState = Mathf.Lerp(start, end, Ease(timeElapsed / sec, CurveType));
             float a = Mathf.Lerp(starta, isVisible ? 1 : 0, Ease(timeElapsed / sec, CurveType));
             foreach (Image image in cachedImages)
             {
@@ -4145,7 +4291,7 @@ public class player : MonoBehaviour
         autoLabelImage.color = new Color(1f, 1f, 1f, isVisible ? 1 : 0);
         autoIconImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, isVisible ? 1 : 0);
         autoImage.color = new Color(250f / 255f, 250f / 255f, 235f / 255f, isVisible ? 1 : 0);
-        rectTransform.anchoredPosition = end;
+        ADVWindowState = end;
     }
     private IEnumerator CharaMoting(string ADVCharaID, string MotID)
     {
@@ -8369,15 +8515,31 @@ public class player : MonoBehaviour
     {
 #if UNITY_WEBGL
         float currentAspect = (float)Screen.width / Screen.height;
-        if (currentAspect >= 16f / 9f)
+        if (FIXED_ASPECT == 0f)
         {
-            canvasScaler.matchWidthOrHeight = 1f; 
-            Camera.main.orthographicSize = 375f;
+            if (currentAspect >= 16f / 9f)
+            {
+                canvasScaler.matchWidthOrHeight = 1f; 
+                Camera.main.orthographicSize = SIDE_LENGTH * (9f / 16f) / 2f;
+            }
+            else
+            {
+                canvasScaler.matchWidthOrHeight = 0f; 
+                Camera.main.orthographicSize = SIDE_LENGTH / (2f * currentAspect);
+            }
         }
         else
         {
-            canvasScaler.matchWidthOrHeight = 0f; 
-            Camera.main.orthographicSize = 375f * (16f / 9f) / currentAspect;
+            if (currentAspect >= 1 / FIXED_ASPECT)
+            {
+                canvasScaler.matchWidthOrHeight = 1f; 
+                Camera.main.orthographicSize = SIDE_LENGTH * FIXED_ASPECT / 2f;
+            }
+            else
+            {
+                canvasScaler.matchWidthOrHeight = 0f; 
+                Camera.main.orthographicSize = SIDE_LENGTH / (2f * currentAspect);
+            }
         }
 #endif
         Time.timeScale = TimeScale;
@@ -8418,7 +8580,7 @@ public class player : MonoBehaviour
             Screen.fullScreen = !Screen.fullScreen;
         }
 #endif
-        if (JsonLoading)
+        if (JsonLoading || netError)
         {
             return;
         }

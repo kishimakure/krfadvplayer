@@ -34,21 +34,56 @@
             </div>
 
             <div class="krf-bottom-bar">
-                <div class="krf-volume-group">
-                    <div class="krf-volume-item">
-                        <label for="vol-bgm">BGM</label>
-                        <input type="range" id="vol-bgm" min="0" max="100" value="100">
-                        <span class="krf-vol-value" id="vol-bgm-val">100</span>
-                    </div>
-                    <div class="krf-volume-item">
-                        <label for="vol-se">SE</label>
-                        <input type="range" id="vol-se" min="0" max="100" value="100">
-                        <span class="krf-vol-value" id="vol-se-val">100</span>
-                    </div>
-                    <div class="krf-volume-item">
-                        <label for="vol-voice">Voice</label>
-                        <input type="range" id="vol-voice" min="0" max="100" value="100">
-                        <span class="krf-vol-value" id="vol-voice-val">100</span>
+                <div class="krf-settings-wrapper">
+                    <button id="btn-settings" class="krf-settings-btn" title="Settings">&#9881; Settings</button>
+                    <div id="settings-dropdown" class="krf-settings-dropdown">
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">BGM</div>
+                            <div class="krf-settings-slider">
+                                <input type="range" id="vol-bgm" min="0" max="100" value="100">
+                                <span class="krf-vol-value" id="vol-bgm-val">100</span>
+                            </div>
+                        </div>
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">SE</div>
+                            <div class="krf-settings-slider">
+                                <input type="range" id="vol-se" min="0" max="100" value="100">
+                                <span class="krf-vol-value" id="vol-se-val">100</span>
+                            </div>
+                        </div>
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">Voice</div>
+                            <div class="krf-settings-slider">
+                                <input type="range" id="vol-voice" min="0" max="100" value="100">
+                                <span class="krf-vol-value" id="vol-voice-val">100</span>
+                            </div>
+                        </div>
+                        <div class="krf-settings-divider"></div>
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">Quality</div>
+                            <select id="setting-quality" class="krf-settings-select">
+                                <option value="960">Low (960p)</option>
+                                <option value="1920" selected>Medium (1920p)</option>
+                                <option value="2560">High (2560p)</option>
+                                <option value="3840">Ultra (3840p)</option>
+                            </select>
+                        </div>
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">Frame Rate</div>
+                            <select id="setting-fps" class="krf-settings-select">
+                                <option value="30">30 FPS</option>
+                                <option value="60">60 FPS</option>
+                                <option value="-1" selected>Unlimited</option>
+                            </select>
+                        </div>
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">Aspect Ratio</div>
+                            <select id="setting-aspect" class="krf-settings-select">
+                                <option value="0">Free</option>
+                                <option value="1" selected>16 : 9</option>
+                                <option value="2">4 : 3</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -101,7 +136,9 @@
             streamingAssetsUrl: "StreamingAssets",
             companyName: "ADVWindow",
             productName: "krfadvplayer",
-            productVersion: "1.0"
+            productVersion: "1.0",
+            matchWebGLToCanvasSize: true,
+            devicePixelRatio: 1
         };
 
         var canvas = document.querySelector("#unity-canvas");
@@ -123,6 +160,22 @@
         const col4 = document.getElementById('col4-body');
         const selectedCountText = document.querySelector("#selected-count");
 
+        /* --- Settings dropdown toggle --- */
+        const settingsBtn = document.getElementById('btn-settings');
+        const settingsDropdown = document.getElementById('settings-dropdown');
+
+        settingsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!settingsDropdown.contains(e.target) && e.target !== settingsBtn) {
+                settingsDropdown.classList.remove('open');
+            }
+        });
+        /* Prevent slider/select interaction from closing dropdown */
+        settingsDropdown.addEventListener('click', (e) => e.stopPropagation());
+
         /* --- Volume sliders --- */
         const volBgm   = document.getElementById('vol-bgm');
         const volSe    = document.getElementById('vol-se');
@@ -131,34 +184,62 @@
         const volSeVal    = document.getElementById('vol-se-val');
         const volVoiceVal = document.getElementById('vol-voice-val');
 
+        /* --- Settings controls --- */
+        const settingQuality = document.getElementById('setting-quality');
+        const settingFps     = document.getElementById('setting-fps');
+        const settingAspect  = document.getElementById('setting-aspect');
+
         function updateSliderTrack(slider) {
             const pct = (slider.value - slider.min) / (slider.max - slider.min) * 100;
             slider.style.setProperty('--pct', pct + '%');
         }
 
-        volBgm.addEventListener('input',   () => { volBgmVal.textContent   = volBgm.value;   updateSliderTrack(volBgm);   updateVolumes(); });
-        volSe.addEventListener('input',    () => { volSeVal.textContent    = volSe.value;    updateSliderTrack(volSe);    updateVolumes(); });
-        volVoice.addEventListener('input', () => { volVoiceVal.textContent = volVoice.value;  updateSliderTrack(volVoice); updateVolumes(); });
+        volBgm.addEventListener('input',   () => { volBgmVal.textContent   = volBgm.value;   updateSliderTrack(volBgm);   updateSettings(); });
+        volSe.addEventListener('input',    () => { volSeVal.textContent    = volSe.value;    updateSliderTrack(volSe);    updateSettings(); });
+        volVoice.addEventListener('input', () => { volVoiceVal.textContent = volVoice.value;  updateSliderTrack(volVoice); updateSettings(); });
         [volBgm, volSe, volVoice].forEach(updateSliderTrack);
+        settingQuality.addEventListener('change', updateSettings);
+        settingFps.addEventListener('change', updateSettings);
+        settingAspect.addEventListener('change', updateSettings);
 
-        /* First 3 elements of selectedAdvs = volume * 0.5 */
+        /* Settings encoding helpers */
+        function encodeQuality() { return parseInt(settingQuality.value); }
+        function encodeFps() { return parseInt(settingFps.value); }
+        function encodeAspect() { return parseInt(settingAspect.value); }
+
+        /*
+         * selectedAdvs layout:
+         *   [0] BGM vol * 0.5
+         *   [1] SE vol * 0.5
+         *   [2] Voice vol * 0.5
+         *   [3] quality (horizontal pixel width, e.g. 960/1920/2560/3840)
+         *   [4] fps (30/60/-1)
+         *   [5] aspect (0=free, 1=16:9, 2=4:3)
+         *   [6+] advIDs
+         */
         let selectedAdvs = [
             parseInt(volBgm.value)   * 0.5,
             parseInt(volSe.value)    * 0.5,
-            parseInt(volVoice.value) * 0.5
+            parseInt(volVoice.value) * 0.5,
+            encodeQuality(),
+            encodeFps(),
+            encodeAspect()
         ];
 
         /* Map advId -> title for the selected column */
         let advTitleMap = {};
 
-        function updateVolumes() {
+        function updateSettings() {
             selectedAdvs[0] = parseInt(volBgm.value)   * 0.5;
             selectedAdvs[1] = parseInt(volSe.value)    * 0.5;
             selectedAdvs[2] = parseInt(volVoice.value) * 0.5;
+            selectedAdvs[3] = encodeQuality();
+            selectedAdvs[4] = encodeFps();
+            selectedAdvs[5] = encodeAspect();
         }
 
         function getAdvCount() {
-            return selectedAdvs.length - 3;
+            return selectedAdvs.length - 6;
         }
 
         function updateCountText() {
@@ -168,7 +249,7 @@
         /* --- Render selected column (col4) --- */
         function renderSelectedColumn() {
             col4.innerHTML = '';
-            const advIds = selectedAdvs.slice(3);
+            const advIds = selectedAdvs.slice(6);
             if (advIds.length === 0) {
                 col4.innerHTML = '<div class="krf-col-placeholder">No scenarios selected</div>';
                 return;
@@ -190,8 +271,8 @@
                 removeBtn.textContent = '\u00D7';
                 removeBtn.title = 'Remove';
                 removeBtn.onclick = () => {
-                    selectedAdvs = selectedAdvs.slice(0, 3).concat(
-                        selectedAdvs.slice(3).filter(v => v !== advId)
+                    selectedAdvs = selectedAdvs.slice(0, 6).concat(
+                        selectedAdvs.slice(6).filter(v => v !== advId)
                     );
                     updateCountText();
                     renderSelectedColumn();
@@ -209,7 +290,7 @@
         /* Refresh col3 checkbox states without re-rendering */
         function refreshCol3Checkboxes() {
             col3.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.checked = selectedAdvs.indexOf(parseInt(cb.value)) > 2;
+                cb.checked = selectedAdvs.indexOf(parseInt(cb.value)) > 5;
             });
         }
 
@@ -219,8 +300,8 @@
                 const cb = row.querySelector('input[type="checkbox"]');
                 if (!cb) return;
                 const scenarioIds = JSON.parse(cb.dataset.scenarioIds || '[]');
-                const allSelected = scenarioIds.length > 0 && scenarioIds.every(id => selectedAdvs.indexOf(id) > 2);
-                const someSelected = scenarioIds.some(id => selectedAdvs.indexOf(id) > 2);
+                const allSelected = scenarioIds.length > 0 && scenarioIds.every(id => selectedAdvs.indexOf(id) > 5);
+                const someSelected = scenarioIds.some(id => selectedAdvs.indexOf(id) > 5);
                 cb.checked = allSelected;
                 cb.indeterminate = someSelected && !allSelected;
             });
@@ -284,8 +365,8 @@
                 checkbox.dataset.scenarioIds = JSON.stringify(scenarioIds);
 
                 /* Check initial state */
-                const allSel = scenarioIds.length > 0 && scenarioIds.every(id => selectedAdvs.indexOf(id) > 2);
-                const someSel = scenarioIds.some(id => selectedAdvs.indexOf(id) > 2);
+                const allSel = scenarioIds.length > 0 && scenarioIds.every(id => selectedAdvs.indexOf(id) > 5);
+                const someSel = scenarioIds.some(id => selectedAdvs.indexOf(id) > 5);
                 checkbox.checked = allSel;
                 checkbox.indeterminate = someSel && !allSel;
 
@@ -295,7 +376,7 @@
                         /* Add all scenarios not yet selected */
                         scenarioIds.forEach(id => {
                             advTitleMap[id] = advTitleMap[id] || ('ADV ' + id);
-                            if (selectedAdvs.indexOf(id) <= 2) {
+                            if (selectedAdvs.indexOf(id) <= 5) {
                                 if (getAdvCount() < 50) {
                                     selectedAdvs.push(id);
                                 }
@@ -304,8 +385,8 @@
                     } else {
                         /* Remove all scenarios of this subcategory */
                         const removeSet = new Set(scenarioIds);
-                        selectedAdvs = selectedAdvs.slice(0, 3).concat(
-                            selectedAdvs.slice(3).filter(v => !removeSet.has(v))
+                        selectedAdvs = selectedAdvs.slice(0, 6).concat(
+                            selectedAdvs.slice(6).filter(v => !removeSet.has(v))
                         );
                     }
                     updateCountText();
@@ -344,7 +425,7 @@
                 checkbox.type = 'checkbox';
                 checkbox.value = advId;
 
-                if (selectedAdvs.indexOf(advId) > 2) {
+                if (selectedAdvs.indexOf(advId) > 5) {
                     checkbox.checked = true;
                 }
 
@@ -354,8 +435,8 @@
                         if (getAdvCount() >= 50) { this.checked = false; return; }
                         selectedAdvs.push(val);
                     } else {
-                        selectedAdvs = selectedAdvs.slice(0, 3).concat(
-                            selectedAdvs.slice(3).filter(v => v !== val)
+                        selectedAdvs = selectedAdvs.slice(0, 6).concat(
+                            selectedAdvs.slice(6).filter(v => v !== val)
                         );
                     }
                     updateCountText();
@@ -385,7 +466,9 @@
 
         btnStart.addEventListener("click", () => {
             if (getAdvCount() === 0) return;
+            updateSettings();
             localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
+
             menuUi.style.display = "none";
             unityContainer.style.display = "block";
 

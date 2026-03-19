@@ -280,7 +280,7 @@ MonoBehaviour:
   AttemptDelay: 0.1
   TimeScale: 1
   DebugMode: 0
-  useCustomJson: 1
+  useCustomJson: 0
   globalFont: ja
   audioMode: ogg
   BGMVolume: 1
