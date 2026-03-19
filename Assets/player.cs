@@ -2482,7 +2482,7 @@ public class player : MonoBehaviour
         text.font = font;
         text.fontSize = 36;
         text.lineSpacing = lineSpacing[globalFont];
-        text.color = new Color(0.431372553f, 0.254901975f, 0.20784314f, 1f);
+        text.color = new Color(110f / 255f, 65f / 255f, 53f / 255f, 1f);
         CanvasGroup textGroup = textObj.AddComponent<CanvasGroup>();
         textGroup.alpha = 0f;
         GameObject nameObj = new GameObject("Name");
@@ -2955,7 +2955,7 @@ public class player : MonoBehaviour
         loadedText.font = font;
         loadedText.fontSize = 16;
         loadedText.lineSpacing = -40f;
-        loadedText.color = new Color(0.431372553f, 0.254901975f, 0.20784314f, 1f);
+        loadedText.color = new Color(110f / 255f, 65f / 255f, 53f / 255f, 1f);
         loadedText.text = "Parsing script...";
         loadedText.alignment = TextAlignmentOptions.BottomLeft;
         loadedText.overflowMode = TextOverflowModes.Overflow;
@@ -4184,17 +4184,17 @@ public class player : MonoBehaviour
                             rubyText.font = font;
                             rubyText.fontSize = 16;
                             rubyText.lineSpacing = lineSpacing[globalFont];
-                            rubyText.color = new Color(0.4235294f, 0.2627451f, 0.2117647f, 1f);
+                            rubyText.color = new Color(110f / 255f, 65f / 255f, 53f / 255f, 1f);
                             rubyText.text = command[1];
                             CanvasGroup rubyGroup = ruby.AddComponent<CanvasGroup>();
                             rubyGroup.alpha = 1f;
                             if (command[3] == "0")
                             {
-                                rubyTransform.localPosition = new Vector3(-438f + (int.Parse(command[2]) + int.Parse(command[4])) * 18f, 16f, 0f);
+                                rubyTransform.localPosition = new Vector3(-437.88f + (int.Parse(command[2]) + int.Parse(command[4])) * 17.64f, 16f, 0f);
                             }
                             else
                             {
-                                rubyTransform.localPosition = new Vector3(-438f + (int.Parse(command[2]) + int.Parse(command[4])) * 18f, -42f, 0f);
+                                rubyTransform.localPosition = new Vector3(-437.88f + (int.Parse(command[2]) + int.Parse(command[4])) * 17.64f, -41.28f, 0f);
                             }
                             break;
                     }

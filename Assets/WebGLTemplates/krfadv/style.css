@@ -1,25 +1,93 @@
 /* ===================================================================
-   krfadvplayer – Material Design Theme
-   Inspired by きらファン解析 Wiki (wiki.kirafan.moe)
-   Color palette: primary #f48fb1, secondary #f8bbd0
+   krfadvplayer – Warm Cream Theme
+   Color palette: #FEF2D4, #FFF7E2, #FEEBD4, #393939, #414141,
+                  #6E4135, #866142, #FAFAEB
    =================================================================== */
 
 /* ===== CSS Variables ===== */
 :root {
-    --primary: #616161;
-    --primary-dark: #424242;
-    --primary-light: #e0e0e0;
-    --secondary: #f5f5f5;
-    --secondary-light: #fafafa;
-    --surface: #ffffff;
-    --background: #ffffff;
-    --on-surface: #212121;
-    --on-surface-secondary: #757575;
-    --divider: #e0e0e0;
-    --elevation-1: 0 1px 3px 0 rgba(0,0,0,.08), 0 1px 2px 0 rgba(0,0,0,.06);
-    --elevation-2: 0 2px 4px -1px rgba(0,0,0,.08), 0 2px 4px 0 rgba(0,0,0,.06), 0 1px 6px 0 rgba(0,0,0,.04);
-    --elevation-4: 0 2px 4px -1px rgba(0,0,0,.10), 0 4px 5px 0 rgba(0,0,0,.07), 0 1px 10px 0 rgba(0,0,0,.05);
-    --elevation-8: 0 5px 5px -3px rgba(0,0,0,.10), 0 8px 10px 1px rgba(0,0,0,.06), 0 3px 14px 2px rgba(0,0,0,.04);
+    --primary: #866142;
+    --primary-dark: #6E4135;
+    --primary-light: #FEEBD4;
+    --secondary: #FEF2D4;
+    --secondary-light: #FFF7E2;
+    --surface: #FAFAEB;
+    --background: #FAFAEB;
+    --on-surface: #393939;
+    --on-surface-secondary: #866142;
+    --divider: #F0D9B5;
+    --elevation-1: 0 1px 3px 0 rgba(57,57,57,.08), 0 1px 2px 0 rgba(57,57,57,.06);
+    --elevation-2: 0 2px 4px -1px rgba(57,57,57,.08), 0 2px 4px 0 rgba(57,57,57,.06), 0 1px 6px 0 rgba(57,57,57,.04);
+    --elevation-4: 0 2px 4px -1px rgba(57,57,57,.10), 0 4px 5px 0 rgba(57,57,57,.07), 0 1px 10px 0 rgba(57,57,57,.05);
+    --elevation-8: 0 5px 5px -3px rgba(57,57,57,.10), 0 8px 10px 1px rgba(57,57,57,.06), 0 3px 14px 2px rgba(57,57,57,.04);
+}
+
+/* ===== Dark Theme ===== */
+[data-theme="dark"] {
+    --primary: #866142;
+    --primary-dark: #6E4135;
+    --primary-light: #414141;
+    --secondary: #414141;
+    --secondary-light: #393939;
+    --surface: #393939;
+    --background: #393939;
+    --on-surface: #FAFAEB;
+    --on-surface-secondary: #FEEBD4;
+    --divider: #6E4135;
+    --elevation-1: 0 1px 3px 0 rgba(0,0,0,.24), 0 1px 2px 0 rgba(0,0,0,.18);
+    --elevation-2: 0 2px 4px -1px rgba(0,0,0,.24), 0 2px 4px 0 rgba(0,0,0,.18), 0 1px 6px 0 rgba(0,0,0,.12);
+    --elevation-4: 0 2px 4px -1px rgba(0,0,0,.30), 0 4px 5px 0 rgba(0,0,0,.20), 0 1px 10px 0 rgba(0,0,0,.14);
+    --elevation-8: 0 5px 5px -3px rgba(0,0,0,.30), 0 8px 10px 1px rgba(0,0,0,.18), 0 3px 14px 2px rgba(0,0,0,.12);
+}
+[data-theme="dark"] .krf-title {
+    color: #FFF7E2;
+}
+[data-theme="dark"] .krf-list-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .krf-list-btn.active {
+    background: #866142;
+    color: #FAFAEB;
+}
+[data-theme="dark"] .krf-list-btn.active .krf-btn-id {
+    color: #FEEBD4;
+}
+[data-theme="dark"] .krf-checkbox-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .krf-settings-slider input[type="range"] {
+    background: linear-gradient(
+        to right,
+        #866142 0%, #866142 var(--pct),
+        #6E4135 var(--pct), #6E4135 100%
+    );
+}
+[data-theme="dark"] .krf-settings-slider input[type="range"]::-moz-range-track {
+    background: #6E4135;
+}
+[data-theme="dark"] .krf-settings-select {
+    background-color: #414141;
+    color: #FAFAEB;
+    border-color: #6E4135;
+}
+[data-theme="dark"] .krf-play-btn:disabled {
+    background-color: #414141;
+    color: #6E4135;
+}
+[data-theme="dark"] .krf-remove-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .adblocker-desc code {
+    background: #414141;
+}
+[data-theme="dark"] #loading-overlay {
+    background: #393939;
+}
+[data-theme="dark"] .loading-bar-track {
+    background: #6E4135;
+}
+[data-theme="dark"] .krf-subtype-row.active {
+    background: rgba(134, 97, 66, 0.2);
 }
 
 /* ===== Reset & Base ===== */
@@ -66,7 +134,7 @@ body, html {
     font-size: 18px;
     font-weight: 500;
     letter-spacing: .5px;
-    color: rgba(0, 0, 0, 0.87);
+    color: #414141;
     background-color: var(--secondary);
     box-shadow: var(--elevation-2);
     flex-shrink: 0;
@@ -359,6 +427,46 @@ body, html {
     box-shadow: 0 0 0 2px rgba(97, 97, 97, 0.12);
 }
 
+/* ===== Toggle switch ===== */
+.krf-toggle {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+}
+.krf-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.krf-toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--divider);
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background .2s ease;
+}
+.krf-toggle-slider::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.krf-toggle input:checked + .krf-toggle-slider {
+    background: var(--primary);
+}
+.krf-toggle input:checked + .krf-toggle-slider::before {
+    transform: translateX(18px);
+}
+
 /* ===== Volume sliders (inside settings dropdown) ===== */
 .krf-settings-slider input[type="range"] {
     -webkit-appearance: none;
@@ -372,7 +480,7 @@ body, html {
     background: linear-gradient(
         to right,
         var(--primary) 0%, var(--primary) var(--pct),
-        #e0e0e0 var(--pct), #e0e0e0 100%
+        #F0D9B5 var(--pct), #F0D9B5 100%
     );
     transition: opacity 0.15s;
 }
@@ -406,7 +514,7 @@ body, html {
 .krf-settings-slider input[type="range"]::-moz-range-track {
     height: 4px;
     border-radius: 2px;
-    background: #e0e0e0;
+    background: #F0D9B5;
 }
 .krf-settings-slider input[type="range"]::-moz-range-progress {
     height: 4px;
@@ -465,8 +573,8 @@ body, html {
     box-shadow: var(--elevation-8);
 }
 .krf-play-btn:disabled {
-    background-color: #e0e0e0;
-    color: #9e9e9e;
+    background-color: #FEEBD4;
+    color: #866142;
     cursor: default;
     box-shadow: none;
 }
@@ -590,7 +698,7 @@ body, html {
     margin-bottom: 16px;
 }
 .adblocker-desc code {
-    background: #f5f5f5;
+    background: #FEF2D4;
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 13px;
@@ -633,7 +741,7 @@ body, html {
 #loading-overlay {
     position: absolute;
     inset: 0;
-    background: #ffffff;
+    background: #FAFAEB;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -652,7 +760,7 @@ body, html {
 }
 .loading-bar-track {
     height: 4px;
-    background: #e0e0e0;
+    background: #F0D9B5;
     border-radius: 2px;
     overflow: hidden;
 }

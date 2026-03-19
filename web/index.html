@@ -71,11 +71,19 @@
                             <div class="krf-settings-label">Aspect Ratio</div>
                             <select id="setting-aspect" class="krf-settings-select"></select>
                         </div>
+                        <div class="krf-settings-divider"></div>
+                        <div class="krf-settings-section">
+                            <div class="krf-settings-label">Dark Mode</div>
+                            <label class="krf-toggle">
+                                <input type="checkbox" id="toggle-dark">
+                                <span class="krf-toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
                 <div class="krf-action-bar">
-                    <span id="selected-count">0 selected</span>
+                    <span id="selected-count">0 / 50 selected</span>
                     <button id="btn-start-engine" class="krf-play-btn" disabled>Loading...</button>
                 </div>
             </div>
@@ -189,6 +197,17 @@
         settingFps.addEventListener('change', updateSettings);
         settingAspect.addEventListener('change', updateSettings);
 
+        /* --- Dark mode toggle --- */
+        const toggleDark = document.getElementById('toggle-dark');
+        function applyTheme(dark) {
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+            toggleDark.checked = dark;
+            localStorage.setItem('krfTheme', dark ? 'dark' : 'light');
+        }
+        toggleDark.addEventListener('change', () => applyTheme(toggleDark.checked));
+        /* Restore saved preference */
+        if (localStorage.getItem('krfTheme') === 'dark') applyTheme(true);
+
         /* Settings encoding helpers */
         function encodeQuality() { return parseInt(settingQuality.value); }
         function encodeFps() { return parseInt(settingFps.value); }
@@ -257,7 +276,7 @@
         }
 
         function updateCountText() {
-            selectedCountText.textContent = getAdvCount() + " selected";
+            selectedCountText.textContent = getAdvCount() + " / " + maxSelection + " selected";
         }
 
         /* --- Clear all selected --- */
