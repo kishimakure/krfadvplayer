@@ -26,7 +26,7 @@
                     <div class="krf-col-body" id="col3-body"></div>
                 </div>
                 <div class="krf-list-col" id="col4-selected">
-                    <div class="krf-col-header">Selected</div>
+                    <div class="krf-col-header">Selected <button id="btn-clear-all" class="krf-clear-btn" title="Clear all">&times;</button></div>
                     <div class="krf-col-body" id="col4-body">
                         <div class="krf-col-placeholder">No scenarios selected</div>
                     </div>
@@ -61,28 +61,15 @@
                         <div class="krf-settings-divider"></div>
                         <div class="krf-settings-section">
                             <div class="krf-settings-label">Quality</div>
-                            <select id="setting-quality" class="krf-settings-select">
-                                <option value="960">Low (960p)</option>
-                                <option value="1920" selected>Medium (1920p)</option>
-                                <option value="2560">High (2560p)</option>
-                                <option value="3840">Ultra (3840p)</option>
-                            </select>
+                            <select id="setting-quality" class="krf-settings-select"></select>
                         </div>
                         <div class="krf-settings-section">
                             <div class="krf-settings-label">Frame Rate</div>
-                            <select id="setting-fps" class="krf-settings-select">
-                                <option value="30">30 FPS</option>
-                                <option value="60">60 FPS</option>
-                                <option value="-1" selected>Unlimited</option>
-                            </select>
+                            <select id="setting-fps" class="krf-settings-select"></select>
                         </div>
                         <div class="krf-settings-section">
                             <div class="krf-settings-label">Aspect Ratio</div>
-                            <select id="setting-aspect" class="krf-settings-select">
-                                <option value="0">Free</option>
-                                <option value="1" selected>16 : 9</option>
-                                <option value="2">4 : 3</option>
-                            </select>
+                            <select id="setting-aspect" class="krf-settings-select"></select>
                         </div>
                     </div>
                 </div>
@@ -207,20 +194,47 @@
         function encodeFps() { return parseInt(settingFps.value); }
         function encodeAspect() { return parseInt(settingAspect.value); }
 
+        /* Max scenarios that can be selected */
+        let maxSelection = 50;
+
+        /* --- Load settings options from settings.json --- */
+        function populateSelect(selectEl, items) {
+            selectEl.innerHTML = '';
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.value;
+                opt.textContent = item.label;
+                if (item.default) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        fetch('settings.json')
+            .then(r => r.json())
+            .then(cfg => {
+                if (cfg.MaxSelection) maxSelection = cfg.MaxSelection;
+                if (cfg.Quality)     populateSelect(settingQuality, cfg.Quality);
+                if (cfg.FrameRate)   populateSelect(settingFps,     cfg.FrameRate);
+                if (cfg.AspectRatio) populateSelect(settingAspect,  cfg.AspectRatio);
+                /* Re-sync selectedAdvs with loaded defaults */
+                updateSettings();
+            })
+            .catch(err => console.warn('Failed to load settings.json, using empty selects:', err));
+
         /*
          * selectedAdvs layout:
-         *   [0] BGM vol * 0.5
-         *   [1] SE vol * 0.5
-         *   [2] Voice vol * 0.5
+         *   [0] BGM vol
+         *   [1] SE vol
+         *   [2] Voice vol
          *   [3] quality (horizontal pixel width, e.g. 960/1920/2560/3840)
          *   [4] fps (30/60/-1)
          *   [5] aspect (0=free, 1=16:9, 2=4:3)
          *   [6+] advIDs
          */
         let selectedAdvs = [
-            parseInt(volBgm.value)   * 0.5,
-            parseInt(volSe.value)    * 0.5,
-            parseInt(volVoice.value) * 0.5,
+            parseInt(volBgm.value),
+            parseInt(volSe.value),
+            parseInt(volVoice.value),
             encodeQuality(),
             encodeFps(),
             encodeAspect()
@@ -230,9 +244,9 @@
         let advTitleMap = {};
 
         function updateSettings() {
-            selectedAdvs[0] = parseInt(volBgm.value)   * 0.5;
-            selectedAdvs[1] = parseInt(volSe.value)    * 0.5;
-            selectedAdvs[2] = parseInt(volVoice.value) * 0.5;
+            selectedAdvs[0] = parseInt(volBgm.value);
+            selectedAdvs[1] = parseInt(volSe.value);
+            selectedAdvs[2] = parseInt(volVoice.value);
             selectedAdvs[3] = encodeQuality();
             selectedAdvs[4] = encodeFps();
             selectedAdvs[5] = encodeAspect();
@@ -245,6 +259,15 @@
         function updateCountText() {
             selectedCountText.textContent = getAdvCount() + " selected";
         }
+
+        /* --- Clear all selected --- */
+        document.getElementById('btn-clear-all').addEventListener('click', () => {
+            selectedAdvs = selectedAdvs.slice(0, 6);
+            updateCountText();
+            renderSelectedColumn();
+            refreshCol3Checkboxes();
+            refreshCol2Checkboxes();
+        });
 
         /* --- Render selected column (col4) --- */
         function renderSelectedColumn() {
@@ -377,7 +400,7 @@
                         scenarioIds.forEach(id => {
                             advTitleMap[id] = advTitleMap[id] || ('ADV ' + id);
                             if (selectedAdvs.indexOf(id) <= 5) {
-                                if (getAdvCount() < 50) {
+                                if (getAdvCount() < maxSelection) {
                                     selectedAdvs.push(id);
                                 }
                             }
@@ -432,7 +455,7 @@
                 checkbox.addEventListener('change', function () {
                     let val = parseInt(this.value);
                     if (this.checked) {
-                        if (getAdvCount() >= 50) { this.checked = false; return; }
+                        if (getAdvCount() >= maxSelection) { this.checked = false; return; }
                         selectedAdvs.push(val);
                     } else {
                         selectedAdvs = selectedAdvs.slice(0, 6).concat(

@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
 using UnityEngine.UI;
+using TMPro;
 using System.Text.RegularExpressions;
 using UnityEngine.Networking;
 using System;
@@ -1090,11 +1091,11 @@ public class player : MonoBehaviour
     public bool enableParticle = false;
     private bool netError = false;
     private string netErrorMessage = "";
-    private int SIDE_LENGTH = 1920;
+    private int SIDE_LENGTH = 1334;
     private float FIXED_ASPECT = 9/16f;
     private float ADVWindowState = 0f;
     private const string SERVER_HOST = "https://assets.krf-adv.com/adv";
-    private Font font;
+    private TMP_FontAsset font;
     private int ADVID;
     private int ADVIndex;
     private bool autoClick = false;
@@ -1164,7 +1165,7 @@ public class player : MonoBehaviour
     private List<string> LoadedPacks = new List<string>();
     private Dictionary<int, string[]> Jsons = new Dictionary<int, string[]>();
     private List<string> LoadedAssets = new List<string>();
-    private Dictionary<string, float> lineSpacing = new Dictionary<string, float> { { "ja", 0.8f }, { "zh", 1.2f } };
+    private Dictionary<string, float> lineSpacing = new Dictionary<string, float> { { "ja", -40f }, { "zh", 40f } };
     private Dictionary<Vector4, Mesh> meshCache = new Dictionary<Vector4, Mesh>();
     private Dictionary<string, GameObject> gameObjectCache = new Dictionary<string, GameObject>();
 
@@ -2209,9 +2210,9 @@ public class player : MonoBehaviour
         AttemptDelay = 1f;
         string jsonStr = GetPlaylistFromLocalStorage();
         ADVIDs = JsonConvert.DeserializeObject<List<int>>(jsonStr);
-        BGMVolume = Mathf.Clamp(ADVIDs[0] / 100f, 0f, 1f);
-        SEVolume = Mathf.Clamp(ADVIDs[1] / 100f, 0f, 1f);
-        VoiceVolume = Mathf.Clamp(ADVIDs[2] / 100f, 0f, 1f);
+        BGMVolume = Mathf.Clamp(ADVIDs[0] / 200f, 0f, 1f);
+        SEVolume = Mathf.Clamp(ADVIDs[1] / 200f, 0f, 1f);
+        VoiceVolume = Mathf.Clamp(ADVIDs[2] / 200f, 0f, 1f);
         SIDE_LENGTH = ADVIDs[3];
         Application.targetFrameRate = ADVIDs[4];
         switch (ADVIDs[5])
@@ -2250,13 +2251,13 @@ public class player : MonoBehaviour
         switch (globalFont)
         {
             case "ja":
-                font = Resources.Load<Font>("DynamicFont");
+                font = Resources.Load<TMP_FontAsset>("DynamicFont SDF");
                 break;
             case "zh":
-                font = Resources.Load<Font>("cnfont");
+                font = Resources.Load<TMP_FontAsset>("cnfont SDF");
                 break;
             default:
-                font = Resources.Load<Font>("DynamicFont");
+                font = Resources.Load<TMP_FontAsset>("DynamicFont SDF");
                 break;
         }
 #if UNITY_WEBGL
@@ -2477,7 +2478,7 @@ public class player : MonoBehaviour
         textTransform.localPosition = new Vector3(30f, 0f, 0f);
         textTransform.sizeDelta = new Vector2(900f, 96f);
         textTransform.localScale = new Vector3(1f, 1f, 1f);
-        Text text = textObj.AddComponent<Text>();
+        TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
         text.font = font;
         text.fontSize = 36;
         text.lineSpacing = lineSpacing[globalFont];
@@ -2490,12 +2491,12 @@ public class player : MonoBehaviour
         nameTransform.localPosition = new Vector3(-379f, 105.5f, 0f);
         nameTransform.sizeDelta = new Vector2(900f, 96f);
         nameTransform.localScale = new Vector3(1f, 1f, 1f);
-        Text name = nameObj.AddComponent<Text>();
+        TextMeshProUGUI name = nameObj.AddComponent<TextMeshProUGUI>();
         name.font = font;
         name.fontSize = 36;
         name.lineSpacing = lineSpacing[globalFont];
         name.color = new Color(1f, 1f, 1f, 1f);
-        name.alignment = TextAnchor.MiddleCenter;
+        name.alignment = TextAlignmentOptions.Center;
         CanvasGroup nameGroup = nameObj.AddComponent<CanvasGroup>();
         nameGroup.alpha = 0f;
         canvas.sortingOrder = -3;
@@ -2950,14 +2951,14 @@ public class player : MonoBehaviour
         loadedTransform.localPosition = new Vector3(-601f, 415f, 0f);
         loadedTransform.sizeDelta = new Vector2(1000f, 1000f);
         loadedTransform.localScale = new Vector3(1f, 1f, 1f);
-        Text loadedText = Loaded.AddComponent<Text>();
+        TextMeshProUGUI loadedText = Loaded.AddComponent<TextMeshProUGUI>();
         loadedText.font = font;
         loadedText.fontSize = 16;
-        loadedText.lineSpacing = 0.8f;
+        loadedText.lineSpacing = -40f;
         loadedText.color = new Color(0.431372553f, 0.254901975f, 0.20784314f, 1f);
         loadedText.text = "Parsing script...";
-        loadedText.alignment = TextAnchor.LowerLeft;
-        loadedText.verticalOverflow = VerticalWrapMode.Overflow;
+        loadedText.alignment = TextAlignmentOptions.BottomLeft;
+        loadedText.overflowMode = TextOverflowModes.Overflow;
         GameObject ToLoad = new GameObject("ToLoad");
         ToLoad.transform.SetParent(DLKuromon.transform);
         RectTransform toloadTransform = ToLoad.AddComponent<RectTransform>();
@@ -4046,10 +4047,10 @@ public class player : MonoBehaviour
         hasCharaName = !isEmpty;
         Transform textTransform = ADVWindow.transform.Find("Text");
         GameObject textObj = textTransform.gameObject;
-        Text text = textObj.GetComponent<Text>();
+        TextMeshProUGUI text = textObj.GetComponent<TextMeshProUGUI>();
         Transform nameTransform = ADVWindow.transform.Find("Name");
         GameObject nameObj = nameTransform.gameObject;
-        Text name = nameObj.GetComponent<Text>();
+        TextMeshProUGUI name = nameObj.GetComponent<TextMeshProUGUI>();
         bool tagging = false;
         Dictionary<int, List<List<string>>> parsed = ParseScriptText(param.m_text);
         yield return null;
@@ -4178,8 +4179,8 @@ public class player : MonoBehaviour
                             RectTransform rubyTransform = ruby.AddComponent<RectTransform>();
                             rubyTransform.sizeDelta = new Vector2(900f, 96f);
                             rubyTransform.localScale = new Vector3(1f, 1f, 1f);
-                            Text rubyText = ruby.AddComponent<Text>();
-                            rubyText.alignment = TextAnchor.UpperCenter;
+                            TextMeshProUGUI rubyText = ruby.AddComponent<TextMeshProUGUI>();
+                            rubyText.alignment = TextAlignmentOptions.Top;
                             rubyText.font = font;
                             rubyText.fontSize = 16;
                             rubyText.lineSpacing = lineSpacing[globalFont];
@@ -4578,7 +4579,7 @@ public class player : MonoBehaviour
         GameObject text = new GameObject("CaptionText");
         text.transform.SetParent(canvas.transform);
         RectTransform textTransform = text.AddComponent<RectTransform>();
-        Text textText = text.AddComponent<Text>();
+        TextMeshProUGUI textText = text.AddComponent<TextMeshProUGUI>();
         textText.text = CaptionTextScript;
         ColorUtility.TryParseHtmlString(CaptionRGBA["Text"][0], out Color textColorStart);
         ColorUtility.TryParseHtmlString(CaptionRGBA["Text"][1], out Color textColorIdle);
@@ -4589,8 +4590,8 @@ public class player : MonoBehaviour
         textText.color = textColorStart;
         textText.font = font;
         textText.fontSize = 36;
-        textText.lineSpacing = 1f;
-        textText.alignment = TextAnchor.MiddleCenter;
+        textText.lineSpacing = 0f;
+        textText.alignment = TextAlignmentOptions.Center;
         float timeElapsed = 0f;
         while (timeElapsed < CaptionSecDelay["Text"][0, 1])
         {
@@ -4666,7 +4667,7 @@ public class player : MonoBehaviour
     {
         GameObject text = FindCached("CaptionText");
         RectTransform textTransform = text.GetComponent<RectTransform>();
-        Text textText = text.GetComponent<Text>();
+        TextMeshProUGUI textText = text.GetComponent<TextMeshProUGUI>();
         ColorUtility.TryParseHtmlString(CaptionRGBA["Text"][1], out Color textColorIdle);
         ColorUtility.TryParseHtmlString(CaptionRGBA["Text"][2], out Color textColorEnd);
         Vector2 WHscale = new Vector2(1f, 1f);

@@ -1,0 +1,20 @@
+{
+    "MaxSelection": 50,
+    "Quality": [
+        { "value": 667,  "label": "Low (667px)" },
+        { "value": 960, "label": "Medium (960px)"},
+        { "value": 1334, "label": "Standard (1334px)", "default": true },
+        { "value": 1920, "label": "High (1920px)" },
+        { "value": 2560, "label": "Ultra (2560px)" }
+    ],
+    "FrameRate": [
+        { "value": 30,  "label": "30 FPS" },
+        { "value": 60,  "label": "60 FPS" },
+        { "value": -1,  "label": "Unlimited", "default": true }
+    ],
+    "AspectRatio": [
+        { "value": 0, "label": "Free" },
+        { "value": 1, "label": "16 : 9", "default": true },
+        { "value": 2, "label": "4 : 3" }
+    ]
+}

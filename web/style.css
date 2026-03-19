@@ -120,6 +120,28 @@ body, html {
     border-bottom: none;
     flex-shrink: 0;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.krf-clear-btn {
+    background: none;
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    color: var(--on-surface-secondary);
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all .15s ease;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.krf-clear-btn:hover {
+    background: #ef5350;
+    border-color: #ef5350;
+    color: #fff;
 }
 
 .krf-col-body {
