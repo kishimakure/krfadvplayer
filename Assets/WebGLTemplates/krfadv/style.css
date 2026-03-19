@@ -71,6 +71,21 @@ body, html {
     box-shadow: var(--elevation-2);
     flex-shrink: 0;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.krf-github-link {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--on-surface-secondary);
+    text-decoration: none;
+    letter-spacing: 0;
+    transition: color .15s ease;
+}
+.krf-github-link:hover {
+    color: var(--on-surface);
 }
 
 /* ===== Main panel (card) ===== */
@@ -170,7 +185,10 @@ body, html {
 
 /* ===== List buttons (column 1 & 2) ===== */
 .krf-list-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
     width: 100%;
     padding: 10px 16px;
     margin-bottom: 2px;
@@ -184,6 +202,21 @@ body, html {
     text-align: left;
     line-height: 1.5;
     font-family: inherit;
+}
+
+.krf-btn-name {
+    flex: 1;
+    min-width: 0;
+}
+
+.krf-btn-id {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--on-surface-secondary);
+    font-variant-numeric: tabular-nums;
+}
+.krf-list-btn.active .krf-btn-id {
+    color: rgba(255,255,255,.6);
 }
 .krf-list-btn:hover {
     background: rgba(0, 0, 0, 0.06);

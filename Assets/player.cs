@@ -4175,7 +4175,7 @@ public class player : MonoBehaviour
                         case "ruby":
                             GameObject ruby = new GameObject("ruby");
                             rubys.Add(ruby);
-                            ruby.transform.SetParent(textCanvas.transform);
+                            ruby.transform.SetParent(ADVWindow.transform);
                             RectTransform rubyTransform = ruby.AddComponent<RectTransform>();
                             rubyTransform.sizeDelta = new Vector2(900f, 96f);
                             rubyTransform.localScale = new Vector3(1f, 1f, 1f);

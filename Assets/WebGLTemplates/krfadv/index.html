@@ -10,7 +10,7 @@
 <body>
     <div id="krf-menu-ui">
         <div class="krf-panel">
-            <h1 class="krf-title">krfadvplayer</h1>
+            <h1 class="krf-title">krfadvplayer <a href="https://github.com/kishimakure/krfadvplayer" target="_blank" rel="noopener" class="krf-github-link" title="GitHub">&#9741; GitHub</a></h1>
 
             <div class="krf-columns-area">
                 <div class="krf-list-col" id="col1-types">
@@ -358,10 +358,20 @@
             col2.innerHTML = '<div class="krf-col-placeholder">\u2190 Select a category</div>';
             col3.innerHTML = '<div class="krf-col-placeholder">\u2190 Select a subcategory</div>';
 
-            webAdvList.Params.forEach(typeName => {
+            webAdvList.Params.forEach((typeName, idx) => {
                 let btn = document.createElement('button');
                 btn.className = 'krf-list-btn';
-                btn.textContent = typeName.Category;
+
+                let nameSpan = document.createElement('span');
+                nameSpan.className = 'krf-btn-name';
+                nameSpan.textContent = typeName.Category;
+
+                let idSpan = document.createElement('span');
+                idSpan.className = 'krf-btn-id';
+                idSpan.textContent = idx + 1;
+
+                btn.appendChild(nameSpan);
+                btn.appendChild(idSpan);
                 btn.onclick = () => {
                     Array.from(col1.children).forEach(c => c.classList.remove('active'));
                     btn.classList.add('active');
@@ -420,7 +430,17 @@
 
                 let btn = document.createElement('button');
                 btn.className = 'krf-list-btn krf-subtype-btn';
-                btn.textContent = subType.Name;
+
+                let nameSpan = document.createElement('span');
+                nameSpan.className = 'krf-btn-name';
+                nameSpan.textContent = subType.Name;
+
+                let idSpan = document.createElement('span');
+                idSpan.className = 'krf-btn-id';
+                idSpan.textContent = subType.ID;
+
+                btn.appendChild(nameSpan);
+                btn.appendChild(idSpan);
                 btn.onclick = () => {
                     col2.querySelectorAll('.krf-subtype-row').forEach(r => r.classList.remove('active'));
                     row.classList.add('active');
