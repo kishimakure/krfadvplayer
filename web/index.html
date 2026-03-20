@@ -389,8 +389,8 @@
                 idSpan.className = 'krf-btn-id';
                 idSpan.textContent = idx + 1;
 
-                btn.appendChild(nameSpan);
                 btn.appendChild(idSpan);
+                btn.appendChild(nameSpan);
                 btn.onclick = () => {
                     Array.from(col1.children).forEach(c => c.classList.remove('active'));
                     btn.classList.add('active');

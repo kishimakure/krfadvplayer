@@ -6,6 +6,7 @@
     <title>krfadvplayer</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
 </head>
 <body>
     <div id="krf-menu-ui">
@@ -389,8 +390,8 @@
                 idSpan.className = 'krf-btn-id';
                 idSpan.textContent = idx + 1;
 
-                btn.appendChild(nameSpan);
                 btn.appendChild(idSpan);
+                btn.appendChild(nameSpan);
                 btn.onclick = () => {
                     Array.from(col1.children).forEach(c => c.classList.remove('active'));
                     btn.classList.add('active');

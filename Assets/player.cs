@@ -1100,7 +1100,7 @@ public class player : MonoBehaviour
     private int ADVIndex;
     private bool autoClick = false;
     private bool PreloadEnd = false;
-    private List<Coroutine> autoSkipCoroutine = new List<Coroutine>();
+    private Coroutine autoSkipCoroutine = null;
     private advlist advList;
     private advmotionlist advMotionList;
     private advemotionlist advEmotionList;
@@ -4510,7 +4510,8 @@ public class player : MonoBehaviour
         yield return null;
         Coroutine BGStartcoroutine = StartCoroutine(CaptionStartBG());
         Coroutine TextStartcoroutine = StartCoroutine(CaptionStartText());
-        autoSkipCoroutine.Add(StartCoroutine(AutoSkip(2f)));
+        if (autoSkipCoroutine != null) { StopCoroutine(autoSkipCoroutine); }
+        autoSkipCoroutine = StartCoroutine(AutoSkip(2f));
         while (WaitForClickCaption)
         {
             yield return null;
@@ -6692,13 +6693,21 @@ public class player : MonoBehaviour
             yield return autoWait[0];
             autoWait.Remove(autoWait[0]);
         }
-        switch (globalFont)
+        float timeElapsed = 0f;
+        while (true)
         {
-            case "ja": yield return new WaitForSeconds(sec); break;
-            case "zh": yield return new WaitForSeconds(sec * 1.5f); break;
-            default: yield return new WaitForSeconds(sec); break;
+            if (!auto)
+            {
+                timeElapsed = 0f;
+            }
+            timeElapsed += Time.deltaTime;
+            if (timeElapsed >= sec)
+            {
+                autoClick = true;
+                yield break;
+            }
+            yield return null;
         }
-        autoClick = true;
     }
     private IEnumerator PlayBGMFadeIn(GameObject obj, float FadeInSec)
     {
@@ -7759,7 +7768,8 @@ public class player : MonoBehaviour
             isUpdateHighlight = true;
             autoWait.Add(StartCoroutine(Talk(param, true)));
         }
-        autoSkipCoroutine.Add(StartCoroutine(AutoSkip(1f)));
+        if (autoSkipCoroutine != null) { StopCoroutine(autoSkipCoroutine); }
+        autoSkipCoroutine = StartCoroutine(AutoSkip(1f));
     }
     private void CharaTalkFullVoice(uint TextID, int FaceID, string EmotionID)
     {
@@ -7797,7 +7807,8 @@ public class player : MonoBehaviour
             isUpdateHighlight = true;
             autoWait.Add(StartCoroutine(Talk(param, true)));
         }
-        autoSkipCoroutine.Add(StartCoroutine(AutoSkip(1f)));
+        if (autoSkipCoroutine != null) { StopCoroutine(autoSkipCoroutine); }
+        autoSkipCoroutine = StartCoroutine(AutoSkip(1f));
     }
     private void CloseTalk()
     {
@@ -8804,10 +8815,6 @@ public class player : MonoBehaviour
                 {
                     StartCoroutine(inputCD(0f));
                     auto = false;
-                    foreach (Coroutine coroutine in autoSkipCoroutine)
-                    {
-                        StopCoroutine(coroutine);
-                    }
                     TalkQuickEnd = true;
                 }
             }
@@ -8817,28 +8824,13 @@ public class player : MonoBehaviour
                 {
                     StartCoroutine(inputCD(0f));
                     auto = false;
-                    foreach (Coroutine coroutine in autoSkipCoroutine)
-                    {
-                        StopCoroutine(coroutine);
-                    }
                     WaitForClickCaption = false;
-                }
-                if (!auto)
-                {
-                    foreach (Coroutine coroutine in autoSkipCoroutine)
-                    {
-                        //StopCoroutine(coroutine);
-                    }
                 }
                 else
                 {
                     if (autoClick)
                     {
                         autoClick = false;
-                        foreach (Coroutine coroutine in autoSkipCoroutine)
-                        {
-                            StopCoroutine(coroutine);
-                        }
                         WaitForClickCaption = false;
                     }
                 }
@@ -8851,29 +8843,14 @@ public class player : MonoBehaviour
                     {
                         StartCoroutine(inputCD(0f));
                         auto = false;
-                        foreach (Coroutine coroutine in autoSkipCoroutine)
-                        {
-                            StopCoroutine(coroutine);
-                        }
                         nextCommand = true;
                         WaitForClick = false;
-                    }
-                    if (!auto)
-                    {
-                        foreach (Coroutine coroutine in autoSkipCoroutine)
-                        {
-                            //StopCoroutine(coroutine);
-                        }
                     }
                     else
                     {
                         if (autoClick)
                         {
                             autoClick = false;
-                            foreach (Coroutine coroutine in autoSkipCoroutine)
-                            {
-                                StopCoroutine(coroutine);
-                            }
                             nextCommand = true;
                             WaitForClick = false;
                         }
