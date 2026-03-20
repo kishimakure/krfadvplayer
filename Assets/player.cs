@@ -8549,7 +8549,6 @@ public class player : MonoBehaviour
     }
     void Update()
     {
-#if UNITY_WEBGL
         float currentAspect = (float)Screen.width / Screen.height;
         if (FIXED_ASPECT == 0f)
         {
@@ -8577,7 +8576,6 @@ public class player : MonoBehaviour
                 Camera.main.orthographicSize = SIDE_LENGTH / (2f * currentAspect);
             }
         }
-#endif
         Time.timeScale = TimeScale;
         if (Input.GetKeyUp(KeyCode.Escape))
         {
