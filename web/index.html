@@ -6,6 +6,7 @@
     <title>krfadvplayer</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
 </head>
 <body>
     <div id="krf-menu-ui">
@@ -133,7 +134,7 @@
             productName: "krfadvplayer",
             productVersion: "1.0",
             matchWebGLToCanvasSize: true,
-            devicePixelRatio: 1
+            devicePixelRatio: window.devicePixelRatio || 1
         };
 
         var canvas = document.querySelector("#unity-canvas");

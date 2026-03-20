@@ -134,7 +134,7 @@
             productName: "{{{ PRODUCT_NAME }}}",
             productVersion: "{{{ PRODUCT_VERSION }}}",
             matchWebGLToCanvasSize: true,
-            devicePixelRatio: 1
+            devicePixelRatio: window.devicePixelRatio || 1
         };
 
         var canvas = document.querySelector("#unity-canvas");

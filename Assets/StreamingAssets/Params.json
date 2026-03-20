@@ -5,6 +5,8 @@
         1000001
     ],
     "Width":1920,
+    "Aspect":0,
+    "FPS":-1,
     "Font":"ja",
     "AudioMode":"ogg",
     "Volume":{

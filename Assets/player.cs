@@ -51,6 +51,8 @@ public class Parameters
     public string Host { get; set; }
     public List<int> ADVIDs { get; set; }
     public int Width;
+    public int Aspect;
+    public float FPS;
     public string Font { get; set; }
     public string AudioMode { get; set; }
     public Parameters_volume Volume { get; set; }
@@ -1089,10 +1091,10 @@ public class player : MonoBehaviour
     public float SEVolume = 1f;
     public float VoiceVolume = 1f;
     public bool enableParticle = false;
+    public int SIDE_LENGTH = 1334;
+    public float FIXED_ASPECT = 9/16f;
     private bool netError = false;
     private string netErrorMessage = "";
-    private int SIDE_LENGTH = 1334;
-    private float FIXED_ASPECT = 9/16f;
     private float ADVWindowState = 0f;
     private const string SERVER_HOST = "https://assets.krf-adv.com/adv";
     private TMP_FontAsset font;
@@ -2201,7 +2203,6 @@ public class player : MonoBehaviour
     void Start()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
-        Application.targetFrameRate = -1;
         host = SERVER_HOST;
         audioMode = "ogg";
         globalFont = "ja";
@@ -2223,8 +2224,11 @@ public class player : MonoBehaviour
             case 1:
                 FIXED_ASPECT = 9f / 16f;
                 break;
-            default:
+            case 2:
                 FIXED_ASPECT = 3f / 4f;
+                break;
+            default:
+                FIXED_ASPECT = 9f / 16f;
                 break;
         }
         ADVIDs.RemoveRange(0, 6);
@@ -2233,7 +2237,6 @@ public class player : MonoBehaviour
         Application.targetFrameRate = 60;
         DebugMode = true;
 #else
-        Application.targetFrameRate = 60;
         string ParametersPath = Path.Combine(Application.streamingAssetsPath, "Params.json");
         string paramjson = File.ReadAllText(ParametersPath);
         Parameters parameters = JsonConvert.DeserializeObject<Parameters>(paramjson);
@@ -2242,10 +2245,27 @@ public class player : MonoBehaviour
             ADVIDs = parameters.ADVIDs;
             host = parameters.Host;
             globalFont = parameters.Font;
+            switch(parameters.Aspect)
+            {
+                case 0:
+                    FIXED_ASPECT = 0f;
+                    break;
+                case 1:
+                    FIXED_ASPECT = 9f / 16f;
+                    break;
+                case 2:
+                    FIXED_ASPECT = 3f / 4f;
+                    break;
+                default:
+                    FIXED_ASPECT = 9f / 16f;
+                    break;
+            }
+            SIDE_LENGTH = parameters.Width;
+            Application.targetFrameRate = parameters.FPS;
             audioMode = parameters.AudioMode == "wav" ? "wav" : "ogg";
-            BGMVolume = Mathf.Clamp(parameters.Volume.BGM / 100f, 0f, 1f);
-            SEVolume = Mathf.Clamp(parameters.Volume.SE / 100f, 0f, 1f);
-            VoiceVolume = Mathf.Clamp(parameters.Volume.Voice / 100f, 0f, 1f);
+            BGMVolume = Mathf.Clamp(parameters.Volume.BGM / 200f, 0f, 1f);
+            SEVolume = Mathf.Clamp(parameters.Volume.SE / 200f, 0f, 1f);
+            VoiceVolume = Mathf.Clamp(parameters.Volume.Voice / 200f, 0f, 1f);
         }
 #endif
         switch (globalFont)
@@ -2261,11 +2281,11 @@ public class player : MonoBehaviour
                 break;
         }
 #if UNITY_WEBGL
-#else
+#elif !UNITY_EDITOR
         Screen.fullScreen = false;
         if (FIXED_ASPECT == 0f)
         {
-            Screen.SetResolution(parameters.Width, parameters.Height, false);
+            Screen.SetResolution(parameters.Width, (int)(parameters.Width * FIXED_ASPECT), false);
         }
         else
         {
@@ -2274,7 +2294,7 @@ public class player : MonoBehaviour
 #endif
         Camera mainCamera = Camera.main;
         cachedMainCameraTransform = mainCamera.transform;
-        renderTexture = new RenderTexture(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT)), 24);
+        renderTexture = new RenderTexture(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT)), 24);
         Render = new GameObject("Render");
         Render.transform.position = new Vector3(-20000f, 0f, 0f);
         Render.transform.localScale = new Vector3(1f, 1f, 1f);
@@ -2286,30 +2306,30 @@ public class player : MonoBehaviour
         PPmaterial.SetTexture("_RenderTex", renderTexture);
         PPmaterial.SetInt(_BlendSrc, 1);
         PPmaterial.SetInt(_BlendDst, 10);
-        Texture2D black = new Texture2D(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT)), TextureFormat.RGBA32, false);
-        Color[] fillPixels = new Color[SIDE_LENGTH * (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))];
+        Texture2D black = new Texture2D(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT)), TextureFormat.RGBA32, false);
+        Color[] fillPixels = new Color[SIDE_LENGTH * (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT))];
         for (int i = 0; i < fillPixels.Length; i++)
         {
             fillPixels[i] = Color.black;
         }
         black.SetPixels(fillPixels);
         black.Apply();
-        spriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
+        spriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
         spriteRenderer.material = PPmaterial;
         spriteRenderer.sortingOrder = -3;
         image = new GameObject("Image");
         image.transform.SetParent(Render.transform);
         imageSpriteRenderer = image.AddComponent<SpriteRenderer>();
         SpriteRenderer ImageRenderer = imageSpriteRenderer;
-        Texture2D white = new Texture2D(1000, (int)(1000 * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT)), TextureFormat.RGBA32, false);
-        Color[] fillPixelsWhite = new Color[1000 * (int)(1000 * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))];
+        Texture2D white = new Texture2D(1000, (int)(1000 * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT)), TextureFormat.RGBA32, false);
+        Color[] fillPixelsWhite = new Color[1000 * (int)(1000 * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT))];
         for (int i = 0; i < fillPixelsWhite.Length; i++)
         {
             fillPixelsWhite[i] = Color.white;
         }
         white.SetPixels(fillPixelsWhite);
         white.Apply();
-        ImageRenderer.sprite = Sprite.Create(white, new Rect(0, 0, 1000, (int)(1000 * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
+        ImageRenderer.sprite = Sprite.Create(white, new Rect(0, 0, 1000, (int)(1000 * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
         ImageRenderer.sortingOrder = -3;
         ImageRenderer.color = new Color(0f, 0f, 0f, 1f);
         image.transform.localScale = new Vector3(1f, 1f, 1f) * (4f / 3f);
@@ -2366,7 +2386,7 @@ public class player : MonoBehaviour
         maskTransform.localPosition = new Vector3(maskTransform.localPosition.x, maskTransform.localPosition.y, 0f);
         AspectRatioFitter fitter = MaskObj.AddComponent<AspectRatioFitter>();
         fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
-        fitter.aspectRatio = FIXED_ASPECT == 0f ? 1f : (1 / FIXED_ASPECT);
+        fitter.aspectRatio = FIXED_ASPECT == 0f ? 16f / 9f : (1 / FIXED_ASPECT);
         GameObject tilingObj = new GameObject("Tiling");
         tilingObj.transform.SetParent(textCanvasObj.transform);
         RectTransform tilingTransform = tilingObj.AddComponent<RectTransform>();
@@ -2615,7 +2635,7 @@ public class player : MonoBehaviour
         UniversalAdditionalCameraData cameraData = newCameraComponent.GetUniversalAdditionalCameraData();
         newCameraComponent.transform.position = new Vector3(0f, 0f, -10000f);
         newCameraComponent.orthographic = true;
-        newCameraComponent.orthographicSize = 2000f / 3f * (FIXED_ASPECT == 0f ? 1f : FIXED_ASPECT);
+        newCameraComponent.orthographicSize = 2000f / 3f * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT);
         newCameraComponent.nearClipPlane = 0.3f;
         newCameraComponent.farClipPlane = 200000f;
         newCameraComponent.backgroundColor = new Color(0f, 0f, 0f, (depth == 0) ? 1f : 0f);
@@ -2856,14 +2876,14 @@ public class player : MonoBehaviour
                 float dy = 0f;
                 if (screenAspect < 16f / 9f)
                 {
-                    dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * (750f / 2f);
-                    dy = dy < -875f / 3f ? -875f / 3f : dy;
+                    dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * 375f;
+                    dy = dy < -125f ? -125f : dy;
                 }
                 DLKuromonTransform.anchoredPosition = standardPosition + new Vector3(0f, dy, 0f);
             }
             else
             {
-                float dy = (9f / 16f - FIXED_ASPECT) * (2000f / 3f);
+                float dy = (9f / 16f - FIXED_ASPECT) * 375f;
                 DLKuromonTransform.anchoredPosition = standardPosition + new Vector3(0f, dy, 0f);
             }
             DLKuromonTransform.localPosition = new Vector3(DLKuromonTransform.localPosition.x, DLKuromonTransform.localPosition.y, 0f);
@@ -2872,6 +2892,7 @@ public class player : MonoBehaviour
     }
     private IEnumerator ADVWindowCycle()
     {
+        AspectRatioFitter fitter = ADVWindow.GetComponentInParent<AspectRatioFitter>();
         while (true)
         {
             if (FIXED_ASPECT == 0f)
@@ -2879,13 +2900,16 @@ public class player : MonoBehaviour
                 float screenAspect = (float)Screen.width / (float)Screen.height;
                 if (screenAspect < 16f / 9f)
                 {
-                    float dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * 3000f / 8f;
+                    float dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * 375f;
+                    dy = dy < -125f ? -125f : dy;
                     ADVWindowTransform.anchoredPosition = new Vector3(0f, -100f - 375f + dy + ADVWindowState * 200f, 0f);
                 }
                 else
                 {
                     ADVWindowTransform.anchoredPosition = new Vector3(0f, -100f - 375f + ADVWindowState * 200f, 0f);
                 }
+                float aspectRatio = Mathf.Clamp(Screen.width / (float)Screen.height, 4f / 3f, 16f / 9f);
+                fitter.aspectRatio = aspectRatio;
             }
             else
             {

@@ -287,6 +287,8 @@ MonoBehaviour:
   SEVolume: 1
   VoiceVolume: 1
   enableParticle: 1
+  SIDE_LENGTH: 1334
+  FIXED_ASPECT: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
