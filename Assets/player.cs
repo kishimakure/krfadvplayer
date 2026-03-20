@@ -52,7 +52,7 @@ public class Parameters
     public List<int> ADVIDs { get; set; }
     public int Width;
     public int Aspect;
-    public float FPS;
+    public int FPS;
     public string Font { get; set; }
     public string AudioMode { get; set; }
     public Parameters_volume Volume { get; set; }
@@ -1126,6 +1126,7 @@ public class player : MonoBehaviour
     private GameObject ADVWindow;
     private RectTransform ADVWindowTransform;
     private RectTransform DLKuromonTransform;
+    private SpriteRenderer tilingRenderer;
     private Canvas textCanvas;
     private CanvasScaler canvasScaler;
     private GameObject renderTextureObj;
@@ -2267,6 +2268,16 @@ public class player : MonoBehaviour
             SEVolume = Mathf.Clamp(parameters.Volume.SE / 200f, 0f, 1f);
             VoiceVolume = Mathf.Clamp(parameters.Volume.Voice / 200f, 0f, 1f);
         }
+        Screen.fullScreen = false;
+        if (FIXED_ASPECT == 0f)
+        {
+            Screen.SetResolution(parameters.Width, (int)(parameters.Width * 9f / 16f), false);
+        }
+        else
+        {
+            Screen.SetResolution(parameters.Width, (int)(parameters.Width * FIXED_ASPECT), false);
+        }
+
 #endif
         switch (globalFont)
         {
@@ -2280,18 +2291,6 @@ public class player : MonoBehaviour
                 font = Resources.Load<TMP_FontAsset>("DynamicFont SDF");
                 break;
         }
-#if UNITY_WEBGL
-#elif !UNITY_EDITOR
-        Screen.fullScreen = false;
-        if (FIXED_ASPECT == 0f)
-        {
-            Screen.SetResolution(parameters.Width, (int)(parameters.Width * FIXED_ASPECT), false);
-        }
-        else
-        {
-            Screen.SetResolution(parameters.Width, (int)(parameters.Width * FIXED_ASPECT), false);
-        }
-#endif
         Camera mainCamera = Camera.main;
         cachedMainCameraTransform = mainCamera.transform;
         renderTexture = new RenderTexture(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT)), 24);
@@ -2397,12 +2396,12 @@ public class player : MonoBehaviour
         tilingTransform.anchoredPosition = new Vector2(0f, 0f);
         tilingTransform.localPosition = new Vector3(tilingTransform.localPosition.x, tilingTransform.localPosition.y, 0f);
         tilingTransform.localScale = new Vector3(1f, 1f, 1f) * (2f / 3f);
-        SpriteRenderer tilingRenderer = tilingObj.AddComponent<SpriteRenderer>();
+        tilingRenderer = tilingObj.AddComponent<SpriteRenderer>();
         tilingRenderer.color = new Color(1f, 1f, 1f, 1f);
         Texture2D tilingTexture = Resources.Load<Texture2D>("aspect_scope");
         tilingRenderer.sprite = Sprite.Create(tilingTexture, new Rect(0, 0, tilingTexture.width, tilingTexture.height), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
         tilingRenderer.drawMode = SpriteDrawMode.Tiled;
-        tilingRenderer.size = new Vector2(8192f, 8192f);
+        tilingRenderer.size = new Vector2(2048f, 2048f);
         tilingRenderer.sortingOrder = -10000;
         ADVWindow = new GameObject("ADVWindow");
         ADVWindow.transform.SetParent(MaskObj.transform);
@@ -2897,7 +2896,7 @@ public class player : MonoBehaviour
         {
             if (FIXED_ASPECT == 0f)
             {
-                float screenAspect = (float)Screen.width / (float)Screen.height;
+                float screenAspect = Screen.width / (float)Screen.height;
                 if (screenAspect < 16f / 9f)
                 {
                     float dy = (9f / 16f - 1f / screenAspect) / (9f / 16f) * 375f;
@@ -2910,10 +2909,28 @@ public class player : MonoBehaviour
                 }
                 float aspectRatio = Mathf.Clamp(Screen.width / (float)Screen.height, 4f / 3f, 16f / 9f);
                 fitter.aspectRatio = aspectRatio;
+                if (screenAspect > 4f / 3f)
+                {
+                    tilingRenderer.size = new Vector2(Mathf.Ceil(2000f * 3f / 4f * screenAspect / 256f) * 256f, Mathf.Ceil(2000f * 3f / 4f / 256f) * 256f);
+                }
+                else
+                {
+                    tilingRenderer.size = new Vector2(Mathf.Ceil(2000f / 256f) * 256f, Mathf.Ceil(2000f / screenAspect / 256f) * 256f);
+                }
+
             }
             else
             {
                 ADVWindowTransform.anchoredPosition = new Vector3(0f, -100f - 2000f / 3f * FIXED_ASPECT + ADVWindowState * 200f, 0f);
+                float screenAspect = Screen.width / (float)Screen.height;
+                if (screenAspect > 1f / FIXED_ASPECT)
+                {
+                    tilingRenderer.size = new Vector2(Mathf.Ceil(2000f * FIXED_ASPECT * screenAspect / 256f) * 256f, Mathf.Ceil(2000f * FIXED_ASPECT / 256f) * 256f);
+                }
+                else
+                {
+                    tilingRenderer.size = new Vector2(Mathf.Ceil(2000f / 256f) * 256f, Mathf.Ceil(2000f / screenAspect / 256f) * 256f);
+                }
             }
             ADVWindowTransform.localPosition = new Vector3(ADVWindowTransform.localPosition.x, ADVWindowTransform.localPosition.y, 0f);
             yield return null;
