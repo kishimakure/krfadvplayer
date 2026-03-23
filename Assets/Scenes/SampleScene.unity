@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01f615eebfd350f40934cbb05e88a967, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  host: file://D:/kirafan/export/adv/
+  host: file://D:/kirafan/export/adv
   ADVIDs: 40420f0041420f00
   auto: 0
   QuickPlay: 0

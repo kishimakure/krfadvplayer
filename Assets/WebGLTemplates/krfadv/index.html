@@ -82,6 +82,7 @@
                         </div>
                     </div>
                 </div>
+                <button id="btn-upload" class="krf-upload-btn" title="Upload custom scenario">&#8593; Upload</button>
 
                 <div class="krf-action-bar">
                     <span id="selected-count">0 / 50 selected</span>
@@ -122,6 +123,33 @@
         </div>
     </div>
 
+    <!-- Upload custom scenario modal -->
+    <div id="upload-modal" class="krf-modal-overlay" style="display:none;">
+        <div class="krf-modal">
+            <div class="krf-modal-header">Upload Custom Scenario</div>
+            <div class="krf-modal-body">
+                <div class="krf-upload-field">
+                    <label class="krf-upload-label">ADVScript <span class="krf-upload-required">*</span></label>
+                    <label class="krf-file-input">
+                        <input type="file" id="file-advscript" accept=".json">
+                        <span class="krf-file-name" id="name-advscript">Choose .json file...</span>
+                    </label>
+                </div>
+                <div class="krf-upload-field">
+                    <label class="krf-upload-label">ADVScriptText <span class="krf-upload-required">*</span></label>
+                    <label class="krf-file-input">
+                        <input type="file" id="file-advscripttext" accept=".json">
+                        <span class="krf-file-name" id="name-advscripttext">Choose .json file...</span>
+                    </label>
+                </div>
+            </div>
+            <div class="krf-modal-footer">
+                <button id="btn-upload-cancel" class="krf-modal-btn krf-modal-btn-cancel">Cancel</button>
+                <button id="btn-upload-confirm" class="krf-modal-btn krf-modal-btn-confirm" disabled>Add to Selected</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         var buildUrl = "Build";
         var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
@@ -134,7 +162,8 @@
             productName: "{{{ PRODUCT_NAME }}}",
             productVersion: "{{{ PRODUCT_VERSION }}}",
             matchWebGLToCanvasSize: true,
-            devicePixelRatio: window.devicePixelRatio || 1
+            devicePixelRatio: window.devicePixelRatio || 1,
+            autoSyncPersistentDataPath: true
         };
 
         var canvas = document.querySelector("#unity-canvas");
@@ -263,6 +292,10 @@
         /* Map advId -> title for the selected column */
         let advTitleMap = {};
 
+        /* --- Custom scenario upload --- */
+        let customAdvScripts = {};   /* advId -> { scriptName, scriptTextName, scriptData, scriptTextData } */
+        let nextCustomAdvId = 9000001;
+
         function updateSettings() {
             selectedAdvs[0] = parseInt(volBgm.value);
             selectedAdvs[1] = parseInt(volSe.value);
@@ -287,6 +320,83 @@
             renderSelectedColumn();
             refreshCol3Checkboxes();
             refreshCol2Checkboxes();
+        });
+
+        /* --- Custom scenario upload modal --- */
+        const uploadModal = document.getElementById('upload-modal');
+        const fileAdvScript = document.getElementById('file-advscript');
+        const fileAdvScriptText = document.getElementById('file-advscripttext');
+        const nameAdvScript = document.getElementById('name-advscript');
+        const nameAdvScriptText = document.getElementById('name-advscripttext');
+        const btnUploadConfirm = document.getElementById('btn-upload-confirm');
+
+        document.getElementById('btn-upload').addEventListener('click', () => {
+            fileAdvScript.value = '';
+            fileAdvScriptText.value = '';
+            nameAdvScript.textContent = 'Choose .json file...';
+            nameAdvScriptText.textContent = 'Choose .json file...';
+            btnUploadConfirm.disabled = true;
+            uploadModal.style.display = 'flex';
+        });
+
+        function checkUploadReady() {
+            btnUploadConfirm.disabled = !(fileAdvScript.files.length > 0 && fileAdvScriptText.files.length > 0);
+        }
+
+        fileAdvScript.addEventListener('change', () => {
+            nameAdvScript.textContent = fileAdvScript.files[0] ? fileAdvScript.files[0].name : 'Choose .json file...';
+            checkUploadReady();
+        });
+        fileAdvScriptText.addEventListener('change', () => {
+            nameAdvScriptText.textContent = fileAdvScriptText.files[0] ? fileAdvScriptText.files[0].name : 'Choose .json file...';
+            checkUploadReady();
+        });
+
+        document.getElementById('btn-upload-cancel').addEventListener('click', () => {
+            uploadModal.style.display = 'none';
+        });
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target === uploadModal) uploadModal.style.display = 'none';
+        });
+
+        btnUploadConfirm.addEventListener('click', () => {
+            if (fileAdvScript.files.length === 0 || fileAdvScriptText.files.length === 0) return;
+            const scriptFile = fileAdvScript.files[0];
+            const textFile   = fileAdvScriptText.files[0];
+
+            Promise.all([scriptFile.text(), textFile.text()])
+                .then(([scriptData, textData]) => {
+                    let scriptObj;
+                    try { scriptObj = JSON.parse(scriptData); }
+                    catch (e) { alert('ADVScript is not valid JSON'); return; }
+                    try { JSON.parse(textData); }
+                    catch (e) { alert('ADVScriptText is not valid JSON'); return; }
+
+                    /* Extract ScriptName from m_Params[0].ScriptName */
+                    let scriptName = '';
+                    if (scriptObj.m_Params && scriptObj.m_Params.length > 0 && scriptObj.m_Params[0].ScriptName) {
+                        scriptName = scriptObj.m_Params[0].ScriptName;
+                    } else {
+                        scriptName = scriptFile.name.replace(/\.json$/i, '');
+                    }
+
+                    const advId = nextCustomAdvId++;
+                    customAdvScripts[advId] = {
+                        scriptName: scriptFile.name,
+                        scriptTextName: textFile.name,
+                        scriptData: scriptData,
+                        scriptTextData: textData
+                    };
+                    localStorage.setItem('customAdvScripts', JSON.stringify(customAdvScripts));
+
+                    advTitleMap[advId] = scriptName;
+                    if (getAdvCount() < maxSelection) {
+                        selectedAdvs.push(advId);
+                        updateCountText();
+                    }
+                    renderSelectedColumn();
+                    uploadModal.style.display = 'none';
+                });
         });
 
         /* --- Render selected column (col4) --- */
@@ -531,6 +641,7 @@
             if (getAdvCount() === 0) return;
             updateSettings();
             localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
+            localStorage.setItem("customAdvScripts", JSON.stringify(customAdvScripts));
 
             menuUi.style.display = "none";
             unityContainer.style.display = "block";

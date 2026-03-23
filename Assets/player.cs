@@ -1070,6 +1070,12 @@ public class player : MonoBehaviour
     public static extern void ClearPlaylistInLocalStorage();
     [DllImport("__Internal")]
     private static extern void ReturnToMenu();
+    [DllImport("__Internal")]
+    private static extern string GetCustomAdvScript(int advId);
+    [DllImport("__Internal")]
+    private static extern string GetCustomAdvScriptText(int advId);
+    [DllImport("__Internal")]
+    private static extern string GetCustomAdvScriptFileNames(int advId);
 #else
     [DllImport("user32.dll")]
     private static extern bool SetWindowText(System.IntPtr hWnd, string text);
@@ -1485,6 +1491,14 @@ public class player : MonoBehaviour
     }
     private IEnumerator LoadJson(int ADVID)
     {
+        if (ADVID.ToString()[0] == '9')
+        {
+            Jsons.Add(ADVID, new string[2]{GetCustomAdvScript(ADVID), GetCustomAdvScriptText(ADVID)});
+            advScript = JsonConvert.DeserializeObject<advscript>(Jsons[ADVID][0]);
+            advScripts.Add(ADVID, advScript);
+            advScriptText = JsonConvert.DeserializeObject<advscripttext>(Jsons[ADVID][1]);
+            advScriptTexts.Add(ADVID, advScriptText);
+        }
         advlist_Params advlistParams = advList.m_Params.First(param => param.m_AdvID == ADVID);
         string advcategory = ADVCategory[advlistParams.m_Category];
         if (Jsons.ContainsKey(ADVID))
@@ -2292,13 +2306,13 @@ public class player : MonoBehaviour
                 break;
         }
         Camera mainCamera = Camera.main;
+        mainCamera.cullingMask = LayerMask.GetMask("Main");
         cachedMainCameraTransform = mainCamera.transform;
         renderTexture = new RenderTexture(SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT)), 24);
         Render = new GameObject("Render");
         Render.transform.position = new Vector3(-20000f, 0f, 0f);
         Render.transform.localScale = new Vector3(1f, 1f, 1f);
         renderSpriteRenderer = Render.AddComponent<SpriteRenderer>();
-        SpriteRenderer spriteRenderer = renderSpriteRenderer;
         Audios = new GameObject("Audios");
         Audios.transform.position = new Vector3(20000f, 0f, 0f);
         Material PPmaterial = new Material(Shader.Find("CustomShader_PP"));
@@ -2313,9 +2327,10 @@ public class player : MonoBehaviour
         }
         black.SetPixels(fillPixels);
         black.Apply();
-        spriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
-        spriteRenderer.material = PPmaterial;
-        spriteRenderer.sortingOrder = -3;
+        renderSpriteRenderer.sprite = Sprite.Create(black, new Rect(0, 0, SIDE_LENGTH, (int)(SIDE_LENGTH * (FIXED_ASPECT == 0f ? 3f / 4f : FIXED_ASPECT))), new Vector2(0.5f, 0.5f), 1);
+        renderSpriteRenderer.material = PPmaterial;
+        renderSpriteRenderer.sortingOrder = -3;
+        Render.layer = LayerMask.NameToLayer("Main");
         image = new GameObject("Image");
         image.transform.SetParent(Render.transform);
         imageSpriteRenderer = image.AddComponent<SpriteRenderer>();
@@ -2332,7 +2347,8 @@ public class player : MonoBehaviour
         ImageRenderer.sortingOrder = -3;
         ImageRenderer.color = new Color(0f, 0f, 0f, 1f);
         image.transform.localScale = new Vector3(1f, 1f, 1f) * (4f / 3f);
-        image.layer = LayerMask.NameToLayer("Main");
+        image.transform.position = new Vector3(0f, 0f, 0f);
+        image.layer = LayerMask.NameToLayer("Image");
         renderTexture.Create();
         mainCamera.transform.position = new Vector3(-20000f, 0f, -10f);
         mainCamera.orthographic = true;
@@ -2372,6 +2388,7 @@ public class player : MonoBehaviour
         canvasScaler = textCanvasObj.AddComponent<CanvasScaler>();
         canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         canvasScaler.referenceResolution = new Vector2(4000f / 3f, 4000f / 3f * (FIXED_ASPECT == 0f ? 9f / 16f : FIXED_ASPECT));
+        textCanvasObj.layer = LayerMask.NameToLayer("Main");
         GameObject MaskObj = new GameObject("Mask");
         MaskObj.transform.SetParent(textCanvasObj.transform);
         MaskObj.AddComponent<RectMask2D>();
@@ -2403,6 +2420,7 @@ public class player : MonoBehaviour
         tilingRenderer.drawMode = SpriteDrawMode.Tiled;
         tilingRenderer.size = new Vector2(2048f, 2048f);
         tilingRenderer.sortingOrder = -10000;
+        tilingObj.layer = LayerMask.NameToLayer("Main");
         ADVWindow = new GameObject("ADVWindow");
         ADVWindow.transform.SetParent(MaskObj.transform);
         ADVWindowTransform = ADVWindow.AddComponent<RectTransform>();
@@ -2540,7 +2558,7 @@ public class player : MonoBehaviour
         SetCamera("Camera_Effect", 3, "Effect", CameraClearFlags.Depth);
         SetCamera("Camera_Sprite", 4, "Sprite", CameraClearFlags.Depth);
         SetCamera("Camera_Caption", 5, "Caption", CameraClearFlags.Depth);
-        SetCamera("Camera_Main", 6, "Main", CameraClearFlags.Depth);
+        SetCamera("Camera_Image", 6, "Image", CameraClearFlags.Depth);
         SetCamera("Camera_SceneChange", 7, "SceneChange", CameraClearFlags.Depth);
         renderTextureObj = new GameObject("RenderTextures");
         renderTextureObj.transform.position = new Vector3(0f, 0f, 0f);
@@ -2766,12 +2784,19 @@ public class player : MonoBehaviour
                 ADVID = advList.m_Params[randomADV].m_AdvID;
                 ADVIDs[i] = ADVID;
             }
-            advlist_Params advlist_Params = advList.m_Params.FirstOrDefault(param => param.m_AdvID == ADVID);
-            if (advlist_Params != null)
+            if (ADVID.ToString()[0] == '9')
             {
-                if (advlist_Params.m_ScriptName != "" || advlist_Params.m_ComicGroupName != "")
+                yield return StartCoroutine(Preload(ADVID));
+            }
+            else
+            {
+                advlist_Params advlist_Params = advList.m_Params.FirstOrDefault(param => param.m_AdvID == ADVID);
+                if (advlist_Params != null)
                 {
-                    yield return StartCoroutine(Preload(ADVID));
+                    if (advlist_Params.m_ScriptName != "" || advlist_Params.m_ComicGroupName != "")
+                    {
+                        yield return StartCoroutine(Preload(ADVID));
+                    }
                 }
             }
         }
@@ -2951,6 +2976,7 @@ public class player : MonoBehaviour
         DLKuromonTransform.anchorMin = new Vector2(0.5f, 0.5f);
         DLKuromonTransform.localScale = new Vector3(1f, 1f, 1f);
         StartCoroutine(DLKuromonCycle());
+        DLKuromon.layer = LayerMask.NameToLayer("Main");
         GameObject Loading = new GameObject("Loading");
         Texture2D LoadingTexture = Resources.Load<Texture2D>("Loading");
         LoadingTexture.wrapMode = TextureWrapMode.Clamp;
@@ -2964,6 +2990,7 @@ public class player : MonoBehaviour
         Texture2D DotTexture = Resources.Load<Texture2D>("LoadingDot");
         DotTexture.wrapMode = TextureWrapMode.Clamp;
         Sprite DotSprite = Sprite.Create(DotTexture, new Rect(0, 0, DotTexture.width, DotTexture.height), new Vector2(0.5f, 0.5f), 1);
+        Loading.layer = LayerMask.NameToLayer("Main");
         GameObject Dot1 = new GameObject("Dot1");
         SpriteRenderer Dot1Renderer = Dot1.AddComponent<SpriteRenderer>();
         Dot1Renderer.sprite = DotSprite;
@@ -2971,6 +2998,7 @@ public class player : MonoBehaviour
         Dot1.transform.SetParent(DLKuromon.transform);
         Dot1.transform.localPosition = new Vector3(-100.5f, -40.5f, 0f);
         Dot1.transform.localScale = new Vector3(1f, 1f, 1f);
+        Dot1.layer = LayerMask.NameToLayer("Main");
         GameObject Dot2 = new GameObject("Dot2");
         SpriteRenderer Dot2Renderer = Dot2.AddComponent<SpriteRenderer>();
         Dot2Renderer.sprite = DotSprite;
@@ -2978,6 +3006,7 @@ public class player : MonoBehaviour
         Dot2.transform.SetParent(DLKuromon.transform);
         Dot2.transform.localPosition = new Vector3(-93f, -40.5f, 0f);
         Dot2.transform.localScale = new Vector3(1f, 1f, 1f);
+        Dot2.layer = LayerMask.NameToLayer("Main");
         GameObject Dot3 = new GameObject("Dot3");
         SpriteRenderer Dot3Renderer = Dot3.AddComponent<SpriteRenderer>();
         Dot3Renderer.sprite = DotSprite;
@@ -2985,6 +3014,7 @@ public class player : MonoBehaviour
         Dot3.transform.SetParent(DLKuromon.transform);
         Dot3.transform.localPosition = new Vector3(-85.5f, -40.5f, 0f);
         Dot3.transform.localScale = new Vector3(1f, 1f, 1f);
+        Dot3.layer = LayerMask.NameToLayer("Main");
         float timeElapsed = 0f;
         GameObject Loaded = new GameObject("Loaded");
         Loaded.transform.SetParent(DLKuromon.transform);
@@ -3007,6 +3037,7 @@ public class player : MonoBehaviour
         toloadTransform.sizeDelta = new Vector2(1000f, 1000f);
         toloadTransform.localScale = new Vector3(1f, 1f, 1f);
         List<string> shown = new List<string>();
+        int dotStatus = 0, newDotStatus;
         while (!PreloadEnd)
         {
             if (netError)
@@ -3016,11 +3047,39 @@ public class player : MonoBehaviour
                 yield break;
             }
             loadedText.text = "Parsing script(" + (advScripts.Count + advScriptTexts.Count).ToString() + "/" + (ADVIDs.Count * 2).ToString() + ")...";
+            timeElapsed += Time.deltaTime;
+            newDotStatus = (int)(timeElapsed * 4 % 4);
+            if (newDotStatus != dotStatus)
+            {
+                dotStatus = newDotStatus;
+                switch ((int)(timeElapsed * 4 % 4))
+                {
+                    case 0:
+                        Dot1.SetActive(false);
+                        Dot2.SetActive(false);
+                        Dot3.SetActive(false);
+                        break;
+                    case 1:
+                        Dot1.SetActive(true);
+                        Dot2.SetActive(false);
+                        Dot3.SetActive(false);
+                        break;
+                    case 2:
+                        Dot1.SetActive(true);
+                        Dot2.SetActive(true);
+                        Dot3.SetActive(false);
+                        break;
+                    case 3:
+                        Dot1.SetActive(true);
+                        Dot2.SetActive(true);
+                        Dot3.SetActive(true);
+                        break;
+                }
+            }
             yield return null;
         }
         loadedText.text = "";
         int lineLimit = 40;
-        int dotStatus = 0, newDotStatus;
         Queue<string> loadedLinesQueue = new Queue<string>();
         int processedAssetCount = 0; 
         bool uiNeedsUpdate;

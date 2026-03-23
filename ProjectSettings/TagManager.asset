@@ -27,7 +27,7 @@ TagManager:
   - Chara9
   - Chara10
   - 
-  - 
+  - Main
   - BG_Prim
   - BG
   - Effect_CharaBehind
@@ -35,7 +35,7 @@ TagManager:
   - Sprite
   - Effect
   - Caption
-  - Main
+  - Image
   - SceneChange
   m_SortingLayers:
   - name: Default
