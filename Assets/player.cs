@@ -1431,7 +1431,11 @@ public class player : MonoBehaviour
             string PackName = advEffectList.m_Params.First(param => param.m_EffectID == name).m_PackName;
             if (PackName == "")
             {
+#if UNITY_WEBGL
+                LoadingIEnumerators.Add(name, DownloadAssetBundle(name, $"{host}/webab/{name.ToLower()}.assetbundle"));
+#else
                 LoadingIEnumerators.Add(name, DownloadAssetBundle(name, $"{host}/ef_adv/ab/{name.ToLower()}.assetbundle"));
+#endif
                 foreach (string CueID in advEffectList.m_Params.First(param => param.m_EffectID == name).m_CueIDs)
                 {
                     if (!LoadingIEnumerators.ContainsKey(CueID))
@@ -1445,7 +1449,11 @@ public class player : MonoBehaviour
             {
                 if (!LoadingIEnumerators.ContainsKey(PackName))
                 {
+#if UNITY_WEBGL
+                    LoadingIEnumerators.Add(PackName, DownloadAssetBundle(PackName, $"{host}/webab/{PackName.ToLower()}.assetbundle"));
+#else
                     LoadingIEnumerators.Add(PackName, DownloadAssetBundle(PackName, $"{host}/ef_adv/ab/{PackName.ToLower()}.assetbundle"));
+#endif
                 }
                 StartCoroutine(GetGameObject(name, PackName));
             }
@@ -1491,6 +1499,7 @@ public class player : MonoBehaviour
     }
     private IEnumerator LoadJson(int ADVID)
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
         if (ADVID.ToString()[0] == '9')
         {
             Jsons.Add(ADVID, new string[2]{GetCustomAdvScript(ADVID), GetCustomAdvScriptText(ADVID)});
@@ -1498,7 +1507,9 @@ public class player : MonoBehaviour
             advScripts.Add(ADVID, advScript);
             advScriptText = JsonConvert.DeserializeObject<advscripttext>(Jsons[ADVID][1]);
             advScriptTexts.Add(ADVID, advScriptText);
+            yield break;
         }
+#endif
         advlist_Params advlistParams = advList.m_Params.First(param => param.m_AdvID == ADVID);
         string advcategory = ADVCategory[advlistParams.m_Category];
         if (Jsons.ContainsKey(ADVID))

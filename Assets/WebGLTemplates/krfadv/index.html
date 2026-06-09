@@ -176,6 +176,10 @@
         script.onload = () => {
             btnStart.disabled = false;
             btnStart.textContent = "\u25B6 START";
+            /* If autoplay data was received before loader finished, start now */
+            if (window._krfAutoPlayReady) {
+                setTimeout(() => btnStart.click(), 300);
+            }
         };
         document.body.appendChild(script);
 
@@ -295,6 +299,42 @@
         /* --- Custom scenario upload --- */
         let customAdvScripts = {};   /* advId -> { scriptName, scriptTextName, scriptData, scriptTextData } */
         let nextCustomAdvId = 9000001;
+
+        /* --- Autoplay via postMessage from editor --- */
+        if (new URLSearchParams(window.location.search).get('autoplay') === '1') {
+            window.addEventListener('message', function _autoPlayHandler(ev) {
+                if (!ev.data || ev.data.type !== 'krfAutoPlay') return;
+                window.removeEventListener('message', _autoPlayHandler);
+                /* Acknowledge so editor stops retrying */
+                try { if (ev.source) ev.source.postMessage({type: 'krfAutoPlayAck'}, '*'); } catch(e) {}
+                /* Import data */
+                try {
+                    const data = ev.data;
+                    if (data.customAdvScripts) {
+                        customAdvScripts = data.customAdvScripts;
+                    }
+                    if (data.selectedAdvs) {
+                        selectedAdvs = data.selectedAdvs;
+                    }
+                    for (const [id, entry] of Object.entries(customAdvScripts)) {
+                        try {
+                            const obj = JSON.parse(entry.scriptData);
+                            if (obj.m_Params && obj.m_Params[0] && obj.m_Params[0].ScriptName) {
+                                advTitleMap[parseInt(id)] = obj.m_Params[0].ScriptName;
+                            }
+                        } catch(e) {}
+                    }
+                    updateCountText();
+                    renderSelectedColumn();
+                } catch(e) { console.warn('autoplay: import failed', e); }
+                /* Start if loader is ready, otherwise flag for script.onload */
+                if (!btnStart.disabled) {
+                    setTimeout(() => btnStart.click(), 300);
+                } else {
+                    window._krfAutoPlayReady = true;
+                }
+            });
+        }
 
         function updateSettings() {
             selectedAdvs[0] = parseInt(volBgm.value);

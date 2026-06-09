@@ -11,7 +11,15 @@
 <body>
     <div id="krf-menu-ui">
         <div class="krf-panel">
-            <h1 class="krf-title">krfadvplayer <a href="https://github.com/kishimakure/krfadvplayer" target="_blank" rel="noopener" class="krf-github-link" title="GitHub">&#9741; GitHub</a></h1>
+            <h1 class="krf-title">krfadvplayer
+                <span class="krf-title-links">
+                    <span class="krf-stats-wrapper" id="stats-wrapper">
+                        <button class="krf-stats-btn" id="btn-stats">&#9654; Stats</button>
+                        <div class="krf-stats-tooltip" id="stats-tooltip"><span class="krf-stats-loading">Loading...</span></div>
+                    </span>
+                    <a href="https://github.com/kishimakure/krfadvplayer" target="_blank" rel="noopener" class="krf-github-link" title="GitHub">&#9741; GitHub</a>
+                </span>
+            </h1>
 
             <div class="krf-columns-area">
                 <div class="krf-list-col" id="col1-types">
@@ -77,6 +85,14 @@
                             <div class="krf-settings-label">Dark Mode</div>
                             <label class="krf-toggle">
                                 <input type="checkbox" id="toggle-dark">
+                                <span class="krf-toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="krf-settings-divider"></div>
+                        <div class="krf-settings-section">
+                            <span class="krf-settings-label">No Limit<span class="krf-info-tip">&#9432;<span class="krf-info-tooltip">All scenarios will be loaded into memory at once. This may cause high memory usage or crashes on low-end devices.</span></span></span>
+                            <label class="krf-toggle">
+                                <input type="checkbox" id="toggle-nolimit">
                                 <span class="krf-toggle-slider"></span>
                             </label>
                         </div>
@@ -176,6 +192,10 @@
         script.onload = () => {
             btnStart.disabled = false;
             btnStart.textContent = "\u25B6 START";
+            /* If autoplay data was received before loader finished, start now */
+            if (window._krfAutoPlayReady) {
+                setTimeout(() => btnStart.click(), 300);
+            }
         };
         document.body.appendChild(script);
 
@@ -238,6 +258,23 @@
         /* Restore saved preference */
         if (localStorage.getItem('krfTheme') === 'dark') applyTheme(true);
 
+        /* --- No-limit toggle --- */
+        const toggleNoLimit = document.getElementById('toggle-nolimit');
+        toggleNoLimit.addEventListener('change', () => {
+            if (toggleNoLimit.checked) {
+                maxSelection = 99999;
+            } else {
+                maxSelection = _configuredMaxSelection;
+                if (getAdvCount() > maxSelection) {
+                    selectedAdvs = selectedAdvs.slice(0, 6 + maxSelection);
+                    renderSelectedColumn();
+                    refreshCol3Checkboxes();
+                    refreshCol2Checkboxes();
+                }
+            }
+            updateCountText();
+        });
+
         /* Settings encoding helpers */
         function encodeQuality() { return parseInt(settingQuality.value); }
         function encodeFps() { return parseInt(settingFps.value); }
@@ -245,6 +282,7 @@
 
         /* Max scenarios that can be selected */
         let maxSelection = 50;
+        let _configuredMaxSelection = 50;
 
         /* --- Load settings options from settings.json --- */
         function populateSelect(selectEl, items) {
@@ -261,7 +299,10 @@
         fetch('settings.json')
             .then(r => r.json())
             .then(cfg => {
-                if (cfg.MaxSelection) maxSelection = cfg.MaxSelection;
+                if (cfg.MaxSelection) {
+                    _configuredMaxSelection = cfg.MaxSelection;
+                    if (!toggleNoLimit.checked) maxSelection = cfg.MaxSelection;
+                }
                 if (cfg.Quality)     populateSelect(settingQuality, cfg.Quality);
                 if (cfg.FrameRate)   populateSelect(settingFps,     cfg.FrameRate);
                 if (cfg.AspectRatio) populateSelect(settingAspect,  cfg.AspectRatio);
@@ -295,6 +336,42 @@
         /* --- Custom scenario upload --- */
         let customAdvScripts = {};   /* advId -> { scriptName, scriptTextName, scriptData, scriptTextData } */
         let nextCustomAdvId = 9000001;
+
+        /* --- Autoplay via postMessage from editor --- */
+        if (new URLSearchParams(window.location.search).get('autoplay') === '1') {
+            window.addEventListener('message', function _autoPlayHandler(ev) {
+                if (!ev.data || ev.data.type !== 'krfAutoPlay') return;
+                window.removeEventListener('message', _autoPlayHandler);
+                /* Acknowledge so editor stops retrying */
+                try { if (ev.source) ev.source.postMessage({type: 'krfAutoPlayAck'}, '*'); } catch(e) {}
+                /* Import data */
+                try {
+                    const data = ev.data;
+                    if (data.customAdvScripts) {
+                        customAdvScripts = data.customAdvScripts;
+                    }
+                    if (data.selectedAdvs) {
+                        selectedAdvs = data.selectedAdvs;
+                    }
+                    for (const [id, entry] of Object.entries(customAdvScripts)) {
+                        try {
+                            const obj = JSON.parse(entry.scriptData);
+                            if (obj.m_Params && obj.m_Params[0] && obj.m_Params[0].ScriptName) {
+                                advTitleMap[parseInt(id)] = obj.m_Params[0].ScriptName;
+                            }
+                        } catch(e) {}
+                    }
+                    updateCountText();
+                    renderSelectedColumn();
+                } catch(e) { console.warn('autoplay: import failed', e); }
+                /* Start if loader is ready, otherwise flag for script.onload */
+                if (!btnStart.disabled) {
+                    setTimeout(() => btnStart.click(), 300);
+                } else {
+                    window._krfAutoPlayReady = true;
+                }
+            });
+        }
 
         function updateSettings() {
             selectedAdvs[0] = parseInt(volBgm.value);
@@ -642,6 +719,7 @@
             updateSettings();
             localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
             localStorage.setItem("customAdvScripts", JSON.stringify(customAdvScripts));
+            reportPlay(selectedAdvs.slice(6)); /* 上报本次播放的剧情 ID 列表 */
 
             menuUi.style.display = "none";
             unityContainer.style.display = "block";
@@ -709,6 +787,123 @@
                 setTimeout(() => settle(true), 4000);
             });
         }
+        /* --- Play stats reporting ---
+         * 部署 Worker 后，将下方 URL 替换为你的 Worker 地址，例如：
+         *   https://krfadvplayer-stats.<your-subdomain>.workers.dev
+         * 留空则禁用统计上报。
+         */
+        const STATS_WORKER_URL = 'https://krfadvplayer-stats.kishima.workers.dev';
+
+        function reportPlay(advIds) {
+            if (!STATS_WORKER_URL) return;
+            fetch(STATS_WORKER_URL + '/play', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ advIds: advIds })
+            }).catch(() => {}); /* 静默失败，不影响主流程 */
+        }
+
+        /* --- Stats tooltip --- */
+        let _statsCache = null;
+        let _statsCacheAt = 0;
+        const STATS_CACHE_TTL = 60000; /* 60s */
+        let _statsHideTimer = null;
+        let _statsToggledId = null; /* advId currently showing its ID instead of title */
+
+        function _escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function _statsShow() {
+            clearTimeout(_statsHideTimer);
+            document.getElementById('stats-tooltip').style.display = 'block';
+        }
+
+        function _statsScheduleHide() {
+            _statsHideTimer = setTimeout(() => {
+                document.getElementById('stats-tooltip').style.display = 'none';
+            }, 150);
+        }
+
+        function renderStatsTooltip(data) {
+            const tooltip = document.getElementById('stats-tooltip');
+            const total = data.total || 0;
+            const byAdv = data.byAdv || {};
+            const sorted = Object.entries(byAdv)
+                .map(([id, cnt]) => ({ id: parseInt(id), cnt }))
+                .sort((a, b) => b.cnt - a.cnt)
+                .slice(0, 5);
+
+            let html = '<div class="krf-stats-total">Total plays&nbsp;<strong>' + total + '</strong></div>';
+            if (sorted.length > 0) {
+                html += '<div class="krf-stats-sep"></div>';
+                html += '<div class="krf-stats-top-label">Top scenarios</div>';
+                sorted.forEach(({ id, cnt }) => {
+                    const title = advTitleMap[id] || ('ADV ' + id);
+                    const isToggled = _statsToggledId === id;
+                    const display = isToggled ? String(id) : _escHtml(title);
+                    html += '<div class="krf-stats-row">' +
+                        '<span class="krf-stats-row-title krf-stats-row-clickable"' +
+                        ' data-title="' + _escHtml(title) + '" data-adv-id="' + id + '">' +
+                        display + '</span>' +
+                        '<span class="krf-stats-row-count">' + cnt + '</span></div>';
+                });
+            }
+            tooltip.innerHTML = html;
+        }
+
+        /* Event delegation: click title to toggle advId display (only one at a time) */
+        document.getElementById('stats-tooltip').addEventListener('click', (e) => {
+            const span = e.target.closest('.krf-stats-row-clickable');
+            if (!span) return;
+            const id = parseInt(span.dataset.advId);
+            const tooltip = document.getElementById('stats-tooltip');
+            if (_statsToggledId === id) {
+                /* Untoggle: restore title */
+                _statsToggledId = null;
+                span.textContent = span.dataset.title;
+            } else {
+                /* Untoggle previous if any */
+                if (_statsToggledId !== null) {
+                    const prev = tooltip.querySelector('.krf-stats-row-clickable[data-adv-id="' + _statsToggledId + '"]');
+                    if (prev) prev.textContent = prev.dataset.title;
+                }
+                _statsToggledId = id;
+                span.textContent = String(id);
+            }
+        });
+
+        const _statsWrapperEl = document.getElementById('stats-wrapper');
+        const _statsTooltipEl = document.getElementById('stats-tooltip');
+
+        function _statsLoadAndShow() {
+            _statsShow();
+            if (!STATS_WORKER_URL) {
+                _statsTooltipEl.innerHTML = '<span class="krf-stats-error">Stats not configured</span>';
+                return;
+            }
+            if (_statsCache && (Date.now() - _statsCacheAt) < STATS_CACHE_TTL) {
+                renderStatsTooltip(_statsCache);
+                return;
+            }
+            _statsTooltipEl.innerHTML = '<span class="krf-stats-loading">Loading...</span>';
+            fetch(STATS_WORKER_URL + '/stats')
+                .then(r => r.json())
+                .then(data => {
+                    _statsCache = data;
+                    _statsCacheAt = Date.now();
+                    renderStatsTooltip(data);
+                })
+                .catch(() => {
+                    _statsTooltipEl.innerHTML = '<span class="krf-stats-error">Failed to load</span>';
+                });
+        }
+
+        _statsWrapperEl.addEventListener('mouseenter', _statsLoadAndShow);
+        _statsWrapperEl.addEventListener('mouseleave', _statsScheduleHide);
+        _statsTooltipEl.addEventListener('mouseenter', () => clearTimeout(_statsHideTimer));
+        _statsTooltipEl.addEventListener('mouseleave', _statsScheduleHide);
+
         window.onUnityExit = function() {
             if (globalUnityInstance) {
                 loadingOverlay.style.display = 'flex';

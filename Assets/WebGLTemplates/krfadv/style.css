@@ -920,11 +920,28 @@ body, html {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 800px) {
+
+/* Portrait on small screens — stack columns vertically */
+@media (max-width: 800px) and (orientation: portrait) {
     .krf-columns-area { flex-direction: column; padding: 8px; gap: 8px; }
     #col1-types, #col2-subtypes, #col3-advids, #col4-selected { flex: 1; }
     .krf-bottom-bar { padding: 12px 16px; }
     .krf-settings-dropdown { min-width: 260px; }
     .krf-action-bar { gap: 10px; }
     .krf-title { padding: 12px 16px; font-size: 16px; }
+}
+
+/* Landscape on small screens — keep horizontal, compact spacing */
+@media (max-height: 500px) and (orientation: landscape) {
+    .krf-title { padding: 6px 16px; font-size: 15px; }
+    .krf-columns-area { padding: 6px 8px; gap: 8px; }
+    .krf-col-header { padding: 6px 10px; font-size: 12px; }
+    .krf-list-btn { padding: 6px 10px; font-size: 13px; }
+    .krf-checkbox-item { padding: 6px 8px; font-size: 13px; }
+    .krf-selected-item { padding: 5px 8px; font-size: 12px; }
+    .krf-col-body { padding: 4px; }
+    .krf-bottom-bar { padding: 6px 12px 8px; gap: 12px; }
+    .krf-settings-btn, .krf-upload-btn { padding: 6px 12px; font-size: 13px; }
+    .krf-play-btn { padding: 6px 20px; font-size: 13px; }
+    .krf-settings-dropdown { min-width: 260px; }
 }
