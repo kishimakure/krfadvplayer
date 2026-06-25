@@ -1580,12 +1580,19 @@ public class player : MonoBehaviour
         }
         Dictionary<string, string> CharasExistPreLoad = new Dictionary<string, string>();
         string[] TargetsPreLoad = new string[5];
-        string cuesheet = advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet;
+        
 #if UNITY_WEBGL && !UNITY_EDITOR
+        string cuesheet;
         if (ADVID.ToString()[0] == '9')
         {
             cuesheet = GetCustomAdvCueSheet(ADVID);
         }
+        else
+        {
+            cuesheet = advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet;
+        }
+#else
+        string cuesheet = advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet;
 #endif
         foreach (class_FuncParam func in advScripts[ADVID].m_Params[0].FuncParam)
         {
@@ -7912,9 +7919,17 @@ public class player : MonoBehaviour
             autoWait.Add(StartCoroutine(Talk(param, false)));
             if (param.m_voiceLabel != "")
             {
-                string voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + param.m_voiceLabel;
 #if UNITY_WEBGL && !UNITY_EDITOR
-                voicePath = GetCustomAdvCueSheet(ADVID) + "_" + param.m_voiceLabel;
+                string voicePath;
+                if (ADVID.ToString()[0] == '9'){
+                    voicePath = GetCustomAdvCueSheet(ADVID) + "_" + param.m_voiceLabel;
+                }
+                else
+                {
+                    voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + param.m_voiceLabel;
+                }
+#else
+                string voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + param.m_voiceLabel;
 #endif
                 GameObject voice = new GameObject(param.m_voiceLabel);
                 voice.transform.SetParent(Audios.transform);
@@ -8276,9 +8291,17 @@ public class player : MonoBehaviour
     }
     private void PlayFULLVOICE(string CueName)
     {
-        string voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + CueName;
 #if UNITY_WEBGL && !UNITY_EDITOR
-        voicePath = GetCustomAdvCueSheet(ADVID) + "_" + CueName;
+        string voicePath;
+        if (ADVID.ToString()[0] == '9'){
+            voicePath = GetCustomAdvCueSheet(ADVID) + "_" + CueName;
+        }
+        else
+        {
+            voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + CueName;
+        }
+#else
+        string voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + CueName;
 #endif
         GameObject voice = new GameObject(CueName);
         voice.transform.SetParent(Audios.transform);

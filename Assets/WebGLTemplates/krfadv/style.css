@@ -96,6 +96,11 @@
 [data-theme="dark"] .krf-file-input:hover {
     border-color: #866142;
 }
+[data-theme="dark"] .krf-search-input {
+    background: #414141;
+    border-color: #6E4135;
+    color: #FAFAEB;
+}
 [data-theme="dark"] .krf-modal-btn-cancel:hover {
     background: rgba(255, 255, 255, 0.08);
 }
@@ -171,6 +176,108 @@ body, html {
 }
 .krf-github-link:hover {
     color: var(--on-surface);
+}
+
+/* ===== Title right-side links group ===== */
+.krf-title-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ===== Stats button & tooltip ===== */
+.krf-stats-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.krf-stats-btn {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--on-surface-secondary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    letter-spacing: 0;
+    font-family: inherit;
+    transition: color .15s ease;
+}
+.krf-stats-btn:hover {
+    color: var(--on-surface);
+}
+
+.krf-stats-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    box-shadow: var(--elevation-8);
+    padding: 10px 14px;
+    z-index: 200;
+    white-space: nowrap;
+}
+.krf-stats-total {
+    font-size: 13px;
+    color: var(--on-surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+.krf-stats-total strong {
+    font-size: 16px;
+    color: var(--primary-dark);
+}
+.krf-stats-sep {
+    height: 1px;
+    background: var(--divider);
+    margin: 8px 0;
+}
+.krf-stats-top-label {
+    font-size: 11px;
+    color: var(--on-surface-secondary);
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.krf-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 0;
+    font-size: 12px;
+    color: var(--on-surface);
+}
+.krf-stats-row-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+.krf-stats-row-clickable {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+    transition: color .12s ease;
+}
+.krf-stats-row-clickable:hover {
+    color: var(--primary-dark);
+}
+.krf-stats-row-count {
+    flex-shrink: 0;
+    color: var(--primary);
+    font-weight: 500;
+}
+.krf-stats-loading,
+.krf-stats-error {
+    font-size: 12px;
+    color: var(--on-surface-secondary);
 }
 
 /* ===== Main panel (card) ===== */
@@ -502,6 +609,40 @@ body, html {
 }
 .krf-toggle input:checked + .krf-toggle-slider::before {
     transform: translateX(18px);
+}
+
+/* ===== Info tip (hover tooltip icon) ===== */
+.krf-info-tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    color: var(--on-surface-secondary);
+    font-size: 12px;
+    cursor: default;
+    vertical-align: middle;
+}
+.krf-info-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--on-surface);
+    color: var(--surface);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 7px 10px;
+    border-radius: 6px;
+    width: 200px;
+    white-space: normal;
+    z-index: 500;
+    pointer-events: none;
+    box-shadow: var(--elevation-4);
+}
+.krf-info-tip:hover .krf-info-tooltip {
+    display: block;
 }
 
 /* ===== Volume sliders (inside settings dropdown) ===== */
@@ -909,6 +1050,25 @@ body, html {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.krf-search-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--on-surface);
+    background: var(--secondary-light);
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+}
+.krf-search-input:hover {
+    border-color: var(--primary);
+    background: var(--secondary);
+}
+.krf-search-input:focus {
+    border-color: var(--primary);
 }
 .krf-modal-btn {
     padding: 8px 20px;
