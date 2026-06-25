@@ -444,6 +444,26 @@ body, html {
     box-shadow: 0 0 0 2px rgba(97, 97, 97, 0.12);
 }
 
+/* ===== Hidden legal entry (intentionally subtle) ===== */
+.krf-settings-secret {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 2px;
+}
+.krf-secret-disclaimer {
+    font-size: 12px;
+    opacity: 0.50;
+    letter-spacing: 0.08em;
+    color: var(--on-surface-secondary);
+    text-decoration: none;
+    user-select: none;
+    transition: opacity .15s ease;
+}
+.krf-secret-disclaimer:hover,
+.krf-secret-disclaimer:focus {
+    opacity: 0.75;
+}
+
 /* ===== Toggle switch ===== */
 .krf-toggle {
     position: relative;

@@ -1076,6 +1076,8 @@ public class player : MonoBehaviour
     private static extern string GetCustomAdvScriptText(int advId);
     [DllImport("__Internal")]
     private static extern string GetCustomAdvScriptFileNames(int advId);
+    [DllImport("__Internal")]
+    private static extern string GetCustomAdvCueSheet(int advId);
 #else
     [DllImport("user32.dll")]
     private static extern bool SetWindowText(System.IntPtr hWnd, string text);
@@ -1578,6 +1580,13 @@ public class player : MonoBehaviour
         }
         Dictionary<string, string> CharasExistPreLoad = new Dictionary<string, string>();
         string[] TargetsPreLoad = new string[5];
+        string cuesheet = advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        if (ADVID.ToString()[0] == '9')
+        {
+            cuesheet = GetCustomAdvCueSheet(ADVID);
+        }
+#endif
         foreach (class_FuncParam func in advScripts[ADVID].m_Params[0].FuncParam)
         {
             advcharacterlist_Params param;
@@ -1807,9 +1816,9 @@ public class player : MonoBehaviour
                     textparam = advScriptText.m_Params[int.Parse(func.m_value1)];
                     if (textparam.m_voiceLabel.StartsWith("voice"))
                     {
-                        if (!LoadingIEnumerators.ContainsKey(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel))
+                        if (!LoadingIEnumerators.ContainsKey(cuesheet + "_" + textparam.m_voiceLabel))
                         {
-                            LoadingIEnumerators.Add(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, DownloadAudio(advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet + "_" + textparam.m_voiceLabel, $"{host}/cuesheet/{advList.m_Params.First(param0 => param0.m_AdvID == ADVID).m_CueSheet}_{textparam.m_voiceLabel}.{audioMode}", audioMode));
+                            LoadingIEnumerators.Add(cuesheet + "_" + textparam.m_voiceLabel, DownloadAudio(cuesheet + "_" + textparam.m_voiceLabel, $"{host}/cuesheet/{cuesheet}_{textparam.m_voiceLabel}.{audioMode}", audioMode));
                         }
                     }
                     if (func.argNum == 3)
@@ -1921,9 +1930,9 @@ public class player : MonoBehaviour
                     }
                     break;
                 case "PlayFULLVOICE":
-                    if (!LoadingIEnumerators.ContainsKey(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1))
+                    if (!LoadingIEnumerators.ContainsKey(cuesheet + "_" + func.m_value1))
                     {
-                        LoadingIEnumerators.Add(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, DownloadAudio(advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + func.m_value1, $"{host}/cuesheet/{advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet}_{func.m_value1}.{audioMode}", audioMode));
+                        LoadingIEnumerators.Add(cuesheet + "_" + func.m_value1, DownloadAudio(cuesheet + "_" + func.m_value1, $"{host}/cuesheet/{cuesheet}_{func.m_value1}.{audioMode}", audioMode));
                     }
                     break;
                 default:
@@ -7904,6 +7913,9 @@ public class player : MonoBehaviour
             if (param.m_voiceLabel != "")
             {
                 string voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + param.m_voiceLabel;
+#if UNITY_WEBGL && !UNITY_EDITOR
+                voicePath = GetCustomAdvCueSheet(ADVID) + "_" + param.m_voiceLabel;
+#endif
                 GameObject voice = new GameObject(param.m_voiceLabel);
                 voice.transform.SetParent(Audios.transform);
                 AudioSource audioSource = voice.AddComponent<AudioSource>();
@@ -8265,6 +8277,9 @@ public class player : MonoBehaviour
     private void PlayFULLVOICE(string CueName)
     {
         string voicePath = advList.m_Params.First(param => param.m_AdvID == ADVID).m_CueSheet + "_" + CueName;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        voicePath = GetCustomAdvCueSheet(ADVID) + "_" + CueName;
+#endif
         GameObject voice = new GameObject(CueName);
         voice.transform.SetParent(Audios.transform);
         AudioSource audioSource = voice.AddComponent<AudioSource>();

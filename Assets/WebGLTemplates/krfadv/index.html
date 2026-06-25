@@ -11,7 +11,15 @@
 <body>
     <div id="krf-menu-ui">
         <div class="krf-panel">
-            <h1 class="krf-title">krfadvplayer <a href="https://github.com/kishimakure/krfadvplayer" target="_blank" rel="noopener" class="krf-github-link" title="GitHub">&#9741; GitHub</a></h1>
+            <h1 class="krf-title">krfadvplayer
+                <span class="krf-title-links">
+                    <span class="krf-stats-wrapper" id="stats-wrapper">
+                        <button class="krf-stats-btn" id="btn-stats">&#9654; Stats</button>
+                        <div class="krf-stats-tooltip" id="stats-tooltip"><span class="krf-stats-loading">Loading...</span></div>
+                    </span>
+                    <a href="https://github.com/kishimakure/krfadvplayer" target="_blank" rel="noopener" class="krf-github-link" title="GitHub">&#9741; GitHub</a>
+                </span>
+            </h1>
 
             <div class="krf-columns-area">
                 <div class="krf-list-col" id="col1-types">
@@ -79,6 +87,17 @@
                                 <input type="checkbox" id="toggle-dark">
                                 <span class="krf-toggle-slider"></span>
                             </label>
+                        </div>
+                        <div class="krf-settings-divider"></div>
+                        <div class="krf-settings-section">
+                            <span class="krf-settings-label">No Limit<span class="krf-info-tip">&#9432;<span class="krf-info-tooltip">All scenarios will be loaded into memory at once. This may cause high memory usage or crashes on low-end devices.</span></span></span>
+                            <label class="krf-toggle">
+                                <input type="checkbox" id="toggle-nolimit">
+                                <span class="krf-toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="krf-settings-secret">
+                            <a href="disclaimer.html" target="_blank" class="krf-secret-disclaimer" title="Disclaimer / Privacy Policy" style="display:none;">Disclaimer</a>
                         </div>
                     </div>
                 </div>
@@ -212,20 +231,42 @@
         const volBgmVal   = document.getElementById('vol-bgm-val');
         const volSeVal    = document.getElementById('vol-se-val');
         const volVoiceVal = document.getElementById('vol-voice-val');
+        const secretDisclaimerLink = document.querySelector('.krf-secret-disclaimer');
 
         /* --- Settings controls --- */
         const settingQuality = document.getElementById('setting-quality');
         const settingFps     = document.getElementById('setting-fps');
         const settingAspect  = document.getElementById('setting-aspect');
 
+        function updateSecretDisclaimerVisibility() {
+            const isDark = !!document.documentElement.getAttribute('data-theme') && document.documentElement.getAttribute('data-theme') === 'dark';
+            const currentCombo = [
+                parseInt(volBgm.value, 10),
+                parseInt(volSe.value, 10),
+                parseInt(volVoice.value, 10)
+            ].join('-');
+            const validCombosA = [
+                '17-12-11',
+                '12-11-17',
+                '11-12-17'
+            ];
+            const validCombosB = [
+                '23-2-28',
+                '2-28-23',
+                '28-2-23'
+            ];
+            const isMatch = validCombosA.includes(currentCombo) || validCombosB.includes(currentCombo);
+            secretDisclaimerLink.style.display = (isDark && isMatch) ? 'inline' : 'none';
+        }
+
         function updateSliderTrack(slider) {
             const pct = (slider.value - slider.min) / (slider.max - slider.min) * 100;
             slider.style.setProperty('--pct', pct + '%');
         }
 
-        volBgm.addEventListener('input',   () => { volBgmVal.textContent   = volBgm.value;   updateSliderTrack(volBgm);   updateSettings(); });
-        volSe.addEventListener('input',    () => { volSeVal.textContent    = volSe.value;    updateSliderTrack(volSe);    updateSettings(); });
-        volVoice.addEventListener('input', () => { volVoiceVal.textContent = volVoice.value;  updateSliderTrack(volVoice); updateSettings(); });
+        volBgm.addEventListener('input',   () => { volBgmVal.textContent   = volBgm.value;   updateSliderTrack(volBgm);   updateSettings(); updateSecretDisclaimerVisibility(); });
+        volSe.addEventListener('input',    () => { volSeVal.textContent    = volSe.value;    updateSliderTrack(volSe);    updateSettings(); updateSecretDisclaimerVisibility(); });
+        volVoice.addEventListener('input', () => { volVoiceVal.textContent = volVoice.value;  updateSliderTrack(volVoice); updateSettings(); updateSecretDisclaimerVisibility(); });
         [volBgm, volSe, volVoice].forEach(updateSliderTrack);
         settingQuality.addEventListener('change', updateSettings);
         settingFps.addEventListener('change', updateSettings);
@@ -237,10 +278,29 @@
             document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
             toggleDark.checked = dark;
             localStorage.setItem('krfTheme', dark ? 'dark' : 'light');
+            updateSecretDisclaimerVisibility();
         }
         toggleDark.addEventListener('change', () => applyTheme(toggleDark.checked));
         /* Restore saved preference */
         if (localStorage.getItem('krfTheme') === 'dark') applyTheme(true);
+        updateSecretDisclaimerVisibility();
+
+        /* --- No-limit toggle --- */
+        const toggleNoLimit = document.getElementById('toggle-nolimit');
+        toggleNoLimit.addEventListener('change', () => {
+            if (toggleNoLimit.checked) {
+                maxSelection = 99999;
+            } else {
+                maxSelection = _configuredMaxSelection;
+                if (getAdvCount() > maxSelection) {
+                    selectedAdvs = selectedAdvs.slice(0, 6 + maxSelection);
+                    renderSelectedColumn();
+                    refreshCol3Checkboxes();
+                    refreshCol2Checkboxes();
+                }
+            }
+            updateCountText();
+        });
 
         /* Settings encoding helpers */
         function encodeQuality() { return parseInt(settingQuality.value); }
@@ -249,6 +309,7 @@
 
         /* Max scenarios that can be selected */
         let maxSelection = 50;
+        let _configuredMaxSelection = 50;
 
         /* --- Load settings options from settings.json --- */
         function populateSelect(selectEl, items) {
@@ -265,7 +326,10 @@
         fetch('settings.json')
             .then(r => r.json())
             .then(cfg => {
-                if (cfg.MaxSelection) maxSelection = cfg.MaxSelection;
+                if (cfg.MaxSelection) {
+                    _configuredMaxSelection = cfg.MaxSelection;
+                    if (!toggleNoLimit.checked) maxSelection = cfg.MaxSelection;
+                }
                 if (cfg.Quality)     populateSelect(settingQuality, cfg.Quality);
                 if (cfg.FrameRate)   populateSelect(settingFps,     cfg.FrameRate);
                 if (cfg.AspectRatio) populateSelect(settingAspect,  cfg.AspectRatio);
@@ -297,7 +361,7 @@
         let advTitleMap = {};
 
         /* --- Custom scenario upload --- */
-        let customAdvScripts = {};   /* advId -> { scriptName, scriptTextName, scriptData, scriptTextData } */
+        let customAdvScripts = {};   /* advId -> { scriptName, scriptTextName, scriptData, scriptTextData, cueSheet } */
         let nextCustomAdvId = 9000001;
 
         /* --- Autoplay via postMessage from editor --- */
@@ -368,14 +432,42 @@
         const fileAdvScriptText = document.getElementById('file-advscripttext');
         const nameAdvScript = document.getElementById('name-advscript');
         const nameAdvScriptText = document.getElementById('name-advscripttext');
+        const uploadCueSheet = document.getElementById('upload-cuesheet');
+        const cueSheetOptions = document.getElementById('cuesheet-options');
         const btnUploadConfirm = document.getElementById('btn-upload-confirm');
+        let cueSheetListCache = null;
+
+        function ensureCueSheetOptionsLoaded() {
+            if (cueSheetListCache) return Promise.resolve(cueSheetListCache);
+            return fetch('cuesheetlist.json')
+                .then(r => r.json())
+                .then(data => {
+                    const values = Array.isArray(data.m_Params) ? data.m_Params : [];
+                    cueSheetListCache = values;
+                    cueSheetOptions.innerHTML = '';
+                    values.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        cueSheetOptions.appendChild(opt);
+                    });
+                    return cueSheetListCache;
+                })
+                .catch(err => {
+                    console.warn('Failed to load cuesheetlist.json:', err);
+                    cueSheetListCache = [];
+                    cueSheetOptions.innerHTML = '';
+                    return cueSheetListCache;
+                });
+        }
 
         document.getElementById('btn-upload').addEventListener('click', () => {
             fileAdvScript.value = '';
             fileAdvScriptText.value = '';
             nameAdvScript.textContent = 'Choose .json file...';
             nameAdvScriptText.textContent = 'Choose .json file...';
+            uploadCueSheet.value = '';
             btnUploadConfirm.disabled = true;
+            ensureCueSheetOptionsLoaded();
             uploadModal.style.display = 'flex';
         });
 
@@ -425,7 +517,8 @@
                         scriptName: scriptFile.name,
                         scriptTextName: textFile.name,
                         scriptData: scriptData,
-                        scriptTextData: textData
+                        scriptTextData: textData,
+                        cueSheet: uploadCueSheet.value.trim()
                     };
                     localStorage.setItem('customAdvScripts', JSON.stringify(customAdvScripts));
 
@@ -682,8 +775,9 @@
             updateSettings();
             localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
             localStorage.setItem("customAdvScripts", JSON.stringify(customAdvScripts));
+            reportPlay(selectedAdvs.slice(6));
 
-            menuUi.style.display = "none";
+            menuUi.style.display = "none";            
             unityContainer.style.display = "block";
 
             /* First check for ad blocker, then decide whether to load */
@@ -749,6 +843,115 @@
                 setTimeout(() => settle(true), 4000);
             });
         }
+        const STATS_WORKER_URL = 'https://krfadvplayer-stats.kishima.workers.dev';
+
+        function reportPlay(advIds) {
+            if (!STATS_WORKER_URL) return;
+            fetch(STATS_WORKER_URL + '/play', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ advIds: advIds })
+            }).catch(() => {});
+        }
+
+        /* --- Stats tooltip --- */
+        let _statsCache = null;
+        let _statsCacheAt = 0;
+        const STATS_CACHE_TTL = 60000;
+        let _statsHideTimer = null;
+        let _statsToggledId = null;
+
+        function _escHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function _statsShow() {
+            clearTimeout(_statsHideTimer);
+            document.getElementById('stats-tooltip').style.display = 'block';
+        }
+
+        function _statsScheduleHide() {
+            _statsHideTimer = setTimeout(() => {
+                document.getElementById('stats-tooltip').style.display = 'none';
+            }, 150);
+        }
+
+        function renderStatsTooltip(data) {
+            const tooltip = document.getElementById('stats-tooltip');
+            const total = data.total || 0;
+            const byAdv = data.byAdv || {};
+            const sorted = Object.entries(byAdv)
+                .map(([id, cnt]) => ({ id: parseInt(id), cnt }))
+                .sort((a, b) => b.cnt - a.cnt)
+                .slice(0, 5);
+
+            let html = '<div class="krf-stats-total">Total plays&nbsp;<strong>' + total + '</strong></div>';
+            if (sorted.length > 0) {
+                html += '<div class="krf-stats-sep"></div>';
+                html += '<div class="krf-stats-top-label">Top scenarios</div>';
+                sorted.forEach(({ id, cnt }) => {
+                    const title = advTitleMap[id] || ('ADV ' + id);
+                    const isToggled = _statsToggledId === id;
+                    const display = isToggled ? String(id) : _escHtml(title);
+                    html += '<div class="krf-stats-row">' +
+                        '<span class="krf-stats-row-title krf-stats-row-clickable"' +
+                        ' data-title="' + _escHtml(title) + '" data-adv-id="' + id + '">' +
+                        display + '</span>' +
+                        '<span class="krf-stats-row-count">' + cnt + '</span></div>';
+                });
+            }
+            tooltip.innerHTML = html;
+        }
+
+        document.getElementById('stats-tooltip').addEventListener('click', (e) => {
+            const span = e.target.closest('.krf-stats-row-clickable');
+            if (!span) return;
+            const id = parseInt(span.dataset.advId);
+            const tooltip = document.getElementById('stats-tooltip');
+            if (_statsToggledId === id) {
+                _statsToggledId = null;
+                span.textContent = span.dataset.title;
+            } else {
+                if (_statsToggledId !== null) {
+                    const prev = tooltip.querySelector('.krf-stats-row-clickable[data-adv-id="' + _statsToggledId + '"]');
+                    if (prev) prev.textContent = prev.dataset.title;
+                }
+                _statsToggledId = id;
+                span.textContent = String(id);
+            }
+        });
+
+        const _statsWrapperEl = document.getElementById('stats-wrapper');
+        const _statsTooltipEl = document.getElementById('stats-tooltip');
+
+        function _statsLoadAndShow() {
+            _statsShow();
+            if (!STATS_WORKER_URL) {
+                _statsTooltipEl.innerHTML = '<span class="krf-stats-error">Stats not configured</span>';
+                return;
+            }
+            if (_statsCache && (Date.now() - _statsCacheAt) < STATS_CACHE_TTL) {
+                renderStatsTooltip(_statsCache);
+                return;
+            }
+            _statsTooltipEl.innerHTML = '<span class="krf-stats-loading">Loading...</span>';
+            fetch(STATS_WORKER_URL + '/stats')
+                .then(r => r.json())
+                .then(data => {
+                    _statsCache = data;
+                    _statsCacheAt = Date.now();
+                    renderStatsTooltip(data);
+                })
+                .catch(() => {
+                    _statsTooltipEl.innerHTML = '<span class="krf-stats-error">Failed to load</span>';
+                });
+        }
+
+        _statsWrapperEl.addEventListener('mouseenter', _statsLoadAndShow);
+        _statsWrapperEl.addEventListener('mouseleave', _statsScheduleHide);
+        _statsTooltipEl.addEventListener('mouseenter', () => clearTimeout(_statsHideTimer));
+        _statsTooltipEl.addEventListener('mouseleave', _statsScheduleHide);
+
         window.onUnityExit = function() {
             if (globalUnityInstance) {
                 loadingOverlay.style.display = 'flex';

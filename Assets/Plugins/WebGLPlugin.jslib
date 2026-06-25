@@ -60,6 +60,21 @@ mergeInto(LibraryManager.library, {
     stringToUTF8(result, buffer, bufferSize);
     return buffer;
   },
+  GetCustomAdvCueSheet: function (advId) {
+    var data = localStorage.getItem("customAdvScripts");
+    var result = "";
+    if (data) {
+        try {
+            var map = JSON.parse(data);
+            var entry = map[advId];
+            if (entry && entry.cueSheet) result = entry.cueSheet;
+        } catch (e) {}
+    }
+    var bufferSize = lengthBytesUTF8(result) + 1;
+    var buffer = _malloc(bufferSize);
+    stringToUTF8(result, buffer, bufferSize);
+    return buffer;
+  },
   ReturnToMenu: function () {
     if (window.onUnityExit) {
         window.onUnityExit();

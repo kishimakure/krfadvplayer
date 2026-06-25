@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disclaimer / Privacy Policy – krfadvplayer</title>
+<style>
+:root {
+  --primary: #866142;
+  --primary-dark: #6E4135;
+  --primary-light: #FEEBD4;
+  --secondary: #FEF2D4;
+  --secondary-light: #FFF7E2;
+  --surface: #FAFAEB;
+  --background: #FAFAEB;
+  --on-surface: #393939;
+  --on-surface-secondary: #866142;
+  --divider: #F0D9B5;
+  --elevation-2: 0 2px 4px -1px rgba(57,57,57,.08), 0 2px 4px 0 rgba(57,57,57,.06), 0 1px 6px 0 rgba(57,57,57,.04);
+}
+[data-theme="dark"] {
+  --primary: #866142;
+  --primary-dark: #6E4135;
+  --primary-light: #414141;
+  --secondary: #414141;
+  --secondary-light: #393939;
+  --surface: #393939;
+  --background: #393939;
+  --on-surface: #FAFAEB;
+  --on-surface-secondary: #FEEBD4;
+  --divider: #6E4135;
+  --elevation-2: 0 2px 4px -1px rgba(0,0,0,.24), 0 2px 4px 0 rgba(0,0,0,.18), 0 1px 6px 0 rgba(0,0,0,.12);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0;
+  font-family: Avenir, Verdana, Helvetica, "Hiragino Sans GB", "Source Han Sans CN",
+               "WenQuanYi Micro Hei", "Microsoft Yahei", "Yu Gothic UI", sans-serif;
+  font-size: 10pt; line-height: 1.8;
+  background: var(--background);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+}
+.title-bar {
+  margin: 0; padding: 14px 24px;
+  font-size: 18px; font-weight: 500; letter-spacing: .5px;
+  color: #414141;
+  background-color: var(--secondary);
+  box-shadow: var(--elevation-2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+[data-theme="dark"] .title-bar { color: #FFF7E2; }
+.title-bar a {
+  font-size: 13px; font-weight: 400;
+  color: var(--on-surface-secondary); text-decoration: none;
+  transition: color .15s;
+}
+.title-bar a:hover { color: var(--on-surface); }
+.krf-toggle {
+  position: relative; display: inline-block;
+  width: 40px; height: 22px; flex-shrink: 0;
+}
+.krf-toggle input { opacity: 0; width: 0; height: 0; }
+.krf-toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--divider); border-radius: 11px;
+  cursor: pointer; transition: background .2s ease;
+}
+.krf-toggle-slider::before {
+  content: ''; position: absolute; left: 2px; top: 2px;
+  width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; transition: transform .2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.krf-toggle input:checked + .krf-toggle-slider { background: var(--primary); }
+.krf-toggle input:checked + .krf-toggle-slider::before { transform: translateX(18px); }
+.page {
+  max-width: 860px; margin: 0 auto;
+  padding: 32px 2vw 48px;
+}
+.lang-bar {
+  display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.lang-btn {
+  padding: 5px 14px; border-radius: 4px; border: 1px solid var(--divider);
+  background: var(--secondary-light); color: var(--on-surface-secondary);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: background .15s, color .15s;
+}
+.lang-btn.active, .lang-btn:hover {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+}
+.doc { display: none; }
+.doc.active { display: block; }
+h1 {
+  font-size: 20px; font-weight: 700; color: var(--primary-dark);
+  border-bottom: 2px solid var(--divider); padding-bottom: 8px; margin-top: 0;
+}
+[data-theme="dark"] h1 { color: #FEEBD4; }
+h2 {
+  font-size: 14px; font-weight: 700; color: var(--primary-dark);
+  margin-top: 28px; margin-bottom: 6px; padding-left: 8px;
+  border-left: 3px solid var(--primary);
+}
+[data-theme="dark"] h2 { color: #FEEBD4; }
+p { margin: 6px 0 12px; }
+ul { margin: 4px 0 12px; padding-left: 1.6em; }
+li { margin: 4px 0; }
+.notice {
+  background: var(--primary-light); border: 1px solid var(--divider);
+  border-radius: 6px; padding: 12px 16px; margin-bottom: 20px;
+  font-size: 9.5pt; color: var(--primary-dark);
+}
+[data-theme="dark"] .notice { background: #4a4a4a; border-color: #6E4135; color: #FEEBD4; }
+.updated {
+  font-size: 9pt; color: var(--on-surface-secondary); margin-top: 32px;
+  border-top: 1px solid var(--divider); padding-top: 12px;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+</style>
+</head>
+<body>
+
+<div class="title-bar">
+  <span>krfadvplayer &nbsp;·&nbsp; <span style="font-size:14px;font-weight:400;">Disclaimer / 免责声明 / 免責事項</span></span>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <label class="krf-toggle" title="Dark Mode">
+      <input type="checkbox" id="toggleDark">
+      <span class="krf-toggle-slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="switchLang('en')">English</button>
+    <button class="lang-btn" onclick="switchLang('zh')">中文</button>
+    <button class="lang-btn" onclick="switchLang('ja')">日本語</button>
+  </div>
+
+  <!-- ===================== 中文 ===================== -->
+  <div class="doc" id="doc-zh">
+    <h1>免责声明与隐私政策</h1>
+
+    <div class="notice">
+      本播放器（krfadvplayer）为非官方同人工具，与《闪耀幻想曲》（きららファンタジア / Kirara Fantasia）官方项目及相关版权方无任何关联。
+      使用本播放器前请仔细阅读以下说明。
+    </div>
+
+    <h2>1. 播放器性质与版权声明</h2>
+    <p>
+      krfadvplayer 是一款由爱好者自发开发的免费开源 WebGL 播放器，用于在浏览器中回放
+      <em>闪耀幻想曲（きららファンタジア / Kirara Fantasia）</em> 游戏的 ADV 剧情。
+      本播放器基于 Unity WebGL 技术构建，不隶属于任何官方平台。
+    </p>
+    <ul>
+      <li>本播放器本身的代码以开源形式提供，版权归原作者所有。</li>
+      <li>游戏资产（角色立绘、背景图、BGM、SE、语音、剧情脚本等）的版权归
+          <strong>芳文社・Aniplex・Drecom</strong> 所有。本播放器通过网络实时加载这些资源进行播放，
+          不对其进行本地持久化存储、二次分发或商业利用。</li>
+      <li>通过"Upload"功能上传的自定义剧情文件（JSON）为用户的原创内容，版权由用户自行承担。
+          若涉及对原版素材的再创作，请遵守各版权方的二次创作相关规定。</li>
+    </ul>
+
+    <h2>2. 网络资产访问说明</h2>
+    <p>本播放器在运行时会向以下网络地址发起请求：</p>
+    <ul>
+      <li><code>https://assets.krf-adv.com/adv/</code> — 游戏图片、音频、剧情脚本数据（由 Unity 引擎加载）</li>
+      <li><code>https://player.krf-adv.com/</code> — 播放器本身所在的托管服务器</li>
+    </ul>
+      <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — 匿名播放统计服务（点击 START 时上报所选剧情 ID 列表；悬停 Stats 按钮时获取统计结果）</li>
+    </ul>
+    <p>游戏资产加载请求为只读请求，不含任何用户数据。匿名统计数据的具体说明见隐私政策第 4 条。</p>
+    <p>
+      <strong>注意：</strong>部分广告拦截器会拦截 URL 中含有 "adv" 字样的请求，导致资产加载失败。
+      如遇播放异常，请暂时禁用广告拦截器后重试。
+    </p>
+
+    <h2>3. 免责声明</h2>
+    <ul>
+      <li>本播放器按"现状"提供，不对其正确性、完整性、适用性提供任何明示或暗示的保证。</li>
+      <li>使用本播放器所产生的任何后果（包括但不限于账号封禁、数据损失、法律纠纷）
+          由用户自行承担，开发者不负任何责任。</li>
+      <li>本播放器不用于任何侵权、破解、外挂、自动化脚本或其他违反游戏服务条款的用途。</li>
+      <li>本播放器依赖 Unity WebGL 运行时及 <code>assets.krf-adv.com</code> 服务，
+          如上游服务不可用，播放器功能将受影响，开发者对此不承担责任。</li>
+      <li>开发者保留随时修改或停止提供本播放器的权利，恕不另行通知。</li>
+    </ul>
+
+    <h2>4. 隐私政策</h2>
+    <p><strong>本播放器不收集任何可识别个人身份的信息。</strong>具体说明如下：</p>
+    <ul>
+      <li><strong>本地存储（localStorage）</strong>：本播放器使用浏览器的 localStorage
+          存储以下数据，均不包含个人身份信息：
+          <ul>
+            <li><code>ADVIDs</code> — 当前选中的剧情 ID 列表及音量、画质、帧率等设置参数</li>
+            <li><code>customAdvScripts</code> — 用户上传的自定义剧情 JSON 数据</li>
+            <li><code>krfTheme</code> — 深色/浅色主题偏好</li>
+          </ul>
+          这些数据仅存储在您自己的浏览器中，不会发送至任何服务器。
+      </li>
+      <li><strong>网络请求</strong>：
+        <ul>
+          <li>游戏资产加载（只读）：仅发起 GET 请求，不含任何用户数据。</li>
+          <li>播放统计（匿名写入）：每次点击 START 时，播放器会向统计服务器（<code>krfadvplayer-stats.kishima.workers.dev</code>）发送本次所选的<strong>剧情 ID 列表</strong>（整数数组）。该数据不含任何个人身份信息，仅用于统计各剧情的累计播放次数，统计结果可通过页面上的 Stats 按钮公开查看。</li>
+        </ul>
+        不发送 Cookie，不上传用户内容。</li>
+      <li><strong>第三方追踪</strong>：本播放器不包含任何分析统计、广告或追踪代码。</li>
+      <li><strong>数据清除</strong>：您可随时在浏览器的"开发者工具 → Application → localStorage"中
+          删除键名 <code>ADVIDs</code>、<code>customAdvScripts</code>、<code>krfTheme</code>
+          以清除所有本地保存数据。</li>
+    </ul>
+
+    <h2>5. 使用条款</h2>
+    <ul>
+      <li>本播放器仅供个人学习、欣赏与非商业同人创作使用。</li>
+      <li>禁止将本播放器用于任何商业目的或以任何方式从中牟利。</li>
+      <li>禁止将本播放器用于批量抓取、镜像或再分发游戏资产的用途。</li>
+      <li>禁止利用本播放器的上传功能传播侵犯他人版权、名誉或其他合法权益的内容。</li>
+      <li>继续使用本播放器即表示您已阅读并同意上述所有条款。</li>
+    </ul>
+
+    <p class="updated">最后更新：2026年6月25日</p>
+  </div>
+
+  <!-- ===================== English ===================== -->
+  <div class="doc active" id="doc-en">
+    <h1>Disclaimer &amp; Privacy Policy</h1>
+
+    <div class="notice">
+      krfadvplayer is an unofficial fan-made tool with no affiliation to the official
+      Kirara Fantasia (きららファンタジア) project or its rights holders (Houbunsha, Aniplex, Drecom).
+      Please read the following carefully before use.
+    </div>
+
+    <h2>1. Nature of the Player &amp; Copyright</h2>
+    <p>
+      krfadvplayer is a free, open-source WebGL player developed by fans to play back ADV scenarios
+      from the game <em>Kirara Fantasia (きららファンタジア)</em> in a browser.
+      It is built on Unity WebGL technology and is not affiliated with any official platform.
+    </p>
+    <ul>
+      <li>The source code of this player is provided open-source; copyright belongs to the original author(s).</li>
+      <li>All game assets (character artwork, backgrounds, BGM, SE, voice, scenario scripts, etc.) are the
+          property of <strong>Houbunsha, Aniplex, and Drecom</strong>. This player streams these resources
+          in real time for playback purposes only. No assets are persistently stored, redistributed, or
+          used for commercial purposes.</li>
+      <li>Custom scenario files (JSON) uploaded via the "Upload" feature are the user's own original content.
+          If such content constitutes a derivative work of original assets, please comply with the fan
+          creation guidelines of the respective rights holders.</li>
+    </ul>
+
+    <h2>2. Network Asset Access</h2>
+    <p>During operation, this player makes network requests to the following addresses:</p>
+    <ul>
+      <li><code>https://assets.krf-adv.com/adv/</code> — game images, audio, and scenario script data
+          (loaded by the Unity engine)</li>
+      <li><code>https://player.krf-adv.com/</code> — the hosting server for the player itself</li>
+    </ul>
+      <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — anonymous play statistics service
+          (scenario IDs are posted on START; stats are fetched when hovering the Stats button)</li>
+        </ul>
+        <p>Asset loading requests are read-only and contain no user data. See Section 4 for details on anonymous statistics reporting.</p>
+    <p>
+      <strong>Note:</strong> Some ad blockers block requests containing "adv" in the URL, causing asset
+      loading to fail. If playback is broken, please temporarily disable your ad blocker and reload.
+    </p>
+
+    <h2>3. Disclaimer</h2>
+    <ul>
+      <li>This player is provided "as-is" without any express or implied warranty of accuracy,
+          completeness, or fitness for a particular purpose.</li>
+      <li>Any consequences arising from the use of this player (including but not limited to
+          account bans, data loss, or legal disputes) are solely the responsibility of the user.
+          The developer assumes no liability.</li>
+      <li>This player is not intended for any infringing, cracking, cheating, automation, or other
+          activities that violate the game's terms of service.</li>
+      <li>This player depends on the Unity WebGL runtime and the <code>assets.krf-adv.com</code> service.
+          If upstream services become unavailable, functionality may be affected; the developer is not
+          liable for such outages.</li>
+      <li>The developer reserves the right to modify or discontinue this player at any time without notice.</li>
+    </ul>
+
+    <h2>4. Privacy Policy</h2>
+    <p><strong>This player does not collect any personally identifiable information.</strong></p>
+    <ul>
+      <li><strong>Local Storage (localStorage)</strong>: The player uses the browser's localStorage
+          to store the following data, none of which contains personally identifiable information:
+          <ul>
+            <li><code>ADVIDs</code> — selected scenario ID list and settings (volume, quality, frame rate)</li>
+            <li><code>customAdvScripts</code> — user-uploaded custom scenario JSON data</li>
+            <li><code>krfTheme</code> — dark/light theme preference</li>
+          </ul>
+          This data is stored only in your own browser and is never sent to any server.
+      </li>
+      <li><strong>Network Requests</strong>:
+        <ul>
+          <li>Asset loading (read-only): Only GET requests are made; no user data is included.</li>
+          <li>Play statistics (anonymous write): Each time START is clicked, the player sends the <strong>list of selected scenario IDs</strong> (an array of integers) to the statistics server (<code>krfadvplayer-stats.kishima.workers.dev</code>). This data contains no personally identifiable information and is used solely to count cumulative plays per scenario. Results are publicly visible via the Stats button.</li>
+        </ul>
+        No cookies are sent and no user content is uploaded.</li>
+      <li><strong>Third-party Tracking</strong>: This player contains no analytics, advertising,
+          or tracking code of any kind.</li>
+      <li><strong>Data Removal</strong>: You can delete all locally saved data at any time via
+          your browser's DevTools → Application → localStorage by removing the keys
+          <code>ADVIDs</code>, <code>customAdvScripts</code>, and <code>krfTheme</code>.</li>
+    </ul>
+
+    <h2>5. Terms of Use</h2>
+    <ul>
+      <li>This player is for personal, non-commercial enjoyment and fan-creation use only.</li>
+      <li>Commercial use or monetization of this player in any form is prohibited.</li>
+      <li>Using this player to bulk-scrape, mirror, or redistribute game assets is prohibited.</li>
+      <li>Uploading content that infringes on copyrights, reputation, or other legitimate rights of
+          others via the Upload feature is prohibited.</li>
+      <li>Continued use of this player constitutes your acceptance of all terms above.</li>
+    </ul>
+
+    <p class="updated">Last updated: June 25, 2026</p>
+  </div>
+
+  <!-- ===================== 日本語 ===================== -->
+  <div class="doc" id="doc-ja">
+    <h1>免責事項・プライバシーポリシー</h1>
+
+    <div class="notice">
+      krfadvplayer は非公式のファン制作ツールであり、『きららファンタジア』公式プロジェクトおよび
+      関連する権利者（芳文社・Aniplex・Drecom）とは一切関係ありません。
+      ご使用前に以下をよくお読みください。
+    </div>
+
+    <h2>1. プレイヤーの性質と著作権</h2>
+    <p>
+      krfadvplayer は、ゲーム <em>きららファンタジア（Kirara Fantasia）</em> の ADV シナリオを
+      ブラウザ上で再生するための無料のオープンソース WebGL プレイヤーです。
+      Unity WebGL 技術を基盤としており、公式プラットフォームとは一切関係ありません。
+    </p>
+    <ul>
+      <li>本プレイヤーのソースコードはオープンソースとして提供されており、著作権は原著作者に帰属します。</li>
+      <li>ゲーム内のすべての素材（キャラクター立ち絵・背景・BGM・SE・ボイス・シナリオスクリプト等）の著作権は
+          <strong>芳文社・Aniplex・Drecom</strong> に帰属します。本プレイヤーはこれらの素材を
+          リアルタイムストリーミングにより再生目的のみに使用するものであり、
+          永続的な保存・再配布・商業利用は行いません。</li>
+      <li>「Upload」機能でアップロードされたカスタムシナリオファイル（JSON）はユーザー自身の創作物です。
+          原作素材の二次創作に該当する場合は、各権利者の二次創作ガイドラインに従ってください。</li>
+    </ul>
+
+    <h2>2. ネットワークアクセスについて</h2>
+    <p>本プレイヤーの動作中、以下のアドレスへリクエストを送信します：</p>
+    <ul>
+      <li><code>https://assets.krf-adv.com/adv/</code> — ゲーム画像・音声・シナリオスクリプトデータ
+          （Unity エンジンが読み込み）</li>
+      <li><code>https://player.krf-adv.com/</code> — 本プレイヤーのホスティングサーバー</li>
+    </ul>
+      <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — 匿名再生統計サービス
+          （START 押下時にシナリオ ID を送信；Stats ボタンホバー時に統計を取得）</li>
+        </ul>
+        <p>素材読み込みリクエストは読み取り専用であり、ユーザーデータを含みません。匿名統計の詳細は第 4 条をご参照ください。</p>
+    <p>
+      <strong>注意：</strong>一部の広告ブロッカーは URL に「adv」を含むリクエストをブロックするため、
+      素材の読み込みに失敗する場合があります。再生がうまくいかない場合は、広告ブロッカーを一時的に
+      無効にしてページを再読み込みしてください。
+    </p>
+
+    <h2>3. 免責事項</h2>
+    <ul>
+      <li>本プレイヤーは「現状のまま」提供され、正確性・完全性・特定目的への適合性について、
+          明示または黙示の保証を一切行いません。</li>
+      <li>本プレイヤーの使用によって生じた一切の結果（アカウント停止・データ損失・法的紛争等を含む）は
+          ユーザー自身の責任であり、開発者は一切の責任を負いません。</li>
+      <li>本プレイヤーを、著作権侵害・不正プログラム・自動化スクリプト・ゲーム利用規約違反等の
+          目的に使用することを禁じます。</li>
+      <li>本プレイヤーは Unity WebGL ランタイムおよび <code>assets.krf-adv.com</code> サービスに
+          依存しており、上流サービスが利用不能になった場合の機能不全について開発者は責任を負いません。</li>
+      <li>開発者はいつでも予告なく本プレイヤーの変更・提供終了を行う権利を留保します。</li>
+    </ul>
+
+    <h2>4. プライバシーポリシー</h2>
+    <p><strong>本プレイヤーは個人を特定できる情報を一切収集しません。</strong></p>
+    <ul>
+      <li><strong>ローカルストレージ（localStorage）</strong>：本プレイヤーはブラウザの localStorage を
+          使用して以下のデータを保存します（いずれも個人を特定する情報は含みません）：
+          <ul>
+            <li><code>ADVIDs</code> — 選択したシナリオ ID リストと各種設定（音量・画質・フレームレート等）</li>
+            <li><code>customAdvScripts</code> — ユーザーがアップロードしたカスタムシナリオ JSON データ</li>
+            <li><code>krfTheme</code> — ダーク/ライトテーマの設定</li>
+          </ul>
+          これらのデータはご自身のブラウザ内にのみ保存され、いかなるサーバーにも送信されません。
+      </li>
+      <li><strong>ネットワークリクエスト</strong>：
+        <ul>
+          <li>素材読み込み（読み取り専用）：GET リクエストのみを行い、ユーザーデータは含みません。</li>
+          <li>再生統計（匿名書き込み）：START ボタンを押すたびに、本プレイヤーは選択した<strong>シナリオ ID リスト</strong>（整数の配列）を統計サーバー（<code>krfadvplayer-stats.kishima.workers.dev</code>）に送信します。このデータに個人を特定できる情報は含まれず、各シナリオの累計再生回数の集計にのみ使用されます。統計結果は Stats ボタンから公開されています。</li>
+        </ul>
+        Cookie の送信・ユーザーコンテンツのアップロードは行いません。</li>
+      <li><strong>サードパーティトラッキング</strong>：本プレイヤーにはアクセス解析・広告・
+          トラッキングコードは一切含まれていません。</li>
+      <li><strong>データの削除</strong>：ブラウザの DevTools → Application → localStorage から
+          キー <code>ADVIDs</code>、<code>customAdvScripts</code>、<code>krfTheme</code>
+          を削除することで、保存されたすべてのローカルデータを消去できます。</li>
+    </ul>
+
+    <h2>5. 利用規約</h2>
+    <ul>
+      <li>本プレイヤーは個人的な鑑賞・学習および非商業的なファン創作目的に限り使用可能です。</li>
+      <li>いかなる商業目的への使用・営利利用も禁止します。</li>
+      <li>本プレイヤーを使用してゲーム素材を大量取得・ミラーリング・再配布することを禁じます。</li>
+      <li>Upload 機能を通じて、他者の著作権・名誉・その他の正当な権利を侵害するコンテンツを
+          アップロードすることを禁じます。</li>
+      <li>本プレイヤーを引き続きご利用いただくことで、上記すべての規約に同意したものとみなします。</li>
+    </ul>
+
+    <p class="updated">最終更新：2026年6月25日</p>
+  </div>
+
+</div>
+
+<script>
+function switchLang(lang) {
+  document.querySelectorAll('.doc').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('doc-' + lang).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+const toggleDark = document.getElementById('toggleDark');
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  toggleDark.checked = dark;
+  localStorage.setItem('krfTheme', dark ? 'dark' : 'light');
+}
+toggleDark.addEventListener('change', () => applyTheme(toggleDark.checked));
+if (localStorage.getItem('krfTheme') === 'dark') applyTheme(true);
+</script>
+</body>
+</html>
