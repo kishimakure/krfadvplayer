@@ -2274,7 +2274,6 @@ public class player : MonoBehaviour
                 break;
         }
         ADVIDs.RemoveRange(0, 6);
-        ClearPlaylistInLocalStorage();
 #elif UNITY_EDITOR
         Application.targetFrameRate = 60;
         DebugMode = true;

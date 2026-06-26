@@ -338,7 +338,41 @@
                 if (cfg.Quality)     populateSelect(settingQuality, cfg.Quality);
                 if (cfg.FrameRate)   populateSelect(settingFps,     cfg.FrameRate);
                 if (cfg.AspectRatio) populateSelect(settingAspect,  cfg.AspectRatio);
-                /* Re-sync selectedAdvs with loaded defaults */
+
+                try {
+                    const saved = localStorage.getItem("ADVIDs");
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        if (Array.isArray(parsed) && parsed.length >= 6) {
+                            selectedAdvs = parsed;
+                            
+                            volBgm.value = selectedAdvs[0];
+                            volBgmVal.textContent = selectedAdvs[0];
+                            updateSliderTrack(volBgm);
+                            
+                            volSe.value = selectedAdvs[1];
+                            volSeVal.textContent = selectedAdvs[1];
+                            updateSliderTrack(volSe);
+                            
+                            volVoice.value = selectedAdvs[2];
+                            volVoiceVal.textContent = selectedAdvs[2];
+                            updateSliderTrack(volVoice);
+                            
+                            settingQuality.value = selectedAdvs[3];
+                            settingFps.value = selectedAdvs[4];
+                            settingAspect.value = selectedAdvs[5];
+
+                            updateCountText();
+                            renderSelectedColumn();
+                            
+                            updateSecretDisclaimerVisibility();
+                            
+                            return;
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Failed to load local settings, falling back to defaults:", e);
+                }
                 updateSettings();
             })
             .catch(err => console.warn('Failed to load settings.json, using empty selects:', err));
@@ -412,6 +446,7 @@
             selectedAdvs[3] = encodeQuality();
             selectedAdvs[4] = encodeFps();
             selectedAdvs[5] = encodeAspect();
+            localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
         }
 
         function getAdvCount() {
@@ -539,6 +574,7 @@
 
         /* --- Render selected column (col4) --- */
         function renderSelectedColumn() {
+            localStorage.setItem("ADVIDs", JSON.stringify(selectedAdvs));
             col4.innerHTML = '';
             const advIds = selectedAdvs.slice(6);
             if (advIds.length === 0) {
