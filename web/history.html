@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Play History – krfadvplayer</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            width: auto;
+            height: auto;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .hist-page { max-width: 1000px; margin: 0 auto; padding: 24px 16px 56px; }
+
+        /* ── toolbar ── */
+        .hist-toolbar {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 18px; flex-wrap: wrap;
+        }
+        .hist-filter-group { display: flex; gap: 4px; }
+        .hist-filter-btn {
+            padding: 5px 14px; border-radius: 4px;
+            border: 1px solid var(--divider);
+            background: var(--secondary-light); color: var(--on-surface-secondary);
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: background .15s, color .15s, border-color .15s;
+        }
+        .hist-filter-btn:hover { border-color: var(--primary); color: var(--on-surface); }
+        .hist-filter-btn.active {
+            background: var(--primary); color: #fff; border-color: var(--primary);
+        }
+        .hist-summary {
+            font-size: 12px; color: var(--on-surface-secondary); margin-left: auto;
+        }
+
+        /* ── table ── */
+        .hist-wrap { overflow-x: auto; border-radius: 8px; box-shadow: var(--elevation-2); }
+        .hist-table {
+            width: 100%; border-collapse: collapse; font-size: 13px;
+            background: var(--surface);
+        }
+        .hist-table thead th {
+            text-align: left; padding: 9px 14px;
+            background: var(--secondary); color: var(--on-surface-secondary);
+            font-size: 11px; letter-spacing: .4px; text-transform: uppercase;
+            border-bottom: 2px solid var(--divider);
+            position: sticky; top: 0; z-index: 1;
+        }
+        .hist-table td {
+            padding: 9px 14px; border-bottom: 1px solid var(--divider);
+            vertical-align: top; color: var(--on-surface);
+        }
+        .hist-table tbody tr:last-child td { border-bottom: none; }
+        .hist-table tbody tr:hover td { background: var(--secondary-light); }
+
+        /* columns */
+        .col-idx  { color: var(--on-surface-secondary); font-size: 11px; width: 36px; }
+        .col-time { white-space: nowrap; }
+        .col-time .t-date  { font-weight: 600; display: block; }
+        .col-time .t-clock { font-size: 11px; color: var(--on-surface-secondary); display: block; }
+        .col-time .t-utc   { font-size: 10px; color: var(--on-surface-secondary); display: block; margin-top: 1px; }
+        .col-cnt { text-align: center; width: 60px; }
+        .cnt-badge {
+            display: inline-block; padding: 1px 8px; border-radius: 10px;
+            background: var(--primary-light); color: var(--primary-dark);
+            font-size: 11px; font-weight: 600;
+        }
+        .col-status { min-width: 160px; }
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 8px; border-radius: 999px; border: 1px solid transparent;
+            font-size: 11px; font-weight: 600; line-height: 1.2;
+            background: var(--secondary); color: var(--on-surface);
+        }
+        .status-badge[data-status="quit_success"],
+        .status-badge[data-status="webgl_ready"] {
+            background: #e7f4ea; color: #1b5e20; border-color: #c8e6c9;
+        }
+        .status-badge[data-status="quit_with_errors"] {
+            background: #fff3e0; color: #6d4c00; border-color: #ffe0b2;
+        }
+        .status-badge[data-status="blocked_before_webgl"],
+        .status-badge[data-status="load_failed_before_webgl"],
+        .status-badge[data-status="webgl_error"],
+        .status-badge[data-status="quit_failed"] {
+            background: #fdecea; color: #b71c1c; border-color: #f5c2c0;
+        }
+        .status-badge[data-status="closed_without_exit"],
+        .status-badge[data-status="error_before_pagehide"],
+        .status-badge[data-status="aborted_before_webgl"],
+        .status-badge[data-status="interrupted"],
+        .status-badge[data-status="pending"] {
+            background: #fff7e0; color: #8a5a00; border-color: #f0ddb0;
+        }
+        .status-meta {
+            display: block; margin-top: 3px; font-size: 10px; color: var(--on-surface-secondary);
+            line-height: 1.35;
+        }
+        .col-duration { text-align: center; width: 96px; white-space: nowrap; }
+        .duration-text { font-size: 12px; font-weight: 600; color: var(--on-surface); }
+        .col-scenarios { max-width: 600px; }
+        .scen-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+        .scen-tag {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 2px 8px; border-radius: 3px;
+            background: var(--secondary); border: 1px solid var(--divider);
+            font-size: 11px; color: var(--on-surface);
+        }
+        .scen-tag .s-id { color: var(--on-surface-secondary); font-size: 10px; }
+
+        /* states */
+        .hist-state {
+            text-align: center; padding: 56px 16px;
+            color: var(--on-surface-secondary); font-size: 14px;
+        }
+        .hist-state.error { color: #c62828; }
+
+        /* ── admin panel ── */
+        .hist-admin-btn {
+            margin-left: auto;
+            padding: 5px 12px; border-radius: 4px;
+            border: 1px solid var(--divider);
+            background: var(--secondary-light); color: var(--on-surface-secondary);
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: background .15s, color .15s, border-color .15s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .hist-admin-btn:hover { border-color: var(--primary); color: var(--on-surface); }
+        .hist-admin-btn.active { background: #e8f5e9; color: #1b5e20; border-color: #a5d6a7; }
+        .hist-admin-form {
+            display: none; align-items: center; gap: 6px;
+            background: var(--surface); border: 1px solid var(--divider);
+            border-radius: 6px; padding: 6px 10px;
+            box-shadow: var(--elevation-2);
+        }
+        .hist-admin-form.open { display: flex; }
+        .hist-admin-form input {
+            width: 180px; padding: 4px 8px; border-radius: 4px;
+            border: 1px solid var(--divider); background: var(--secondary-light);
+            color: var(--on-surface); font-size: 12px; font-family: inherit;
+        }
+        .hist-admin-form input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+        .hist-admin-form .btn-ok {
+            padding: 4px 12px; border-radius: 4px; border: none;
+            background: var(--primary); color: #fff;
+            font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+        }
+        .hist-admin-form .btn-cancel {
+            padding: 4px 8px; border-radius: 4px; border: 1px solid var(--divider);
+            background: none; color: var(--on-surface-secondary);
+            font-size: 12px; cursor: pointer; font-family: inherit;
+        }
+        .hist-admin-form .err-msg {
+            font-size: 11px; color: #c62828;
+        }
+
+        /* ── delete column ── */
+        .col-del { width: 48px; text-align: center; }
+        .del-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 26px; height: 26px; border-radius: 4px;
+            border: 1px solid #f5c2c0; background: #fdecea;
+            color: #b71c1c; font-size: 14px; line-height: 1;
+            cursor: pointer; transition: background .12s;
+        }
+        .del-btn:hover { background: #f5c2c0; }
+        .del-btn:disabled { opacity: .4; cursor: default; }
+        .hist-table tr.deleting td { opacity: .4; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="krf-title">
+    krfadvplayer
+    <span class="krf-title-links">
+        <a href="index.html" class="krf-github-link">&#8592; Back</a>
+        <label class="krf-toggle" title="Dark Mode">
+            <input type="checkbox" id="toggle-dark">
+            <span class="krf-toggle-slider"></span>
+        </label>
+    </span>
+</div>
+
+<div class="hist-page">
+    <div class="hist-toolbar">
+        <div class="hist-filter-group" id="filter-group">
+            <button class="hist-filter-btn active" data-days="0">All</button>
+            <button class="hist-filter-btn" data-days="30">30d</button>
+            <button class="hist-filter-btn" data-days="7">7d</button>
+            <button class="hist-filter-btn" data-days="1">1d</button>
+        </div>
+        <span class="hist-summary" id="hist-summary"></span>
+        <button class="hist-admin-btn" id="admin-btn" title="Admin: authenticate to delete records">&#128274; Admin</button>
+        <div class="hist-admin-form" id="admin-form">
+            <input type="password" id="admin-token-input" placeholder="Reset token" autocomplete="off">
+            <button class="btn-ok" id="admin-ok">Unlock</button>
+            <button class="btn-cancel" id="admin-cancel">&#215;</button>
+            <span class="err-msg" id="admin-err"></span>
+        </div>
+    </div>
+    <div id="hist-content">
+        <div class="hist-state">Loading...</div>
+    </div>
+</div>
+
+<script>
+    /* ─── Config ─────────────────────────────────────────── */
+    const STATS_WORKER_URL = 'https://krfadvplayer-stats.kishima.workers.dev';
+
+    /* ─── Dark mode ──────────────────────────────────────── */
+    const toggleDark = document.getElementById('toggle-dark');
+    function applyTheme(dark) {
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        toggleDark.checked = dark;
+        localStorage.setItem('krfTheme', dark ? 'dark' : 'light');
+    }
+    toggleDark.addEventListener('change', () => applyTheme(toggleDark.checked));
+    if (localStorage.getItem('krfTheme') === 'dark') applyTheme(true);
+
+    /* ─── State ──────────────────────────────────────────── */
+    let advTitleMap = {};
+    let currentDays = 0;
+    let lastSessions = [];
+    let adminToken = sessionStorage.getItem('histAdminToken') || null;
+
+    /* ─── Admin auth panel ───────────────────────────────── */
+    const adminBtn    = document.getElementById('admin-btn');
+    const adminForm   = document.getElementById('admin-form');
+    const adminInput  = document.getElementById('admin-token-input');
+    const adminOk     = document.getElementById('admin-ok');
+    const adminCancel = document.getElementById('admin-cancel');
+    const adminErr    = document.getElementById('admin-err');
+
+    function syncAdminUI() {
+        if (adminToken) {
+            adminBtn.textContent = '🔓 Admin';
+            adminBtn.classList.add('active');
+            adminBtn.title = 'Click to lock (exit admin mode)';
+            adminForm.classList.remove('open');
+        } else {
+            adminBtn.textContent = '🔒 Admin';
+            adminBtn.classList.remove('active');
+            adminBtn.title = 'Admin: authenticate to delete records';
+        }
+    }
+    syncAdminUI();
+
+    adminBtn.addEventListener('click', () => {
+        if (adminToken) {
+            /* already unlocked → lock */
+            adminToken = null;
+            sessionStorage.removeItem('histAdminToken');
+            syncAdminUI();
+            render(lastSessions);
+        } else {
+            adminForm.classList.toggle('open');
+            if (adminForm.classList.contains('open')) {
+                adminInput.value = '';
+                adminErr.textContent = '';
+                adminInput.focus();
+            }
+        }
+    });
+
+    adminCancel.addEventListener('click', () => {
+        adminForm.classList.remove('open');
+        adminErr.textContent = '';
+    });
+
+    /* Verify token by sending a test DELETE with a clearly-invalid id */
+    async function verifyToken(token) {
+        const res = await fetch(STATS_WORKER_URL + '/session', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'X-Reset-Token': token },
+            body: JSON.stringify({ sessionId: '__probe__', startedAt: '__probe__' }),
+        });
+        /* 400 = bad params (auth passed) · 401 = wrong token */
+        return res.status !== 401;
+    }
+
+    adminOk.addEventListener('click', async () => {
+        const tok = adminInput.value.trim();
+        if (!tok) { adminErr.textContent = 'Token required.'; return; }
+        adminOk.disabled = true;
+        adminErr.textContent = '';
+        try {
+            const ok = await verifyToken(tok);
+            if (ok) {
+                adminToken = tok;
+                sessionStorage.setItem('histAdminToken', tok);
+                syncAdminUI();
+                render(lastSessions);
+            } else {
+                adminErr.textContent = 'Wrong token.';
+            }
+        } catch (_) {
+            adminErr.textContent = 'Network error.';
+        }
+        adminOk.disabled = false;
+    });
+
+    adminInput.addEventListener('keydown', e => { if (e.key === 'Enter') adminOk.click(); });
+
+    /* ─── Load webadvlist for title lookup ───────────────── */
+    fetch('webadvlist.json')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.Params) return;
+            data.Params.forEach(cat => {
+                cat.Subclasses.forEach(sub => {
+                    sub.Scenarios.forEach(sc => {
+                        advTitleMap[parseInt(sc.AdvID)] = sc.Title;
+                    });
+                });
+            });
+        })
+        .catch(() => {})
+        .finally(() => loadHistory(currentDays));
+
+    /* ─── Filter bar ─────────────────────────────────────── */
+    document.getElementById('filter-group').addEventListener('click', e => {
+        const btn = e.target.closest('.hist-filter-btn');
+        if (!btn) return;
+        document.querySelectorAll('.hist-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDays = parseInt(btn.dataset.days);
+        loadHistory(currentDays);
+    });
+
+    /* ─── Load & render ──────────────────────────────────── */
+    function loadHistory(days) {
+        const content = document.getElementById('hist-content');
+        content.innerHTML = '<div class="hist-state">Loading...</div>';
+        document.getElementById('hist-summary').textContent = '';
+
+        if (!STATS_WORKER_URL) {
+            content.innerHTML = '<div class="hist-state error">STATS_WORKER_URL is not configured.</div>';
+            return;
+        }
+        const url = days > 0
+            ? STATS_WORKER_URL + '/history?days=' + days
+            : STATS_WORKER_URL + '/history';
+
+        fetch(url)
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(data => render(data))
+            .catch(err => {
+                content.innerHTML = '<div class="hist-state error">Failed to load: ' + escHtml(String(err)) +
+                    '<br><small>Check Worker URL and CORS settings.</small></div>';
+            });
+    }
+
+    function render(data) {
+        const sessions = Array.isArray(data) ? data : (data.sessions || []);
+        lastSessions = sessions;
+        const summary  = document.getElementById('hist-summary');
+        const content  = document.getElementById('hist-content');
+
+        summary.textContent = sessions.length.toLocaleString() +
+            ' session' + (sessions.length !== 1 ? 's' : '');
+
+        if (sessions.length === 0) {
+            content.innerHTML = '<div class="hist-state">No play records found for this period.</div>';
+            return;
+        }
+
+        const showDel = !!adminToken;
+        const delHead = showDel ? '<th class="col-del"></th>' : '';
+
+        const rows = sessions.map((s, i) => {
+            const startedAt = s.startedAt || s.t;
+            const d = new Date(startedAt);
+            const localDate  = d.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const localClock = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const utcStr     = String(startedAt).replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
+            const ids = Array.isArray(s.advIds) ? s.advIds : (Array.isArray(s.ids) ? s.ids : []);
+            const statusCode = s.statusCode || s.status || (s.fromLegacy ? 'legacy' : 'pending');
+            const statusLabel = s.statusLabel || s.stage || statusCode;
+            const durationText = s.durationText || (Number.isFinite(Number(s.durationMs)) ? formatDuration(Number(s.durationMs)) : '—');
+
+            const tags = ids.map(id => {
+                const title = advTitleMap[id];
+                return '<li class="scen-tag">' +
+                    (title ? '<span>' + escHtml(title) + '</span><span class="s-id">' + id + '</span>' :
+                             '<span>ADV ' + id + '</span>') +
+                    '</li>';
+            }).join('');
+
+            const statusExtra = s.errorMessage ? '<span class="status-meta">' + escHtml(s.errorMessage) + '</span>' :
+                (s.stage && s.stage !== statusLabel ? '<span class="status-meta">' + escHtml(s.stage) + '</span>' : '');
+
+            /* legacy records use fabricated sessionId and startedAt=t, so delete is supported */
+            const canDel = showDel && s.sessionId && s.startedAt;
+            const delCell = showDel
+                ? '<td class="col-del">' +
+                    (canDel
+                        ? '<button class="del-btn" title="Delete this record" ' +
+                          'data-idx="' + i + '" data-sid="' + escHtml(s.sessionId) + '" ' +
+                          'data-sat="' + escHtml(s.startedAt) + '">&#215;</button>'
+                        : '') +
+                  '</td>'
+                : '';
+
+            return '<tr data-sid="' + (s.sessionId ? escHtml(s.sessionId) : '') + '">' +
+                '<td class="col-idx">' + (i + 1) + '</td>' +
+                '<td class="col-time">' +
+                    '<span class="t-date">'  + escHtml(localDate)  + '</span>' +
+                    '<span class="t-clock">' + escHtml(localClock) + '</span>' +
+                    '<span class="t-utc">'   + escHtml(utcStr)     + '</span>' +
+                '</td>' +
+                '<td class="col-status"><span class="status-badge" data-status="' + escHtml(statusCode) + '">' + escHtml(statusLabel) + '</span>' + statusExtra + '</td>' +
+                '<td class="col-duration"><span class="duration-text">' + escHtml(durationText) + '</span></td>' +
+                '<td class="col-cnt"><span class="cnt-badge">' + ids.length + '</span></td>' +
+                '<td class="col-scenarios"><ul class="scen-list">' + tags + '</ul></td>' +
+                delCell +
+                '</tr>';
+        }).join('');
+
+        content.innerHTML =
+            '<div class="hist-wrap"><table class="hist-table">' +
+            '<thead><tr>' +
+            '<th>#</th><th>Time (Local / UTC)</th><th>Status</th><th>Duration</th>' +
+            '<th style="text-align:center">Count</th><th>Scenarios</th>' + delHead +
+            '</tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+            '</table></div>';
+
+        /* delegate delete clicks */
+        content.querySelector('tbody').addEventListener('click', e => {
+            const btn = e.target.closest('.del-btn');
+            if (!btn) return;
+            deleteSession(btn);
+        });
+    }
+
+    async function deleteSession(btn) {
+        const sid = btn.dataset.sid;
+        const sat = btn.dataset.sat;
+        const row = btn.closest('tr');
+        if (!confirm('Delete this session record?\n' + sid)) return;
+
+        btn.disabled = true;
+        row.classList.add('deleting');
+
+        try {
+            const res = await fetch(STATS_WORKER_URL + '/session', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'X-Reset-Token': adminToken },
+                body: JSON.stringify({ sessionId: sid, startedAt: sat }),
+            });
+            if (res.status === 401) {
+                alert('Token rejected. Please re-authenticate.');
+                adminToken = null;
+                sessionStorage.removeItem('histAdminToken');
+                syncAdminUI();
+                row.classList.remove('deleting');
+                btn.disabled = false;
+                render(lastSessions);
+                return;
+            }
+            if (!res.ok) {
+                const j = await res.json().catch(() => ({}));
+                throw new Error(j.error || res.status);
+            }
+            /* remove from local cache and re-render */
+            lastSessions = lastSessions.filter(s => s.sessionId !== sid);
+            render(lastSessions);
+        } catch (err) {
+            alert('Delete failed: ' + err.message);
+            row.classList.remove('deleting');
+            btn.disabled = false;
+        }
+    }
+
+    function formatDuration(ms) {
+        if (!Number.isFinite(ms) || ms < 0) return '—';
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const pad = n => String(n).padStart(2, '0');
+        return hours > 0 ? hours + ':' + pad(minutes) + ':' + pad(seconds) : minutes + ':' + pad(seconds);
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+</script>
+</body>
+</html>

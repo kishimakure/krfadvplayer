@@ -2796,7 +2796,7 @@ public class player : MonoBehaviour
             else
             {
                 ADVIDs[2] = advList.m_Params[ADVIDs[1]].m_AdvID;
-                Debug.Log(ADVIDs[2]);
+                //Debug.Log(ADVIDs[2]);
             }
         }
         Coroutine coroutine = StartCoroutine(LoadingStart());
@@ -2870,7 +2870,7 @@ public class player : MonoBehaviour
             }
             ADVID = ADVIDs[ADVIndex];
         }
-        Debug.Log(ADVID);
+        //Debug.Log(ADVID);
 #if UNITY_WEBGL && !UNITY_EDITOR
     SetWebTitle("krfadvplayer - " + ADVID.ToString());
 #elif !UNITY_EDITOR
@@ -6739,6 +6739,7 @@ public class player : MonoBehaviour
     private IEnumerator ShakeCharaCoroutine(string ADVCharaID, int ShakeType, float time)
     {
         CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        yield return null;
         float timeElapsed = 0f;
         int a = ShakeType % 3;
         int b = ShakeType / 3;
@@ -8820,7 +8821,7 @@ public class player : MonoBehaviour
                     advScript = advScripts[ADVID];
                     advScriptText = advScriptTexts[ADVID];
                     SetUp();
-                    Debug.Log(ADVID);
+                    //Debug.Log(ADVID);
                 }
                 else
                 {
@@ -9009,7 +9010,7 @@ public class player : MonoBehaviour
                 class_FuncParam func = advScript.m_Params[0].FuncParam[advScriptProgress];
                 if (!QuickPlay)
                 {
-                    Debug.Log(func.funcName + "(" + func.m_value1 + "," + func.m_value2 + "," + func.m_value3 + "," + func.m_value4 + "," + func.m_value5 + "," + func.m_value6 + ")");
+                    Debug.Log(ADVID.ToString() + "[" + advScriptProgress.ToString() + "]: " + func.funcName + "(" + func.m_value1 + "," + func.m_value2 + "," + func.m_value3 + "," + func.m_value4 + "," + func.m_value5 + "," + func.m_value6 + ")");
                 }
                 uint m_ID;
                 uint m_TextID;

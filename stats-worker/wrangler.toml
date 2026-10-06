@@ -1,0 +1,9 @@
+name            = "krfadvplayer-stats"
+main            = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# 部署前先在 Cloudflare Dashboard 创建名为 krfadvplayer-stats 的 R2 存储桶，
+# 或运行: wrangler r2 bucket create krfadvplayer-stats
+[[r2_buckets]]
+binding     = "STATS_BUCKET"
+bucket_name = "krfadvplayer-stats"

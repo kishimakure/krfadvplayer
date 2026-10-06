@@ -172,8 +172,7 @@ a:hover { text-decoration: underline; }
     <ul>
       <li><code>https://assets.krf-adv.com/adv/</code> — 游戏图片、音频、剧情脚本数据（由 Unity 引擎加载）</li>
       <li><code>https://player.krf-adv.com/</code> — 播放器本身所在的托管服务器</li>
-    </ul>
-      <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — 匿名播放统计服务（点击 START 时上报所选剧情 ID 列表；悬停 Stats 按钮时获取统计结果）</li>
+      <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — 匿名播放统计与历史记录服务（点击 START 时上报播放会话；Stats 按钮会请求 <code>/stats</code>、<code>/stats?days=N</code>；历史页会请求 <code>/history</code>、<code>/history?days=N</code>）</li>
     </ul>
     <p>游戏资产加载请求为只读请求，不含任何用户数据。匿名统计数据的具体说明见隐私政策第 4 条。</p>
     <p>
@@ -207,7 +206,7 @@ a:hover { text-decoration: underline; }
       <li><strong>网络请求</strong>：
         <ul>
           <li>游戏资产加载（只读）：仅发起 GET 请求，不含任何用户数据。</li>
-          <li>播放统计（匿名写入）：每次点击 START 时，播放器会向统计服务器（<code>krfadvplayer-stats.kishima.workers.dev</code>）发送本次所选的<strong>剧情 ID 列表</strong>（整数数组）。该数据不含任何个人身份信息，仅用于统计各剧情的累计播放次数，统计结果可通过页面上的 Stats 按钮公开查看。</li>
+          <li>播放统计与历史（匿名写入）：每次点击 START 时，播放器会向统计服务器（<code>krfadvplayer-stats.kishima.workers.dev</code>）发送本次所选的<strong>剧情 ID 列表</strong>（整数数组）。服务端会记录该次会话的时间戳（UTC）、ID 列表、播放状态细节（例如：WebGL 到达前被拦截、读档失败、已进入 WebGL、运行时错误、正常退出或被中断）以及可选的观看时长估计，用于累计统计与历史列表展示。统计展示会请求 <code>/stats</code> 与 <code>/stats?days=N</code>，历史页面会请求 <code>/history</code> 与 <code>/history?days=N</code>。</li>
         </ul>
         不发送 Cookie，不上传用户内容。</li>
       <li><strong>第三方追踪</strong>：本播放器不包含任何分析统计、广告或追踪代码。</li>
@@ -225,7 +224,7 @@ a:hover { text-decoration: underline; }
       <li>继续使用本播放器即表示您已阅读并同意上述所有条款。</li>
     </ul>
 
-    <p class="updated">最后更新：2026年6月25日</p>
+    <p class="updated">最后更新：2026年8月7日</p>
   </div>
 
   <!-- ===================== English ===================== -->
@@ -261,11 +260,10 @@ a:hover { text-decoration: underline; }
       <li><code>https://assets.krf-adv.com/adv/</code> — game images, audio, and scenario script data
           (loaded by the Unity engine)</li>
       <li><code>https://player.krf-adv.com/</code> — the hosting server for the player itself</li>
-    </ul>
       <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — anonymous play statistics service
-          (scenario IDs are posted on START; stats are fetched when hovering the Stats button)</li>
-        </ul>
-        <p>Asset loading requests are read-only and contain no user data. See Section 4 for details on anonymous statistics reporting.</p>
+        (play sessions are posted on START; playback-state updates such as WebGL readiness, load failures, runtime errors, clean exits, interruptions, and an optional watched-duration estimate are also sent; the Stats panel fetches <code>/stats</code> and <code>/stats?days=N</code>; the history page fetches <code>/history</code> and <code>/history?days=N</code>)</li>
+    </ul>
+    <p>Asset loading requests are read-only and contain no user data. See Section 4 for details on anonymous statistics reporting.</p>
     <p>
       <strong>Note:</strong> Some ad blockers block requests containing "adv" in the URL, causing asset
       loading to fail. If playback is broken, please temporarily disable your ad blocker and reload.
@@ -301,7 +299,7 @@ a:hover { text-decoration: underline; }
       <li><strong>Network Requests</strong>:
         <ul>
           <li>Asset loading (read-only): Only GET requests are made; no user data is included.</li>
-          <li>Play statistics (anonymous write): Each time START is clicked, the player sends the <strong>list of selected scenario IDs</strong> (an array of integers) to the statistics server (<code>krfadvplayer-stats.kishima.workers.dev</code>). This data contains no personally identifiable information and is used solely to count cumulative plays per scenario. Results are publicly visible via the Stats button.</li>
+          <li>Play statistics and history (anonymous write): Each time START is clicked, the player sends the <strong>list of selected scenario IDs</strong> (an array of integers) to the statistics server (<code>krfadvplayer-stats.kishima.workers.dev</code>). The server stores a UTC timestamp, the ID list, playback-state details (for example: blocked before WebGL, loading failure, WebGL ready, runtime error, clean exit, or interruption), and an optional watched-duration estimate for that play session. The client fetches <code>/stats</code> and <code>/stats?days=N</code> for summary stats, and <code>/history</code> and <code>/history?days=N</code> for session history.</li>
         </ul>
         No cookies are sent and no user content is uploaded.</li>
       <li><strong>Third-party Tracking</strong>: This player contains no analytics, advertising,
@@ -321,7 +319,7 @@ a:hover { text-decoration: underline; }
       <li>Continued use of this player constitutes your acceptance of all terms above.</li>
     </ul>
 
-    <p class="updated">Last updated: June 25, 2026</p>
+    <p class="updated">Last updated: August 7, 2026</p>
   </div>
 
   <!-- ===================== 日本語 ===================== -->
@@ -356,11 +354,10 @@ a:hover { text-decoration: underline; }
       <li><code>https://assets.krf-adv.com/adv/</code> — ゲーム画像・音声・シナリオスクリプトデータ
           （Unity エンジンが読み込み）</li>
       <li><code>https://player.krf-adv.com/</code> — 本プレイヤーのホスティングサーバー</li>
-    </ul>
       <li><code>https://krfadvplayer-stats.kishima.workers.dev/</code> — 匿名再生統計サービス
-          （START 押下時にシナリオ ID を送信；Stats ボタンホバー時に統計を取得）</li>
-        </ul>
-        <p>素材読み込みリクエストは読み取り専用であり、ユーザーデータを含みません。匿名統計の詳細は第 4 条をご参照ください。</p>
+        （START 押下時に再生セッションを送信し、WebGL 到達可否・読込失敗・実行時エラー・正常終了・中断などの再生状態や、任意の視聴時間推定も送信します。Stats パネルは <code>/stats</code>・<code>/stats?days=N</code> を取得；履歴ページは <code>/history</code>・<code>/history?days=N</code> を取得）</li>
+    </ul>
+    <p>素材読み込みリクエストは読み取り専用であり、ユーザーデータを含みません。匿名統計の詳細は第 4 条をご参照ください。</p>
     <p>
       <strong>注意：</strong>一部の広告ブロッカーは URL に「adv」を含むリクエストをブロックするため、
       素材の読み込みに失敗する場合があります。再生がうまくいかない場合は、広告ブロッカーを一時的に
@@ -395,7 +392,7 @@ a:hover { text-decoration: underline; }
       <li><strong>ネットワークリクエスト</strong>：
         <ul>
           <li>素材読み込み（読み取り専用）：GET リクエストのみを行い、ユーザーデータは含みません。</li>
-          <li>再生統計（匿名書き込み）：START ボタンを押すたびに、本プレイヤーは選択した<strong>シナリオ ID リスト</strong>（整数の配列）を統計サーバー（<code>krfadvplayer-stats.kishima.workers.dev</code>）に送信します。このデータに個人を特定できる情報は含まれず、各シナリオの累計再生回数の集計にのみ使用されます。統計結果は Stats ボタンから公開されています。</li>
+          <li>再生統計・履歴（匿名書き込み）：START ボタンを押すたびに、本プレイヤーは選択した<strong>シナリオ ID リスト</strong>（整数の配列）を統計サーバー（<code>krfadvplayer-stats.kishima.workers.dev</code>）に送信します。サーバー側では各再生セッションの UTC 時刻と ID リストを記録し、累計統計および履歴表示に利用します。統計表示は <code>/stats</code> と <code>/stats?days=N</code>、履歴表示は <code>/history</code> と <code>/history?days=N</code> を利用します。</li>
         </ul>
         Cookie の送信・ユーザーコンテンツのアップロードは行いません。</li>
       <li><strong>サードパーティトラッキング</strong>：本プレイヤーにはアクセス解析・広告・
@@ -415,7 +412,7 @@ a:hover { text-decoration: underline; }
       <li>本プレイヤーを引き続きご利用いただくことで、上記すべての規約に同意したものとみなします。</li>
     </ul>
 
-    <p class="updated">最終更新：2026年6月25日</p>
+    <p class="updated">最終更新：2026年8月7日</p>
   </div>
 
 </div>

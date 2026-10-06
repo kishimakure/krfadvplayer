@@ -976,6 +976,17 @@ body, html {
     background: var(--primary-light);
 }
 
+/* ===== AdvID direct-input: hide number spinner ===== */
+#input-advid::-webkit-outer-spin-button,
+#input-advid::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+#input-advid {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 /* ===== Upload modal ===== */
 .krf-modal-overlay {
     position: fixed;
