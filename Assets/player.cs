@@ -3757,7 +3757,7 @@ public class player : MonoBehaviour
         {
             texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
         }
-        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_PoseID + "_" + charaFaceID[charaProperties.FaceID]]; }
+        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
         Anchorxy += new Vector2(Pose.m_OffsetX + charaProperties.Position.x, Pose.m_OffsetY + charaProperties.Position.y) + new Vector2(-texture.width / 2f, texture.height * (1 - Pose.m_FaceReferenceImageType * Pose.m_FacePivotY));
         switch (CharaAnchor)
         {
@@ -3925,7 +3925,7 @@ public class player : MonoBehaviour
         {
             texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
         }
-        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_PoseID + "_" + charaFaceID[charaProperties.FaceID]]; }
+        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
         charaProperties.RotateCenter = new Vector2((PivotX - 0.5f) * texture.width, (1 - PivotY) * texture.height);
         while (timeElapsed < Sec)
         {
@@ -6427,7 +6427,7 @@ public class player : MonoBehaviour
         {
             texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
         }
-        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_PoseID + "_" + charaFaceID[charaProperties.FaceID]]; }
+        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
         EmoOffset += new Vector2(-texture.width / 2f, texture.height * (1 - Pose.m_FaceReferenceImageType * Pose.m_FacePivotY)); ;
         double a = Math.Cos(charaProperties.Angle * Mathf.Deg2Rad);
         double b = Math.Sin(charaProperties.Angle * Mathf.Deg2Rad);
@@ -7388,7 +7388,7 @@ public class player : MonoBehaviour
         {
             texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
         }
-        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_PoseID + "_" + charaFaceID[charaProperties.FaceID]]; }
+        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
         float PivotX = 0.5f;
         float PivotY = 0.5f;
         switch (CharaAnchor)
@@ -8516,7 +8516,7 @@ public class player : MonoBehaviour
         advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
         GameObject charaMask = FindCached(ADVCharaID + "_Mask");
         Texture2D texture = new Texture2D(0, 0);
-        string maskPath = param.m_ResourceBaseName + "_Face_" + Pose.m_PoseID + "_Default";
+        string maskPath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_Default";
         if (webTexture.ContainsKey(maskPath))
         {
             texture = webTexture[maskPath];
@@ -8530,7 +8530,7 @@ public class player : MonoBehaviour
         charaMask.GetComponent<SpriteMask>().sprite = sprite;
         GameObject charaFace = FindCached(ADVCharaID + "_Face");
         texture = new Texture2D(0, 0);
-        string facePath = param.m_ResourceBaseName + "_Face_" + Pose.m_PoseID + "_" + charaFaceID[charaProperties.FaceID];
+        string facePath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID];
         if (webTexture.ContainsKey(facePath))
         {
             texture = webTexture[facePath];
