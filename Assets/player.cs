@@ -1100,7 +1100,7 @@ public class player : MonoBehaviour
     public float VoiceVolume = 1f;
     public bool enableParticle = false;
     public int SIDE_LENGTH = 1334;
-    public float FIXED_ASPECT = 9/16f;
+    public float FIXED_ASPECT = 750f/1334f;
     private bool netError = false;
     private string netErrorMessage = "";
     private float ADVWindowState = 0f;
@@ -3211,6 +3211,7 @@ public class player : MonoBehaviour
     private List<string> Waiting = new List<string>();
     private int advScriptProgress = 0;
     private List<string> talkingChara = new List<string>();
+    private List<string> nextTalkingChara = new List<string>();
     private List<string> highlightChara = new List<string>();
     private List<string> forceHighlight = new List<string>();
     private List<string> forceShading = new List<string>();
@@ -3227,7 +3228,7 @@ public class player : MonoBehaviour
     private bool EffectSEMuted = false;
     private bool preRead = false;
     private Dictionary<int, int> charaShotPx = new Dictionary<int, int>{
-        {-1,-999},{5,-555},{0,-444},{6,-333},{1,-222},{7,-111},{2,0},{8,111},{3,222},{9,333},{4,444},{10,555},{-2,999}
+        {5,-555},{0,-444},{6,-333},{1,-222},{7,-111},{2,0},{8,111},{3,222},{9,333},{4,444},{10,555},
     };
     private Dictionary<int, string> charaFaceID = new Dictionary<int, string>{
         {0,"Default"},{1,"Joy"},{2,"Angry"},{3,"Sorrow"},{4,"Happy"},{5,"Shy"},{6,"Surprise"},{7,"Unique1"},{8,"Unique2"},{9,"Unique3"},{10,"Unique4"},{11,"Unique5"},{12,"Unique6"},{13,"Unique7"},{14,"Unique8"},{15,"Unique9"},{16,"Unique10"},{17,"Unique11"},{18,"Unique12"},{19,"Unique13"}
@@ -3583,128 +3584,144 @@ public class player : MonoBehaviour
                 layerID = existingLayers.Count;
             }
             CharasLayer.Add(ADVCharaID, layerID);
-        }
-        string layerName = "Chara" + layerID.ToString();
-        GameObject chara;
-        chara = FindCached(ADVCharaID);
-        if (chara == null)
-        {
-            chara = new GameObject(ADVCharaID);
-            CacheGameObject(ADVCharaID, chara);
-        }
-        Texture2D texture = new Texture2D(0, 0)
-        {
-            wrapMode = TextureWrapMode.Clamp
-        };
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, 0, 0), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
-        SpriteRenderer spriteRenderer = chara.GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-        {
-            spriteRenderer = chara.AddComponent<SpriteRenderer>();
-        }
-        spriteRenderer.sprite = sprite;
-        spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
-        spriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
-        spriteRenderer.sortingOrder = 0;
-        chara.layer = layerID + 10;
-        chara.transform.SetParent(canvas.transform);
-        GameObject charaMask;
-        charaMask = FindCached(ADVCharaID + "_Mask");
-        if (charaMask == null)
-        {
-            charaMask = new GameObject(ADVCharaID + "_Mask");
-            CacheGameObject(ADVCharaID + "_Mask", charaMask);
-        }
-        SpriteMask spriteMask = charaMask.GetComponent<SpriteMask>();
-        if (spriteMask == null)
-        {
-            spriteMask = charaMask.AddComponent<SpriteMask>();
-        }
-        spriteMask.sprite = sprite;
-        spriteMask.isCustomRangeActive = true;
-        spriteMask.frontSortingOrder = 0;
-        spriteMask.backSortingOrder = -1;
-        RectTransform rectTransform = charaMask.GetComponent<RectTransform>();
-        if (rectTransform == null)
-        {
-            rectTransform = charaMask.AddComponent<RectTransform>();
-        }
-        rectTransform.anchorMin = new Vector2(0f, 1f);
-        rectTransform.anchorMax = new Vector2(0f, 1f);
-        rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        rectTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-        rectTransform.localScale = new Vector3(1f, 1f, 1f);
-        charaMask.layer = layerID + 10;
-        charaMask.transform.SetParent(chara.transform);
-        GameObject charaFace;
-        charaFace = FindCached(ADVCharaID + "_Face");
-        if (charaFace == null)
-        {
-            charaFace = new GameObject(ADVCharaID + "_Face");
-            CacheGameObject(ADVCharaID + "_Face", charaFace);
-        }
-        SpriteRenderer faceRenderer = charaFace.GetComponent<SpriteRenderer>();
-        if (faceRenderer == null)
-        {
-            faceRenderer = charaFace.AddComponent<SpriteRenderer>();
-        }
-        faceRenderer.sprite = sprite;
-        faceRenderer.color = new Color(1f, 1f, 1f, 0f);
-        faceRenderer.sortingOrder = 0;
-        rectTransform = charaFace.GetComponent<RectTransform>();
-        if (rectTransform == null)
-        {
-            rectTransform = charaFace.AddComponent<RectTransform>();
-        }
-        rectTransform.anchorMin = new Vector2(0f, 1f);
-        rectTransform.anchorMax = new Vector2(0f, 1f);
-        rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        rectTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-        rectTransform.localScale = new Vector3(1f, 1f, 1f);
-        charaFace.layer = layerID + 10;
-        charaFace.transform.SetParent(chara.transform);
-        rectTransform = chara.GetComponent<RectTransform>();
-        if (rectTransform == null)
-        {
-            rectTransform = chara.AddComponent<RectTransform>();
-        }
-        rectTransform.anchorMin = new Vector2(0.5f, 0f);
-        rectTransform.anchorMax = new Vector2(0.5f, 0f);
-        rectTransform.pivot = new Vector2(0.5f, 0f);
-        rectTransform.localScale = new Vector3(1f, 1f, 1f);
-        rectTransform.anchoredPosition = new Vector3(0f, 10000f, 0f);
-        if (!charaPriorityFirst.Contains(ADVCharaID) && !charaPriorityMid.Contains(ADVCharaID) && !charaPriorityLast.Contains(ADVCharaID))
-        {
-            //charaPriorityMid.Insert(0,ADVCharaID);
-            charaPriorityMid.Add(ADVCharaID);
-        }
-        Camera camera = cameras[layerID];
-        RenderTexture renderTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
-        camera.targetTexture = renderTexture;
-        if (FindCached(ADVCharaID + "_RT") != null)
-        {
-            FindCached(ADVCharaID + "_RT").GetComponent<MeshRenderer>().material.SetTexture(_MainTex, camera.targetTexture);
-        }
-        else
-        {
-            GameObject renderTextureChara = new GameObject(ADVCharaID + "_RT");
-            CacheGameObject(ADVCharaID + "_RT", renderTextureChara);
-            renderTextureChara.transform.SetParent(renderTextureObj.transform);
-            renderTextureChara.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
-            renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, camera.targetTexture);
-            renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("noise-good"));
-            renderTextureChara.GetComponent<MeshRenderer>().material.SetVector(_NoiseTextureParam, new Vector4(0, 0, 0.5f, 0.5f));
-            renderTextureChara.AddComponent<MeshFilter>().mesh = CreateMesh(4000f/3f, 4000f/3f, new Vector2(0.5f, 0.5f));
-            rectTransform = renderTextureChara.AddComponent<RectTransform>();
+            string layerName = "Chara" + layerID.ToString();
+            GameObject chara;
+            chara = FindCached(ADVCharaID);
+            if (chara == null)
+            {
+                chara = new GameObject(ADVCharaID);
+                CacheGameObject(ADVCharaID, chara);
+            }
+            Texture2D texture = new Texture2D(0, 0)
+            {
+                wrapMode = TextureWrapMode.Clamp
+            };
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, 0, 0), new Vector2(0.5f, 0.5f), 1, 0, SpriteMeshType.FullRect);
+            SpriteRenderer spriteRenderer = chara.GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+            {
+                spriteRenderer = chara.AddComponent<SpriteRenderer>();
+            }
+            spriteRenderer.sprite = sprite;
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
+            spriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+            spriteRenderer.sortingOrder = 0;
+            chara.layer = layerID + 10;
+            chara.transform.SetParent(canvas.transform);
+            GameObject charaMask;
+            charaMask = FindCached(ADVCharaID + "_Mask");
+            if (charaMask == null)
+            {
+                charaMask = new GameObject(ADVCharaID + "_Mask");
+                CacheGameObject(ADVCharaID + "_Mask", charaMask);
+            }
+            SpriteMask spriteMask = charaMask.GetComponent<SpriteMask>();
+            if (spriteMask == null)
+            {
+                spriteMask = charaMask.AddComponent<SpriteMask>();
+            }
+            spriteMask.sprite = sprite;
+            spriteMask.isCustomRangeActive = true;
+            spriteMask.frontSortingOrder = 0;
+            spriteMask.backSortingOrder = -1;
+            RectTransform rectTransform = charaMask.GetComponent<RectTransform>();
+            if (rectTransform == null)
+            {
+                rectTransform = charaMask.AddComponent<RectTransform>();
+            }
+            rectTransform.anchorMin = new Vector2(0f, 1f);
+            rectTransform.anchorMax = new Vector2(0f, 1f);
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
             rectTransform.localScale = new Vector3(1f, 1f, 1f);
-            rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
-            renderTextureChara.layer = LayerMask.NameToLayer("Chara");
+            charaMask.layer = layerID + 10;
+            charaMask.transform.SetParent(chara.transform);
+            GameObject charaFace;
+            charaFace = FindCached(ADVCharaID + "_Face");
+            if (charaFace == null)
+            {
+                charaFace = new GameObject(ADVCharaID + "_Face");
+                CacheGameObject(ADVCharaID + "_Face", charaFace);
+            }
+            SpriteRenderer faceRenderer = charaFace.GetComponent<SpriteRenderer>();
+            if (faceRenderer == null)
+            {
+                faceRenderer = charaFace.AddComponent<SpriteRenderer>();
+            }
+            faceRenderer.sprite = sprite;
+            faceRenderer.color = new Color(1f, 1f, 1f, 0f);
+            faceRenderer.sortingOrder = 0;
+            rectTransform = charaFace.GetComponent<RectTransform>();
+            if (rectTransform == null)
+            {
+                rectTransform = charaFace.AddComponent<RectTransform>();
+            }
+            rectTransform.anchorMin = new Vector2(0f, 1f);
+            rectTransform.anchorMax = new Vector2(0f, 1f);
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            rectTransform.localScale = new Vector3(1f, 1f, 1f);
+            charaFace.layer = layerID + 10;
+            charaFace.transform.SetParent(chara.transform);
+            rectTransform = chara.GetComponent<RectTransform>();
+            if (rectTransform == null)
+            {
+                rectTransform = chara.AddComponent<RectTransform>();
+            }
+            rectTransform.anchorMin = new Vector2(0.5f, 0f);
+            rectTransform.anchorMax = new Vector2(0.5f, 0f);
+            rectTransform.pivot = new Vector2(0.5f, 0f);
+            rectTransform.localScale = new Vector3(1f, 1f, 1f);
+            rectTransform.anchoredPosition = new Vector3(0f, 10000f, 0f);
+            if (!charaPriorityFirst.Contains(ADVCharaID) && !charaPriorityMid.Contains(ADVCharaID) && !charaPriorityLast.Contains(ADVCharaID))
+            {
+                //charaPriorityMid.Insert(0,ADVCharaID);
+                charaPriorityMid.Add(ADVCharaID);
+            }
+            Camera camera = cameras[layerID];
+            RenderTexture renderTexture = new RenderTexture(SIDE_LENGTH, SIDE_LENGTH, 24);
+            camera.targetTexture = renderTexture;
+            if (FindCached(ADVCharaID + "_RT") != null)
+            {
+                FindCached(ADVCharaID + "_RT").GetComponent<MeshRenderer>().material.SetTexture(_MainTex, camera.targetTexture);
+            }
+            else
+            {
+                GameObject renderTextureChara = new GameObject(ADVCharaID + "_RT");
+                CacheGameObject(ADVCharaID + "_RT", renderTextureChara);
+                renderTextureChara.transform.SetParent(renderTextureObj.transform);
+                renderTextureChara.AddComponent<MeshRenderer>().material = new Material(Shader.Find("CustomShader_COMMON"));
+                renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture(_MainTex, camera.targetTexture);
+                renderTextureChara.GetComponent<MeshRenderer>().material.SetTexture("_Texture_Noise", Resources.Load<Texture2D>("noise-good"));
+                renderTextureChara.GetComponent<MeshRenderer>().material.SetVector(_NoiseTextureParam, new Vector4(0, 0, 0.5f, 0.5f));
+                renderTextureChara.AddComponent<MeshFilter>().mesh = CreateMesh(4000f/3f, 4000f/3f, new Vector2(0.5f, 0.5f));
+                rectTransform = renderTextureChara.AddComponent<RectTransform>();
+                rectTransform.localScale = new Vector3(1f, 1f, 1f);
+                rectTransform.anchoredPosition = new Vector3(0f, 0f, 0f);
+                renderTextureChara.layer = LayerMask.NameToLayer("Chara");
+            }
         }
     }
     private void CharaSetPosition(string ADVCharaID, float x, float y)
     {
         if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
         charaPropertiesDict[ADVCharaID].Position = new Vector2(x, y);
+        isUpdateCharaPosition.Add(ADVCharaID);
+    }
+    private void CharaSetPosition(string ADVCharaID, int Side)
+    {
+        if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+        Texture2D texture;
+        int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+        if (FaceReferenceImageType == 0)
+        {
+            texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+        }
+        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
+        charaPropertiesDict[ADVCharaID].Position = new Vector2((667 + texture.width / 2f) * Side, 0);
         isUpdateCharaPosition.Add(ADVCharaID);
     }
     private void Highlight(string ADVCharaID)
@@ -3722,24 +3739,6 @@ public class player : MonoBehaviour
         SpriteRenderer sr = chara.GetComponent<SpriteRenderer>();
         sr.color = new Color(0.5f, 0.5f, 0.5f, sr.color.a);
         FindCached(chara.name + "_Face").GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f, sr.color.a);
-    }
-    private void ForwardChara(string ADVCharaID)
-    {
-        if (charaPriorityFirst.Contains(ADVCharaID))
-        {
-            charaPriorityFirst.Remove(ADVCharaID);
-            charaPriorityFirst.Add(ADVCharaID);
-        }
-        if (charaPriorityMid.Contains(ADVCharaID))
-        {
-            charaPriorityMid.Remove(ADVCharaID);
-            charaPriorityMid.Add(ADVCharaID);
-        }
-        if (charaPriorityLast.Contains(ADVCharaID))
-        {
-            charaPriorityLast.Remove(ADVCharaID);
-            charaPriorityLast.Add(ADVCharaID);
-        }
     }
     private Coroutine CreateEffect(string effectID, int StandPosition, float X, float Y, float Rotate, bool isCharaBehind, bool isLoop, float multiple)
     {
@@ -3803,6 +3802,7 @@ public class player : MonoBehaviour
         CharaMoving.Add(ADVCharaID);
         CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
         Vector2 start = charaProperties.Position;
+        yield return null;
         float timeElapsed = 0f;
         while (timeElapsed < sec)
         {
@@ -3817,6 +3817,35 @@ public class player : MonoBehaviour
         isUpdateCharaPosition.Add(ADVCharaID);
         CharaMoving.RemoveAll(item => item == ADVCharaID);
     }
+        private IEnumerator CharaMoveTo(string ADVCharaID, int Side, float sec, int CurveType)
+    {
+        CharaMoving.Add(ADVCharaID);
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+        int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+        Texture2D texture;
+        if (FaceReferenceImageType == 0)
+        {
+            texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+        }
+        else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
+        Vector2 start = charaProperties.Position;
+        float timeElapsed = 0f;
+        while (timeElapsed < sec)
+        {
+            timeElapsed += Time.deltaTime;
+            float x_axis = Mathf.Lerp(start[0], (667 + texture.width / 2f) * Side, Ease(timeElapsed / sec, CurveType));
+            float y_axis = Mathf.Lerp(start[1], 0, Ease(timeElapsed / sec, CurveType));
+            charaPropertiesDict[ADVCharaID].Position = new Vector2(x_axis, y_axis);
+            isUpdateCharaPosition.Add(ADVCharaID);
+            yield return null;
+        }
+        charaPropertiesDict[ADVCharaID].Position = new Vector2((667 + texture.width / 2f) * Side, 0);
+        isUpdateCharaPosition.Add(ADVCharaID);
+        CharaMoving.RemoveAll(item => item == ADVCharaID);
+    }
+
     private IEnumerator CharaFade(string ADVCharaID, float start, float end, float sec)
     {
         CharaFading.Add(ADVCharaID);
@@ -3926,7 +3955,7 @@ public class player : MonoBehaviour
             texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
         }
         else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
-        charaProperties.RotateCenter = new Vector2((PivotX - 0.5f) * texture.width, (1 - PivotY) * texture.height);
+        charaProperties.RotateCenter = new Vector2((PivotX - 0.5f) * texture.width, (1 - FaceReferenceImageType * Pose.m_FacePivotY - PivotY) * texture.height);
         while (timeElapsed < Sec)
         {
             timeElapsed += Time.deltaTime;
@@ -7056,16 +7085,22 @@ public class player : MonoBehaviour
             charaCoroutinesDict[chara]["destroy"] = StartCoroutine(DestroyAfterAnimation(chara, new List<Coroutine> { }));
         }
         string[] ADVCharaIDs = new string[5] { ADVCharaID, ADVCharaID2, ADVCharaID3, ADVCharaID4, ADVCharaID5 };
-        for (int i = 0; i < 5; i++)
+        int[] order = new int[11] {10,5,4,0,9,6,3,1,8,7,2};
+        for (int i = 0; i < order.Length; i++)
         {
-            if (GetCharaParams(ADVCharaIDs[i]) != null && CharaShots[i] != -1)
+            if (CharaShots.Contains(order[i]))
             {
-                CreateStandpic(ADVCharaIDs[i]);
-                CharaSetPosition(ADVCharaIDs[i], charaShotPx[CharaShots[i]], 0);
-                charaPropertiesDict[ADVCharaIDs[i]].Fade = 1f;
-                isUpdateCharaFade.Add(ADVCharaIDs[i]);
+                int idx = Array.IndexOf(CharaShots, order[i]);
+                if (GetCharaParams(ADVCharaIDs[idx]) != null && CharaShots[idx] != -1)
+                {
+                    CreateStandpic(ADVCharaIDs[idx]);
+                    CharaSetPosition(ADVCharaIDs[idx], charaShotPx[CharaShots[idx]], 0);
+                    charaPropertiesDict[ADVCharaIDs[idx]].Fade = 1f;
+                    isUpdateCharaFade.Add(ADVCharaIDs[idx]);
+                }
             }
         }
+        CharaShots = new int[5] { 0, 1, 2, 3, 4 };
     }
     private void CharaIn(string ADVCharaID, int StandPosition)
     {
@@ -7077,7 +7112,7 @@ public class player : MonoBehaviour
     private void CharaIn(string ADVCharaID, int StandPosition, int StartSide, float Sec, int CurveType, float XOffset)
     {
         CreateStandpic(ADVCharaID);
-        CharaSetPosition(ADVCharaID, charaShotPx[StartSide == 0 ? -1 : -2], 0);
+        CharaSetPosition(ADVCharaID, StartSide == 0 ? -1 : 1);
         charaPropertiesDict[ADVCharaID].Fade = 1f;
         isUpdateCharaFade.Add(ADVCharaID);
         StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset, 0, Sec, CurveType));
@@ -7091,7 +7126,7 @@ public class player : MonoBehaviour
     private void CharaOut(string ADVCharaID, int EndSide, float Sec, int CurveType)
     {
         if (!CharasExist.ContainsKey(ADVCharaID)) { return; }
-        Coroutine MoveCoroutine = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[EndSide == 0 ? -1 : -2], 0, Sec, CurveType));
+        Coroutine MoveCoroutine = StartCoroutine(CharaMoveTo(ADVCharaID, EndSide == 0 ? -1 : 1, Sec, CurveType));
         if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
         charaCoroutinesDict[ADVCharaID]["move"] = MoveCoroutine;
         if (charaCoroutinesDict[ADVCharaID]["destroy"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["destroy"]); }
@@ -7115,11 +7150,11 @@ public class player : MonoBehaviour
     private void CharaInFade(string ADVCharaID, int StandPosition, float Sec, int StartSide, int CurveType, float XOffset)
     {
         CreateStandpic(ADVCharaID);
-        CharaSetPosition(ADVCharaID, charaShotPx[StartSide == 0 ? -1 : -2], 0);
+        CharaSetPosition(ADVCharaID, StartSide == 0 ? -1 : 1);
         if (charaCoroutinesDict[ADVCharaID]["fade"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["fade"]); }
         charaCoroutinesDict[ADVCharaID]["fade"] = StartCoroutine(CharaFade(ADVCharaID, 0f, 1f, Sec));
         if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
-        charaCoroutinesDict[ADVCharaID]["move"] = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset * 2, 0, Sec, CurveType));
+        charaCoroutinesDict[ADVCharaID]["move"] = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset, 0, Sec, CurveType));
     }
     private void CharaOutFade(string ADVCharaID, float Sec)
     {
@@ -7139,7 +7174,7 @@ public class player : MonoBehaviour
         if (chara != null)
         {
             Coroutine FadeCoroutine = StartCoroutine(CharaFade(ADVCharaID, charaPropertiesDict[ADVCharaID].Fade, 0f, Sec));
-            Coroutine MoveCoroutine = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[EndSide == 0 ? -1 : -2], 0, Sec, CurveType));
+            Coroutine MoveCoroutine = StartCoroutine(CharaMoveTo(ADVCharaID, EndSide == 0 ? -1 : 1, Sec, CurveType));
             if (charaCoroutinesDict[ADVCharaID]["fade"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["fade"]); }
             charaCoroutinesDict[ADVCharaID]["fade"] = FadeCoroutine;
             if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
@@ -7156,16 +7191,22 @@ public class player : MonoBehaviour
             charaCoroutinesDict[chara]["destroy"] = StartCoroutine(DestroyAfterAnimation(chara, new List<Coroutine> { }));
         }
         string[] ADVCharaIDs = new string[5] { ADVCharaID, ADVCharaID2, ADVCharaID3, ADVCharaID4, ADVCharaID5 };
-        for (int i = 0; i < 5; i++)
+        int[] order = new int[11] {10,5,4,0,9,6,3,1,8,7,2};
+        for (int i = 0; i < order.Length; i++)
         {
-            if (GetCharaParams(ADVCharaIDs[i]) != null && CharaShots[i] != -1)
+            if (CharaShots.Contains(order[i]))
             {
-                CreateStandpic(ADVCharaIDs[i]);
-                CharaSetPosition(ADVCharaIDs[i], charaShotPx[CharaShots[i]], 0);
-                if (charaCoroutinesDict[ADVCharaIDs[i]]["fade"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaIDs[i]]["fade"]); }
-                charaCoroutinesDict[ADVCharaIDs[i]]["fade"] = StartCoroutine(CharaFade(ADVCharaIDs[i], 0f, 1f, Sec));
+                int idx = Array.IndexOf(CharaShots, order[i]);
+                if (GetCharaParams(ADVCharaIDs[idx]) != null && CharaShots[idx] != -1)
+                {
+                    CreateStandpic(ADVCharaIDs[idx]);
+                    CharaSetPosition(ADVCharaIDs[idx], charaShotPx[CharaShots[idx]], 0);
+                    if (charaCoroutinesDict[ADVCharaIDs[idx]]["fade"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaIDs[idx]]["fade"]); }
+                    charaCoroutinesDict[ADVCharaIDs[idx]]["fade"] = StartCoroutine(CharaFade(ADVCharaIDs[idx], 0f, 1f, Sec));
+                }
             }
         }
+        CharaShots = new int[5] { 0, 1, 2, 3, 4 };
     }
     private void CharaOutAllFade(float Sec)
     {
@@ -7201,6 +7242,7 @@ public class player : MonoBehaviour
     private void CharaPose(string ADVCharaID, string PoseName)
     {
         charaPropertiesDict[ADVCharaID].PoseID = GetCharaParams(ADVCharaID).m_Datas.First(param => param.m_PoseName == PoseName).m_PoseID;
+        charaPropertiesDict[ADVCharaID].FaceID = 0;
         isUpdateCharaPose.Add(ADVCharaID);
         isUpdateCharaFace.Add(ADVCharaID);
         isUpdateCharaFaceTexture.Add(ADVCharaID);
@@ -7217,7 +7259,7 @@ public class player : MonoBehaviour
         forceHighlight.Add(ADVCharaID);
         if (forceShading.Contains(ADVCharaID))
         {
-            forceShading.Remove(ADVCharaID);
+            forceShading.RemoveAll(x => x == ADVCharaID);
         }
         isUpdateHighlight = true;
     }
@@ -7231,11 +7273,11 @@ public class player : MonoBehaviour
     {
         if (forceHighlight.Contains(ADVCharaID))
         {
-            forceHighlight.Remove(ADVCharaID);
+            forceHighlight.RemoveAll(x => x == ADVCharaID);
         }
         if (forceShading.Contains(ADVCharaID))
         {
-            forceShading.Remove(ADVCharaID);
+            forceShading.RemoveAll(x => x == ADVCharaID);
         }
         isUpdateHighlight = true;
     }
@@ -7243,7 +7285,6 @@ public class player : MonoBehaviour
     {
         forceHighlight = new List<string>();
         forceShading = new List<string>();
-        talkingChara = new List<string>();
         isUpdateHighlight = true;
     }
     private void CharaShading(string ADVCharaID)
@@ -7251,7 +7292,7 @@ public class player : MonoBehaviour
         forceShading.Add(ADVCharaID);
         if (forceHighlight.Contains(ADVCharaID))
         {
-            forceHighlight.Remove(ADVCharaID);
+            forceHighlight.RemoveAll(x => x == ADVCharaID);
         }
         isUpdateHighlight = true;
     }
@@ -7263,43 +7304,57 @@ public class player : MonoBehaviour
     }
     private void CharaPriorityTop(string ADVCharaID)
     {
-        charaPriorityMid.Remove(ADVCharaID);
+        charaPriorityFirst.RemoveAll(x => x == ADVCharaID);
+        charaPriorityMid.RemoveAll(x => x == ADVCharaID);
+        charaPriorityLast.RemoveAll(x => x == ADVCharaID);
         charaPriorityMid.Add(ADVCharaID);
         isUpdatePriority = true;
     }
     private void CharaPriorityTopSet(string ADVCharaID)
     {
-        charaPriorityMid.Remove(ADVCharaID);
+        charaPriorityFirst.RemoveAll(x => x == ADVCharaID);
+        charaPriorityMid.RemoveAll(x => x == ADVCharaID);
+        charaPriorityLast.RemoveAll(x => x == ADVCharaID);
         charaPriorityFirst.Add(ADVCharaID);
         isUpdatePriority = true;
     }
     private void CharaPriorityBottom(string ADVCharaID)
     {
-        charaPriorityMid.Remove(ADVCharaID);
+        charaPriorityFirst.RemoveAll(x => x == ADVCharaID);
+        charaPriorityMid.RemoveAll(x => x == ADVCharaID);
+        charaPriorityLast.RemoveAll(x => x == ADVCharaID);
         charaPriorityMid.Insert(0, ADVCharaID);
         isUpdatePriority = true;
     }
     private void CharaPriorityBottomSet(string ADVCharaID)
     {
-        charaPriorityMid.Remove(ADVCharaID);
+        charaPriorityFirst.RemoveAll(x => x == ADVCharaID);
+        charaPriorityMid.RemoveAll(x => x == ADVCharaID);
+        charaPriorityLast.RemoveAll(x => x == ADVCharaID);
         charaPriorityLast.Add(ADVCharaID);
         isUpdatePriority = true;
     }
     private void CharaPriorityReset(string ADVCharaID)
     {
-        if (charaPriorityFirst.Contains(ADVCharaID))
+        int state = 0;
+        if (charaPriorityFirst.Contains(ADVCharaID)) {state = 1;}
+        if (charaPriorityMid.Contains(ADVCharaID)) {state = 2;}
+        if (charaPriorityLast.Contains(ADVCharaID)) {state = 3;}
+        charaPriorityFirst.RemoveAll(x => x == ADVCharaID);
+        charaPriorityMid.RemoveAll(x => x == ADVCharaID);
+        charaPriorityLast.RemoveAll(x => x == ADVCharaID);
+        switch (state)
         {
-            charaPriorityFirst.Remove(ADVCharaID);
+            case 1:
+                charaPriorityMid.Add(ADVCharaID);
+                break;
+            case 3:
+                charaPriorityMid.Insert(0,ADVCharaID);
+                break;
+            default:
+                charaPriorityMid.Add(ADVCharaID);
+                break;
         }
-        if (charaPriorityMid.Contains(ADVCharaID))
-        {
-            charaPriorityMid.Remove(ADVCharaID);
-        }
-        if (charaPriorityLast.Contains(ADVCharaID))
-        {
-            charaPriorityLast.Remove(ADVCharaID);
-        }
-        charaPriorityMid.Add(ADVCharaID);
         isUpdatePriority = true;
     }
     private void Fade(string RGBAStart, string RGBAEnd, float Sec, int CurveType)
@@ -7434,23 +7489,18 @@ public class player : MonoBehaviour
         Dictionary<float, string> XToChara = new Dictionary<float, string>();
         foreach (string ADVCharaID in CharasExist.Keys)
         {
-            Xs.Add(charaPropertiesDict[ADVCharaID].Position.x);
-            XToChara.Add(charaPropertiesDict[ADVCharaID].Position.x, ADVCharaID);
+            float new_x = charaPropertiesDict[ADVCharaID].Position.x;
+            if(Xs.Contains(new_x))
+            {
+                new_x += 0.01f;
+            }
+            Xs.Add(new_x);
+            XToChara.Add(new_x, ADVCharaID);
         }
         Xs.Sort();
-        if (Xs.Count == 2)
+        for (int i = 0; i < Xs.Count; i++)
         {
-            for (int i = 0; i < 2; i++)
-            {
-                StartCoroutine(CharaMoveTo(XToChara[Xs[i]], 444f * (i - 0.5f), 0, Sec, CurveType));
-            }
-        }
-        else if (Xs.Count == 3)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                StartCoroutine(CharaMoveTo(XToChara[Xs[i]], 333f * (i - 1f), 0, Sec, CurveType));
-            }
+            StartCoroutine(CharaMoveTo(XToChara[Xs[i]], 1334f * (i + 1) / (Xs.Count + 1) - 667f, 0, Sec, CurveType));
         }
     }
     private void CharaSwap(string ADVCharaID1, string ADVCharaID2, float Sec, int CurveType)
@@ -7479,7 +7529,36 @@ public class player : MonoBehaviour
             }
         }
         float Offset;
-        if (StartSide == 0) { Offset = charaShotPx[-1] - Xs.Max(); } else { Offset = charaShotPx[-2] - Xs.Min(); }
+        if (StartSide == 0) 
+        { 
+            string ADVCharaID = CharaTargets[Xs.IndexOf(Xs.Max())];
+            CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+            advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+            advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+            Texture2D texture;
+            int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+            if (FaceReferenceImageType == 0)
+            {
+                texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+            }
+            else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
+            Offset = -667f - texture.width / 2f - Xs.Max(); 
+        }
+        else
+        { 
+            string ADVCharaID = CharaTargets[Xs.IndexOf(Xs.Max())];
+            CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+            advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+            advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+            Texture2D texture;
+            int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+            if (FaceReferenceImageType == 0)
+            {
+                texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+            }
+            else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
+            Offset = 667f + texture.width / 2f - Xs.Min(); 
+        }
         for (int i = 0; i < 5; i++)
         {
             if (GetCharaParams(CharaTargets[i]) != null)
@@ -7503,7 +7582,36 @@ public class player : MonoBehaviour
             }
         }
         float Offset;
-        if (EndSide == 0) { Offset = charaShotPx[-1] - Xs.Max(); } else { Offset = charaShotPx[-2] - Xs.Min(); }
+        if (EndSide == 0) 
+        { 
+            string ADVCharaID = CharaTargets[Xs.IndexOf(Xs.Max())];
+            CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+            advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+            advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+            Texture2D texture;
+            int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+            if (FaceReferenceImageType == 0)
+            {
+                texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+            }
+            else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
+            Offset = -667f - texture.width / 2f - Xs.Max(); 
+        }
+        else
+        { 
+            string ADVCharaID = CharaTargets[Xs.IndexOf(Xs.Max())];
+            CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+            advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+            advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+            Texture2D texture;
+            int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+            if (FaceReferenceImageType == 0)
+            {
+                texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+            }
+            else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID]]; }
+            Offset = 667f + texture.width / 2f - Xs.Min(); 
+        }
         for (int i = 0; i < 5; i++)
         {
             if (GetCharaParams(CharaTargets[i]) != null)
@@ -7737,7 +7845,7 @@ public class player : MonoBehaviour
     }
     private void CharaHighlightTalker(string ADVCharaID)
     {
-        talkingChara = new List<string> { ADVCharaID };
+        nextTalkingChara.Add(ADVCharaID);
     }
     private void CharaEmotion(string ADVCharaID, string EmotionID, int EmoPosition)
     {
@@ -7775,59 +7883,56 @@ public class player : MonoBehaviour
             if (GetCharaParams(charaName) != null)
             {
                 advcharacterlist_Params charaParams = GetCharaParams(charaName);
-                if (charaParams == null)
+                if (FaceID != -1)
                 {
-                isUpdateHighlight = true;
-                    isUpdatePriority = true;
-                    autoWait.Add(StartCoroutine(Talk(param, false)));
+                    CharaFace(charaName, FaceID);
                 }
-                else
+                if (EmotionID != "")
                 {
-                    if (FaceID != -1)
+                    StartCoroutine(PlayEmotion(charaName, EmotionID, 0));
+                }
+                talkingChara = new List<string> { charaName };
+                foreach (string chara in nextTalkingChara)
+                {
+                    talkingChara.Add(chara);
+                }
+                nextTalkingChara = new List<string>();
+                isUpdateHighlight = true;
+                isUpdateTalkingCharaPriority = true;
+                isUpdatePriority = true;
+                autoWait.Add(StartCoroutine(Talk(param, false)));
+                if (param.m_voiceLabel != "")
+                {
+                    List<string> voicePaths = new List<string>();
+                    string voiceName = charaName + "_" + param.m_voiceLabel;
+                    string voicePathBase = "";
+                    if (charaParams.m_CueSheet != "")
                     {
-                        CharaFace(charaName, FaceID);
+                        voicePathBase = charaParams.m_CueSheet + @"\" + param.m_voiceLabel + "_";
                     }
-                    if (EmotionID != "")
+                    else if (charaParams.m_NamedType != -1)
                     {
-                        StartCoroutine(PlayEmotion(charaName, EmotionID, 0));
+                        string charaResourceName = advCharaVoiceLabel.m_Params.First(param => param.m_NamedType == charaParams.m_NamedType).m_VoiceLabel;
+                        voicePathBase = charaResourceName + @"\" + param.m_voiceLabel + "_";
                     }
-                    talkingChara = new List<string> { charaName };
-                    isUpdateHighlight = true;
-                    isUpdatePriority = true;
-                    autoWait.Add(StartCoroutine(Talk(param, false)));
-                    if (param.m_voiceLabel != "")
+                    for (int i = 0; i < 100; i++)
                     {
-                        List<string> voicePaths = new List<string>();
-                        string voiceName = charaName + "_" + param.m_voiceLabel;
-                        string voicePathBase = "";
-                        if (charaParams.m_CueSheet != "")
+                        if (webAudio.ContainsKey(voicePathBase + i.ToString("D2")))
                         {
-                            voicePathBase = charaParams.m_CueSheet + @"\" + param.m_voiceLabel + "_";
+                            voicePaths.Add(i.ToString("D2"));
                         }
-                        else if (charaParams.m_NamedType != -1)
-                        {
-                            string charaResourceName = advCharaVoiceLabel.m_Params.First(param => param.m_NamedType == charaParams.m_NamedType).m_VoiceLabel;
-                            voicePathBase = charaResourceName + @"\" + param.m_voiceLabel + "_";
-                        }
-                        for (int i = 0; i < 100; i++)
-                        {
-                            if (webAudio.ContainsKey(voicePathBase + i.ToString("D2")))
-                            {
-                                voicePaths.Add(i.ToString("D2"));
-                            }
-                            else { break; }
-                        }
-                        if (voicePaths.Count > 0)
-                        {
-                            System.Random random = new System.Random();
-                            string voicePath = voicePathBase + voicePaths[random.Next(voicePaths.Count)];
-                            GameObject voice = new GameObject(voiceName);
-                            voice.transform.SetParent(Audios.transform);
-                            AudioSource audioSource = voice.AddComponent<AudioSource>();
-                            voice.transform.position = new Vector3(-1000f, 0f, 0f);
-                            audioSource.clip = webAudio[voicePath];
-                            autoWait.Add(StartCoroutine(PlayTalkVoice(voice)));
-                        }
+                        else { break; }
+                    }
+                    if (voicePaths.Count > 0)
+                    {
+                        System.Random random = new System.Random();
+                        string voicePath = voicePathBase + voicePaths[random.Next(voicePaths.Count)];
+                        GameObject voice = new GameObject(voiceName);
+                        voice.transform.SetParent(Audios.transform);
+                        AudioSource audioSource = voice.AddComponent<AudioSource>();
+                        voice.transform.position = new Vector3(-1000f, 0f, 0f);
+                        audioSource.clip = webAudio[voicePath];
+                        autoWait.Add(StartCoroutine(PlayTalkVoice(voice)));
                     }
                 }
             }
@@ -7842,7 +7947,13 @@ public class player : MonoBehaviour
                         talkingChara.Add(chara1.Key);
                     }
                 }
+                foreach (string chara in talkingChara)
+                {
+                    nextTalkingChara.Add(chara);
+                }
+                nextTalkingChara = new List<string>();
                 isUpdateHighlight = true;
+                isUpdateTalkingCharaPriority = true;
                 isUpdatePriority = true;
                 autoWait.Add(StartCoroutine(Talk(param, false)));
                 if (param.m_voiceLabel != "")
@@ -7884,7 +7995,13 @@ public class player : MonoBehaviour
             else
             {
                 talkingChara = new List<string>();
+                foreach (string chara in nextTalkingChara)
+                {
+                    talkingChara.Add(chara);
+                }
+                nextTalkingChara = new List<string>();
                 isUpdateHighlight = true;
+                isUpdateTalkingCharaPriority = true;
                 isUpdatePriority = true;
                 autoWait.Add(StartCoroutine(Talk(param, false)));
             }
@@ -7892,7 +8009,14 @@ public class player : MonoBehaviour
         else
         {
             talkingChara = new List<string> { };
+            foreach (string chara in nextTalkingChara)
+            {
+                talkingChara.Add(chara);
+            }
+            nextTalkingChara = new List<string>();
             isUpdateHighlight = true;
+            isUpdateTalkingCharaPriority = true;
+            isUpdatePriority = true;
             autoWait.Add(StartCoroutine(Talk(param, true)));
         }
         if (autoSkipCoroutine != null) { StopCoroutine(autoSkipCoroutine); }
@@ -7914,7 +8038,13 @@ public class player : MonoBehaviour
                 StartCoroutine(PlayEmotion(charaName, EmotionID, 0));
             }
             talkingChara = new List<string> { charaName };
+            foreach (string chara in nextTalkingChara)
+            {
+                talkingChara.Add(chara);
+            }
+            nextTalkingChara = new List<string>();
             isUpdateHighlight = true;
+            isUpdateTalkingCharaPriority = true;
             isUpdatePriority = true;
             autoWait.Add(StartCoroutine(Talk(param, false)));
             if (param.m_voiceLabel != "")
@@ -7942,6 +8072,11 @@ public class player : MonoBehaviour
         else
         {
             talkingChara = new List<string> { };
+            foreach (string chara in nextTalkingChara)
+            {
+                talkingChara.Add(chara);
+            }
+            nextTalkingChara = new List<string>();
             isUpdateHighlight = true;
             autoWait.Add(StartCoroutine(Talk(param, true)));
         }
@@ -8417,6 +8552,11 @@ public class player : MonoBehaviour
             UpdateHighlight();
             isUpdateHighlight = false;
         }
+        if (isUpdateTalkingCharaPriority)
+        {
+            UpdateTalkingCharaPriority();
+            isUpdateTalkingCharaPriority = false;
+        }
         if (isUpdatePriority)
         {
             UpdatePriority();
@@ -8435,6 +8575,7 @@ public class player : MonoBehaviour
     private bool isUpdateBGScale = false;
     private bool isUpdateHighlight = false;
     private bool isUpdatePriority = false;
+    private bool isUpdateTalkingCharaPriority = false;
     private void UpdateCharaPosition(string ADVCharaID)
     {
         GameObject chara = FindCached(ADVCharaID);
@@ -8482,7 +8623,6 @@ public class player : MonoBehaviour
             texture.wrapMode = TextureWrapMode.Clamp;
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0f), 1, 0, SpriteMeshType.FullRect);
             spriteRenderer.sprite = sprite;
-            spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
             RectTransform rectTransform = chara.GetComponent<RectTransform>();
             rectTransform.sizeDelta = new Vector2(texture.width, texture.height);
         }
@@ -8514,6 +8654,10 @@ public class player : MonoBehaviour
         CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
         advcharacterlist_Params param = GetCharaParams(ADVCharaID);
         advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+        if(Pose.m_FacePattern == -1)
+        {
+            return;
+        }
         GameObject charaMask = FindCached(ADVCharaID + "_Mask");
         Texture2D texture = new Texture2D(0, 0);
         string maskPath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_Default";
@@ -8623,10 +8767,6 @@ public class player : MonoBehaviour
     {
         int priority = -1000;
         GameObject chara;
-        foreach (string ADVCharaID in talkingChara)
-        {
-            ForwardChara(ADVCharaID);
-        }
         foreach (string ADVCharaID in charaPriorityLast)
         {
             chara = FindCached(ADVCharaID + "_RT");
@@ -8649,6 +8789,27 @@ public class player : MonoBehaviour
             priority++;
         }
     }
+    private void UpdateTalkingCharaPriority()
+    {
+        foreach (string ADVCharaID in talkingChara)
+        {
+            if (charaPriorityFirst.Contains(ADVCharaID))
+            {
+                charaPriorityFirst.Remove(ADVCharaID);
+                charaPriorityFirst.Add(ADVCharaID);
+            }
+            if (charaPriorityMid.Contains(ADVCharaID))
+            {
+                charaPriorityMid.Remove(ADVCharaID);
+                charaPriorityMid.Add(ADVCharaID);
+            }
+            if (charaPriorityLast.Contains(ADVCharaID))
+            {
+                charaPriorityLast.Remove(ADVCharaID);
+                charaPriorityLast.Add(ADVCharaID);
+            }
+        }
+    }
     private void CreateCharaProperties(string ADVCharaID, float x, float y)
     {
         if (!charaPropertiesDict.ContainsKey(ADVCharaID))
@@ -8660,6 +8821,38 @@ public class player : MonoBehaviour
                 FaceID = 0,
                 PoseID = 0,
                 Position = new Vector2(x, y),
+                Scale = 1f,
+                MotOffset = new Vector2(0f, 0f),
+                Angle = 0f,
+                RotateCenter = new Vector2(0f, 0f),
+                HDRFactor = 1f
+            };
+            charaPropertiesDict.Add(ADVCharaID, charaProperties);
+            charaCoroutinesDict.Add(ADVCharaID, new Dictionary<string, Coroutine>{
+                {"fade",null},{"move",null},{"mot",null},{"rotate",null},{"shake",null},{"transparency",null},{"destroy",null},
+            });
+        }
+    }
+    private void CreateCharaProperties(string ADVCharaID, int Side)
+    {
+        if (!charaPropertiesDict.ContainsKey(ADVCharaID))
+        {
+            Texture2D texture;
+            advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+            advclist_Params_Data Pose = param.m_Datas.First(param => param.m_PoseID == 0);
+            int FaceReferenceImageType = GetCharaParamsPoseFaceRefernceImageType(ADVCharaID);
+            if (FaceReferenceImageType == 0)
+            {
+                texture = webTexture[param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID];
+            }
+            else { texture = webTexture[param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[0]]; }
+            CharaProperties charaProperties = new CharaProperties
+            {
+                Fade = 0f,
+                Transparency = 1f,
+                FaceID = 0,
+                PoseID = 0,
+                Position = new Vector2((667 + texture.width / 2f) * Side, 0),
                 Scale = 1f,
                 MotOffset = new Vector2(0f, 0f),
                 Angle = 0f,
@@ -8869,20 +9062,20 @@ public class player : MonoBehaviour
                             {
                                 CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2)], 0);
                             }
-                            else { CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value3) == 0 ? -1 : -2], 0); }
+                            else { CreateCharaProperties(func.m_value1, int.Parse(func.m_value3) == 0 ? -1 : 1, 0); }
                             break;
                         case "CharaInFade":
                             if (func.argNum == 3)
                             {
                                 CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2)], 0);
                             }
-                            else { CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2) == 0 ? -1 : -2], 0); }
+                            else { CreateCharaProperties(func.m_value1, int.Parse(func.m_value3) == 0 ? -1 : 1, 0); }
                             break;
                         case "CharaPosition":
                             CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2)] + float.Parse(func.m_value3), float.Parse(func.m_value4));
                             break;
                         case "CharaMove":
-                            CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2) == 0 ? -1 : -2], 0);
+                            CreateCharaProperties(func.m_value1, int.Parse(func.m_value3) == 0 ? -1 : 1, 0);
                             break;
                         case "CharaShot":
                             if (GetCharaParams(func.m_value1) != null)
@@ -9349,6 +9542,7 @@ public class player : MonoBehaviour
                             WaitBGScale(m_ID);
                         }
                         else { WaitBGScale(); }
+                        nextCommand = false;
                         break;
                     case "CharaTransparency":
                         m_ADVCharaID = func.m_value1;
@@ -9399,6 +9593,7 @@ public class player : MonoBehaviour
                             WaitCharaRotate(m_ADVCharaID);
                         }
                         else { WaitCharaRotate(); }
+                        nextCommand = false;
                         break;
                     case "CharaAlignment":
                         m_Sec = float.Parse(func.m_value1);
@@ -10139,6 +10334,7 @@ public class player : MonoBehaviour
                         break;
                     case "WaitVOICE":
                         WaitVOICE();
+                        nextCommand = false;
                         break;
                     case "StopVOICE":
                         StopVOICE();
