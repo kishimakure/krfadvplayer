@@ -3761,7 +3761,14 @@ public class player : MonoBehaviour
         switch (CharaAnchor)
         {
             case 0:
-                Anchorxy += new Vector2(texture.width / 2f, -(texture.height * (1 - Pose.m_FaceReferenceImageType * Pose.m_FacePivotY) + Pose.m_OffsetY) / 2f);
+                if(Pose.m_FaceReferenceImageType == 1 && Pose.m_FacePivotY == 0.5f)
+                {
+                    Anchorxy += new Vector2(texture.width / 2f, (texture.height * 0.5f + Pose.m_OffsetY) - (texture.height + Pose.m_OffsetY * 0.5f) / 2f);
+                }
+                else
+                {
+                    Anchorxy += new Vector2(texture.width / 2f, -(texture.height * (1 - Pose.m_FaceReferenceImageType * Pose.m_FacePivotY) + Pose.m_OffsetY) / 2f);
+                }
                 break;
             case 1:
                 Anchorxy += new Vector2(Pose.m_FaceX, -Pose.m_FaceY);
@@ -7449,7 +7456,14 @@ public class player : MonoBehaviour
         switch (CharaAnchor)
         {
             case 0:
-                PivotY = (texture.height * (1 - Pose.m_FaceReferenceImageType * Pose.m_FacePivotY) + Pose.m_OffsetY) / 2f / texture.height;
+                if (Pose.m_FaceReferenceImageType == 1 && Pose.m_FacePivotY == 0.5f)
+                {
+                    PivotY = (texture.height * 0.5f + Pose.m_OffsetY -  (texture.height + Pose.m_OffsetY * 0.5f) / 2f) / texture.height;
+                }
+                else
+                {
+                    PivotY = (texture.height * (1 - Pose.m_FaceReferenceImageType * Pose.m_FacePivotY) + Pose.m_OffsetY) / 2f / texture.height;
+                }
                 break;
             case 1:
                 PivotX = Pose.m_FaceX / texture.width;
