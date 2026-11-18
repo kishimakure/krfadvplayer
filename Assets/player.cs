@@ -4367,6 +4367,7 @@ public class player : MonoBehaviour
                 if (param.m_text[i] == '>')
                 {
                     tagging = false;
+                    yield return new WaitForSeconds(0.02f);
                 }
             }
             else
@@ -7161,7 +7162,7 @@ public class player : MonoBehaviour
         if (charaCoroutinesDict[ADVCharaID]["fade"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["fade"]); }
         charaCoroutinesDict[ADVCharaID]["fade"] = StartCoroutine(CharaFade(ADVCharaID, 0f, 1f, Sec));
         if (charaCoroutinesDict[ADVCharaID]["move"] != null) { StopCoroutine(charaCoroutinesDict[ADVCharaID]["move"]); }
-        charaCoroutinesDict[ADVCharaID]["move"] = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset, 0, Sec, CurveType));
+        charaCoroutinesDict[ADVCharaID]["move"] = StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset * (Sec <= 0f ? 2 : 1), 0, Sec, CurveType));
     }
     private void CharaOutFade(string ADVCharaID, float Sec)
     {
