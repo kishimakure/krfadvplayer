@@ -1057,6 +1057,7 @@ public class CharaProperties
     public float Angle;
     public Vector2 RotateCenter;
     public float HDRFactor;
+    public bool IsMoting;
 }
 public class player : MonoBehaviour
 {
@@ -4465,6 +4466,7 @@ public class player : MonoBehaviour
         float timeElapsed;
         List<advmoParams_Datas> datas = param.m_Datas;
         CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        charaProperties.IsMoting = true;
         float finalx = charaProperties.MotOffset[0];
         float finaly = charaProperties.MotOffset[1];
         float finalscale = 1;
@@ -4473,16 +4475,19 @@ public class player : MonoBehaviour
             timeElapsed = 0f;
             if (datas[i].m_Action == 1)
             {
-                Vector2 start = charaProperties.MotOffset;
+                Vector2 start = charaProperties.ShakeOffset;
                 float endx = datas[i].m_X;
                 float endy = datas[i].m_Y;
-                finalx = endx;
-                finaly = endy;
+                finalx = endx + start.x;
+                finaly = endy + start.y;
+                charaProperties.IsMoting = false;
+                yield return null;
+                charaProperties.IsMoting = true;
                 while (timeElapsed < datas[i].m_Duration)
                 {
                     timeElapsed += Time.deltaTime;
-                    float x_axis = Mathf.Lerp(start[0], endx, Ease(timeElapsed / datas[i].m_Duration, datas[i].m_EaseType));
-                    float y_axis = Mathf.Lerp(start[1], endy, Ease(timeElapsed / datas[i].m_Duration, datas[i].m_EaseType));
+                    float x_axis = Mathf.Lerp(start.x, endx, Ease(timeElapsed / datas[i].m_Duration, datas[i].m_EaseType));
+                    float y_axis = Mathf.Lerp(start.y, endy, Ease(timeElapsed / datas[i].m_Duration, datas[i].m_EaseType));
                     charaProperties.MotOffset = new Vector2(x_axis, y_axis);
                     isUpdateCharaPosition.Add(ADVCharaID);
                     yield return null;
@@ -4493,6 +4498,7 @@ public class player : MonoBehaviour
                 float start = charaProperties.Scale;
                 float endx = datas[i].m_X;
                 finalscale = endx;
+                yield return null;
                 while (timeElapsed < datas[i].m_Duration)
                 {
                     timeElapsed += Time.deltaTime;
@@ -4511,6 +4517,7 @@ public class player : MonoBehaviour
                 }
             }
         }
+        charaProperties.IsMoting = false;
         charaProperties.MotOffset = new Vector2(finalx, finaly);
         charaProperties.Scale = finalscale;
         isUpdateCharaPosition.Add(ADVCharaID);
@@ -8468,363 +8475,6 @@ public class player : MonoBehaviour
     {
         StartCoroutine(StoppingVOICE());
     }
-    private void UpdateGame()
-    {
-        foreach (string ADVCharaID in isUpdateCharaPosition)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaPosition(ADVCharaID);
-        }
-        isUpdateCharaPosition.Clear();
-        foreach (string ADVCharaID in isUpdateCharaPose)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaPose(ADVCharaID);
-        }
-        isUpdateCharaPose.Clear();
-        foreach (string ADVCharaID in isUpdateCharaFace)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaFace(ADVCharaID);
-        }
-        isUpdateCharaFace.Clear();
-        foreach (string ADVCharaID in isUpdateCharaFaceTexture)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaFaceTexture(ADVCharaID);
-        }
-        isUpdateCharaFaceTexture.Clear();
-        foreach (string ADVCharaID in isUpdateCharaFade)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaFade(ADVCharaID);
-        }
-        isUpdateCharaFade.Clear();
-        foreach (string ADVCharaID in isUpdateCharaTransparency)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaTransparency(ADVCharaID);
-        }
-        isUpdateCharaTransparency.Clear();
-        foreach (string ADVCharaID in isUpdateCharaHDRFactor)
-        {
-            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
-            UpdateCharaHDRFactor(ADVCharaID);
-        }
-        isUpdateCharaHDRFactor.Clear();
-        foreach (string ADVCharaID in isUpdateCharaDestroy)
-        {
-            foreach (Coroutine coroutine in charaCoroutinesDict[ADVCharaID].Values)
-            {
-                if (coroutine == null) { continue; }
-                StopCoroutine(coroutine);
-            }
-            while (CharaMoving.Remove(ADVCharaID)) { }
-            while (CharaRotating.Remove(ADVCharaID)) { }
-            while (CharaMotioning.Remove(ADVCharaID)) { }
-            while (CharaFading.Remove(ADVCharaID)) { }
-            //charaPriorityFirst.RemoveAll(item=>item==ADVCharaID);
-            //charaPriorityMid.RemoveAll(item=>item==ADVCharaID);
-            //charaPriorityLast.RemoveAll(item=>item==ADVCharaID);
-            while (highlightChara.Remove(ADVCharaID)) { }
-            while (forceHighlight.Remove(ADVCharaID)) { }
-            while (forceShading.Remove(ADVCharaID)) { }
-            CharasExist.Remove(ADVCharaID);
-            CharasLayer.Remove(ADVCharaID);
-            charaCoroutinesDict[ADVCharaID] = new Dictionary<string, Coroutine>{
-                {"fade",null},{"move",null},{"mot",null},{"rotate",null},{"shake",null},{"transparency",null},{"destroy",null},
-            };
-            GameObject chara = FindCached(ADVCharaID);
-            foreach(SpriteRenderer spriteRenderer in chara.GetComponentsInChildren<SpriteRenderer>())
-            {
-                Destroy(spriteRenderer.material);
-            }
-            Destroy(chara);
-            RemoveCachedGameObject(ADVCharaID);
-            GameObject charaCamera = FindCached(ADVCharaID + "_Camera");
-            Destroy(charaCamera);
-            RemoveCachedGameObject(ADVCharaID + "_Camera");
-            GameObject charaRT = FindCached(ADVCharaID + "_RT");
-            Destroy(charaRT.GetComponent<MeshRenderer>().material);
-            Destroy(charaRT);
-            RemoveCachedGameObject(ADVCharaID + "_RT");
-            RemoveCachedGameObject(ADVCharaID + "_Face");
-            RemoveCachedGameObject(ADVCharaID + "_Mask");
-        }
-        isUpdateCharaDestroy.Clear();
-        if (isUpdateBGPosition)
-        {
-            UpdateBGPosition();
-            isUpdateBGPosition = false;
-        }
-        if (isUpdateBGScale)
-        {
-            UpdateBGScale();
-            isUpdateBGScale = false;
-        }
-        if (isUpdateHighlight)
-        {
-            UpdateHighlight();
-            isUpdateHighlight = false;
-        }
-        if (isUpdateTalkingCharaPriority)
-        {
-            UpdateTalkingCharaPriority();
-            isUpdateTalkingCharaPriority = false;
-        }
-        if (isUpdatePriority)
-        {
-            UpdatePriority();
-            isUpdatePriority = false;
-        }
-    }
-    private HashSet<string> isUpdateCharaDestroy = new HashSet<string>();
-    private HashSet<string> isUpdateCharaPosition = new HashSet<string>();
-    private HashSet<string> isUpdateCharaPose = new HashSet<string>();
-    private HashSet<string> isUpdateCharaFace = new HashSet<string>();
-    private HashSet<string> isUpdateCharaFaceTexture = new HashSet<string>();
-    private HashSet<string> isUpdateCharaFade = new HashSet<string>();
-    private HashSet<string> isUpdateCharaTransparency = new HashSet<string>();
-    private HashSet<string> isUpdateCharaHDRFactor = new HashSet<string>();
-    private bool isUpdateBGPosition = false;
-    private bool isUpdateBGScale = false;
-    private bool isUpdateHighlight = false;
-    private bool isUpdatePriority = false;
-    private bool isUpdateTalkingCharaPriority = false;
-    private void UpdateCharaPosition(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID);
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
-        RectTransform rectTransform = chara.GetComponent<RectTransform>();
-        double a = 1 - Math.Cos(charaProperties.Angle * Mathf.Deg2Rad);
-        double b = -Math.Sin(charaProperties.Angle * Mathf.Deg2Rad);
-        double dx = charaProperties.RotateCenter.x * a - charaProperties.RotateCenter.y * b;
-        double dy = charaProperties.RotateCenter.y * a + charaProperties.RotateCenter.x * b;
-        float x = (float)dx + GetCharaParamsPose(ADVCharaID).m_OffsetX + charaProperties.Position.x + charaProperties.MotOffset.x + charaProperties.ShakeOffset.x;
-        float y = (float)dy + GetCharaParamsPose(ADVCharaID).m_OffsetY + charaProperties.Position.y + charaProperties.MotOffset.y + charaProperties.ShakeOffset.y;
-        rectTransform.anchoredPosition = new Vector3(x, y + 10000f, 0f);
-        rectTransform.localRotation = Quaternion.Euler(0f, 0f, charaProperties.Angle);
-        rectTransform.localScale = new Vector3(charaProperties.Scale, charaProperties.Scale, 1f);
-    }
-    private void UpdateCharaPose(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID);
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        advcharacterlist_Params param = GetCharaParams(ADVCharaID);
-        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
-        if (Pose.m_FaceReferenceImageType == 0)
-        {
-            charaPropertiesDict[ADVCharaID].PoseID = Pose.m_PoseID;
-            string posePath = param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID;
-            SpriteRenderer spriteRenderer = chara.GetComponent<SpriteRenderer>();
-            Texture2D texture = new Texture2D(0, 0);
-            if (webTexture.ContainsKey(posePath))
-            {
-                texture = webTexture[posePath];
-            }
-            else
-            {
-                //Debug.LogError("Texture Not Found: "+posePath);
-            }
-            texture.wrapMode = TextureWrapMode.Clamp;
-            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0f), 1, 0, SpriteMeshType.FullRect);
-            spriteRenderer.sprite = sprite;
-            RectTransform rectTransform = chara.GetComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(texture.width, texture.height);
-        }
-    }
-    private void UpdateCharaFace(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID);
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
-        GameObject charaMask = FindCached(ADVCharaID + "_Mask");
-        RectTransform rectTransform = charaMask.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = new Vector3(Pose.m_FacePicX, -Pose.m_FacePicY, 0f);
-        GameObject charaFace = FindCached(ADVCharaID + "_Face");
-        rectTransform = charaFace.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = new Vector3(Pose.m_FacePicX, -Pose.m_FacePicY, 0f);
-    }
-    private void UpdateCharaFaceTexture(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID);
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
-        advcharacterlist_Params param = GetCharaParams(ADVCharaID);
-        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
-        if(Pose.m_FacePattern == -1)
-        {
-            return;
-        }
-        GameObject charaMask = FindCached(ADVCharaID + "_Mask");
-        Texture2D texture = new Texture2D(0, 0);
-        string maskPath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_Default";
-        if (webTexture.ContainsKey(maskPath))
-        {
-            texture = webTexture[maskPath];
-        }
-        else
-        {
-            //Debug.LogError("Texture Not Found: "+maskPath);
-        }
-        texture.wrapMode = TextureWrapMode.Clamp;
-        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(Pose.m_FacePivotX, Pose.m_FacePivotY), 1, 0, SpriteMeshType.FullRect);
-        charaMask.GetComponent<SpriteMask>().sprite = sprite;
-        GameObject charaFace = FindCached(ADVCharaID + "_Face");
-        texture = new Texture2D(0, 0);
-        string facePath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID];
-        if (webTexture.ContainsKey(facePath))
-        {
-            texture = webTexture[facePath];
-        }
-        else
-        {
-            //Debug.LogError("Texture Not Found: "+facePath);
-        }
-        texture.wrapMode = TextureWrapMode.Clamp;
-        sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(Pose.m_FacePivotX, Pose.m_FacePivotY), 1, 0, SpriteMeshType.FullRect);
-        SpriteRenderer spriteRenderer = charaFace.GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = sprite;
-    }
-    private void UpdateCharaFade(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID);
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
-        SpriteRenderer sr = chara.GetComponent<SpriteRenderer>();
-        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, charaProperties.Fade);
-        FindCached(ADVCharaID + "_Face").GetComponent<SpriteRenderer>().color = new Color(sr.color.r, sr.color.g, sr.color.b, charaProperties.Fade);
-    }
-    private void UpdateCharaTransparency(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID + "_RT");
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
-        chara.GetComponent<MeshRenderer>().material.SetColor(_MeshColor, new Color(1f, 1f, 1f, charaProperties.Transparency));
-    }
-    private void UpdateCharaHDRFactor(string ADVCharaID)
-    {
-        GameObject chara = FindCached(ADVCharaID + "_RT");
-        if (chara == null)
-        {
-            //Debug.LogError("Chara Not Found: "+ADVCharaID);
-            return;
-        }
-        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
-        chara.GetComponent<MeshRenderer>().material.SetFloat(_HDRFactor, charaProperties.HDRFactor);
-    }
-    private void UpdateBGPosition()
-    {
-        foreach (uint id in bgCoroutinesDict.Keys)
-        {
-            GameObject bg = FindCached("bg_" + id.ToString());
-            BGProperties bgProperties = bg.GetComponent<BGProperties>();
-            bg.GetComponent<RectTransform>().anchoredPosition = bgProperties.Position + bgProperties.ShakeOffset;
-        }
-    }
-    private void UpdateBGScale()
-    {
-        foreach (uint id in bgCoroutinesDict.Keys)
-        {
-            GameObject bg = FindCached("bg_" + id.ToString());
-            BGProperties bgProperties = bg.GetComponent<BGProperties>();
-            bg.GetComponent<RectTransform>().localScale = new Vector3(0.6510415f * bgProperties.Scale, 0.6510415f * bgProperties.Scale, 1f);
-        }
-    }
-    private void UpdateHighlight()
-    {
-        foreach (string ADVCharaID in CharasExist.Keys)
-        {
-            if (forceHighlight.Contains(ADVCharaID))
-            {
-                Highlight(ADVCharaID);
-            }
-            else if (forceShading.Contains(ADVCharaID))
-            {
-                Shading(ADVCharaID);
-            }
-            else if (talkingChara.Contains(ADVCharaID) && textCanvasVisible)
-            {
-                Highlight(ADVCharaID);
-            }
-            else
-            {
-                Shading(ADVCharaID);
-            }
-        }
-    }
-    private void UpdatePriority()
-    {
-        int priority = -1000;
-        GameObject chara;
-        foreach (string ADVCharaID in charaPriorityLast)
-        {
-            chara = FindCached(ADVCharaID + "_RT");
-            if (chara == null) { continue; }
-            chara.GetComponent<MeshRenderer>().sortingOrder = priority;
-            priority++;
-        }
-        foreach (string ADVCharaID in charaPriorityMid)
-        {
-            chara = FindCached(ADVCharaID + "_RT");
-            if (chara == null) { continue; }
-            chara.GetComponent<MeshRenderer>().sortingOrder = priority;
-            priority++;
-        }
-        foreach (string ADVCharaID in charaPriorityFirst)
-        {
-            chara = FindCached(ADVCharaID + "_RT");
-            if (chara == null) { continue; }
-            chara.GetComponent<MeshRenderer>().sortingOrder = priority;
-            priority++;
-        }
-    }
-    private void UpdateTalkingCharaPriority()
-    {
-        foreach (string ADVCharaID in talkingChara)
-        {
-            if (charaPriorityFirst.Contains(ADVCharaID))
-            {
-                charaPriorityFirst.Remove(ADVCharaID);
-                charaPriorityFirst.Add(ADVCharaID);
-            }
-            if (charaPriorityMid.Contains(ADVCharaID))
-            {
-                charaPriorityMid.Remove(ADVCharaID);
-                charaPriorityMid.Add(ADVCharaID);
-            }
-            if (charaPriorityLast.Contains(ADVCharaID))
-            {
-                charaPriorityLast.Remove(ADVCharaID);
-                charaPriorityLast.Add(ADVCharaID);
-            }
-        }
-    }
     private void CreateCharaProperties(string ADVCharaID, float x, float y)
     {
         if (!charaPropertiesDict.ContainsKey(ADVCharaID))
@@ -8840,7 +8490,8 @@ public class player : MonoBehaviour
                 MotOffset = new Vector2(0f, 0f),
                 Angle = 0f,
                 RotateCenter = new Vector2(0f, 0f),
-                HDRFactor = 1f
+                HDRFactor = 1f,
+                IsMoting = false
             };
             charaPropertiesDict.Add(ADVCharaID, charaProperties);
             charaCoroutinesDict.Add(ADVCharaID, new Dictionary<string, Coroutine>{
@@ -8872,7 +8523,8 @@ public class player : MonoBehaviour
                 MotOffset = new Vector2(0f, 0f),
                 Angle = 0f,
                 RotateCenter = new Vector2(0f, 0f),
-                HDRFactor = 1f
+                HDRFactor = 1f,
+                IsMoting = false
             };
             charaPropertiesDict.Add(ADVCharaID, charaProperties);
             charaCoroutinesDict.Add(ADVCharaID, new Dictionary<string, Coroutine>{
@@ -10350,7 +10002,364 @@ public class player : MonoBehaviour
                         break;
                 }
             }
-            UpdateGame();
         }
     }
+        void LateUpdate()
+    {
+        foreach (string ADVCharaID in isUpdateCharaPosition)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaPosition(ADVCharaID);
+        }
+        isUpdateCharaPosition.Clear();
+        foreach (string ADVCharaID in isUpdateCharaPose)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaPose(ADVCharaID);
+        }
+        isUpdateCharaPose.Clear();
+        foreach (string ADVCharaID in isUpdateCharaFace)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaFace(ADVCharaID);
+        }
+        isUpdateCharaFace.Clear();
+        foreach (string ADVCharaID in isUpdateCharaFaceTexture)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaFaceTexture(ADVCharaID);
+        }
+        isUpdateCharaFaceTexture.Clear();
+        foreach (string ADVCharaID in isUpdateCharaFade)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaFade(ADVCharaID);
+        }
+        isUpdateCharaFade.Clear();
+        foreach (string ADVCharaID in isUpdateCharaTransparency)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaTransparency(ADVCharaID);
+        }
+        isUpdateCharaTransparency.Clear();
+        foreach (string ADVCharaID in isUpdateCharaHDRFactor)
+        {
+            if (isUpdateCharaDestroy.Contains(ADVCharaID)) { continue; }
+            UpdateCharaHDRFactor(ADVCharaID);
+        }
+        isUpdateCharaHDRFactor.Clear();
+        foreach (string ADVCharaID in isUpdateCharaDestroy)
+        {
+            foreach (Coroutine coroutine in charaCoroutinesDict[ADVCharaID].Values)
+            {
+                if (coroutine == null) { continue; }
+                StopCoroutine(coroutine);
+            }
+            while (CharaMoving.Remove(ADVCharaID)) { }
+            while (CharaRotating.Remove(ADVCharaID)) { }
+            while (CharaMotioning.Remove(ADVCharaID)) { }
+            while (CharaFading.Remove(ADVCharaID)) { }
+            //charaPriorityFirst.RemoveAll(item=>item==ADVCharaID);
+            //charaPriorityMid.RemoveAll(item=>item==ADVCharaID);
+            //charaPriorityLast.RemoveAll(item=>item==ADVCharaID);
+            while (highlightChara.Remove(ADVCharaID)) { }
+            while (forceHighlight.Remove(ADVCharaID)) { }
+            while (forceShading.Remove(ADVCharaID)) { }
+            CharasExist.Remove(ADVCharaID);
+            CharasLayer.Remove(ADVCharaID);
+            charaCoroutinesDict[ADVCharaID] = new Dictionary<string, Coroutine>{
+                {"fade",null},{"move",null},{"mot",null},{"rotate",null},{"shake",null},{"transparency",null},{"destroy",null},
+            };
+            GameObject chara = FindCached(ADVCharaID);
+            foreach(SpriteRenderer spriteRenderer in chara.GetComponentsInChildren<SpriteRenderer>())
+            {
+                Destroy(spriteRenderer.material);
+            }
+            Destroy(chara);
+            RemoveCachedGameObject(ADVCharaID);
+            GameObject charaCamera = FindCached(ADVCharaID + "_Camera");
+            Destroy(charaCamera);
+            RemoveCachedGameObject(ADVCharaID + "_Camera");
+            GameObject charaRT = FindCached(ADVCharaID + "_RT");
+            Destroy(charaRT.GetComponent<MeshRenderer>().material);
+            Destroy(charaRT);
+            RemoveCachedGameObject(ADVCharaID + "_RT");
+            RemoveCachedGameObject(ADVCharaID + "_Face");
+            RemoveCachedGameObject(ADVCharaID + "_Mask");
+        }
+        isUpdateCharaDestroy.Clear();
+        if (isUpdateBGPosition)
+        {
+            UpdateBGPosition();
+            isUpdateBGPosition = false;
+        }
+        if (isUpdateBGScale)
+        {
+            UpdateBGScale();
+            isUpdateBGScale = false;
+        }
+        if (isUpdateHighlight)
+        {
+            UpdateHighlight();
+            isUpdateHighlight = false;
+        }
+        if (isUpdateTalkingCharaPriority)
+        {
+            UpdateTalkingCharaPriority();
+            isUpdateTalkingCharaPriority = false;
+        }
+        if (isUpdatePriority)
+        {
+            UpdatePriority();
+            isUpdatePriority = false;
+        }
+    }
+    private HashSet<string> isUpdateCharaDestroy = new HashSet<string>();
+    private HashSet<string> isUpdateCharaPosition = new HashSet<string>();
+    private HashSet<string> isUpdateCharaPose = new HashSet<string>();
+    private HashSet<string> isUpdateCharaFace = new HashSet<string>();
+    private HashSet<string> isUpdateCharaFaceTexture = new HashSet<string>();
+    private HashSet<string> isUpdateCharaFade = new HashSet<string>();
+    private HashSet<string> isUpdateCharaTransparency = new HashSet<string>();
+    private HashSet<string> isUpdateCharaHDRFactor = new HashSet<string>();
+    private bool isUpdateBGPosition = false;
+    private bool isUpdateBGScale = false;
+    private bool isUpdateHighlight = false;
+    private bool isUpdatePriority = false;
+    private bool isUpdateTalkingCharaPriority = false;
+    private void UpdateCharaPosition(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID);
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        RectTransform rectTransform = chara.GetComponent<RectTransform>();
+        double a = 1 - Math.Cos(charaProperties.Angle * Mathf.Deg2Rad);
+        double b = -Math.Sin(charaProperties.Angle * Mathf.Deg2Rad);
+        double dx = charaProperties.RotateCenter.x * a - charaProperties.RotateCenter.y * b;
+        double dy = charaProperties.RotateCenter.y * a + charaProperties.RotateCenter.x * b;
+        float x = (float)dx + GetCharaParamsPose(ADVCharaID).m_OffsetX + charaProperties.Position.x + charaProperties.MotOffset.x + charaProperties.ShakeOffset.x * (charaProperties.IsMoting ? 0f : 1f);
+        float y = (float)dy + GetCharaParamsPose(ADVCharaID).m_OffsetY + charaProperties.Position.y + charaProperties.MotOffset.y + charaProperties.ShakeOffset.y * (charaProperties.IsMoting ? 0f : 1f);
+        rectTransform.anchoredPosition = new Vector3(x, y + 10000f, 0f);
+        rectTransform.localRotation = Quaternion.Euler(0f, 0f, charaProperties.Angle);
+        rectTransform.localScale = new Vector3(charaProperties.Scale, charaProperties.Scale, 1f);
+    }
+    private void UpdateCharaPose(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID);
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+        if (Pose.m_FaceReferenceImageType == 0)
+        {
+            charaPropertiesDict[ADVCharaID].PoseID = Pose.m_PoseID;
+            string posePath = param.m_ResourceBaseName + "_StandPic_" + Pose.m_PoseID;
+            SpriteRenderer spriteRenderer = chara.GetComponent<SpriteRenderer>();
+            Texture2D texture = new Texture2D(0, 0);
+            if (webTexture.ContainsKey(posePath))
+            {
+                texture = webTexture[posePath];
+            }
+            else
+            {
+                //Debug.LogError("Texture Not Found: "+posePath);
+            }
+            texture.wrapMode = TextureWrapMode.Clamp;
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0f), 1, 0, SpriteMeshType.FullRect);
+            spriteRenderer.sprite = sprite;
+            RectTransform rectTransform = chara.GetComponent<RectTransform>();
+            rectTransform.sizeDelta = new Vector2(texture.width, texture.height);
+        }
+    }
+    private void UpdateCharaFace(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID);
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+        GameObject charaMask = FindCached(ADVCharaID + "_Mask");
+        RectTransform rectTransform = charaMask.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = new Vector3(Pose.m_FacePicX, -Pose.m_FacePicY, 0f);
+        GameObject charaFace = FindCached(ADVCharaID + "_Face");
+        rectTransform = charaFace.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = new Vector3(Pose.m_FacePicX, -Pose.m_FacePicY, 0f);
+    }
+    private void UpdateCharaFaceTexture(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID);
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        advcharacterlist_Params param = GetCharaParams(ADVCharaID);
+        advclist_Params_Data Pose = GetCharaParamsPose(ADVCharaID);
+        if(Pose.m_FacePattern == -1)
+        {
+            return;
+        }
+        GameObject charaMask = FindCached(ADVCharaID + "_Mask");
+        Texture2D texture = new Texture2D(0, 0);
+        string maskPath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_Default";
+        if (webTexture.ContainsKey(maskPath))
+        {
+            texture = webTexture[maskPath];
+        }
+        else
+        {
+            //Debug.LogError("Texture Not Found: "+maskPath);
+        }
+        texture.wrapMode = TextureWrapMode.Clamp;
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(Pose.m_FacePivotX, Pose.m_FacePivotY), 1, 0, SpriteMeshType.FullRect);
+        charaMask.GetComponent<SpriteMask>().sprite = sprite;
+        GameObject charaFace = FindCached(ADVCharaID + "_Face");
+        texture = new Texture2D(0, 0);
+        string facePath = param.m_ResourceBaseName + "_Face_" + Pose.m_FacePattern + "_" + charaFaceID[charaProperties.FaceID];
+        if (webTexture.ContainsKey(facePath))
+        {
+            texture = webTexture[facePath];
+        }
+        else
+        {
+            //Debug.LogError("Texture Not Found: "+facePath);
+        }
+        texture.wrapMode = TextureWrapMode.Clamp;
+        sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(Pose.m_FacePivotX, Pose.m_FacePivotY), 1, 0, SpriteMeshType.FullRect);
+        SpriteRenderer spriteRenderer = charaFace.GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = sprite;
+    }
+    private void UpdateCharaFade(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID);
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        SpriteRenderer sr = chara.GetComponent<SpriteRenderer>();
+        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, charaProperties.Fade);
+        FindCached(ADVCharaID + "_Face").GetComponent<SpriteRenderer>().color = new Color(sr.color.r, sr.color.g, sr.color.b, charaProperties.Fade);
+    }
+    private void UpdateCharaTransparency(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID + "_RT");
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        chara.GetComponent<MeshRenderer>().material.SetColor(_MeshColor, new Color(1f, 1f, 1f, charaProperties.Transparency));
+    }
+    private void UpdateCharaHDRFactor(string ADVCharaID)
+    {
+        GameObject chara = FindCached(ADVCharaID + "_RT");
+        if (chara == null)
+        {
+            //Debug.LogError("Chara Not Found: "+ADVCharaID);
+            return;
+        }
+        CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
+        chara.GetComponent<MeshRenderer>().material.SetFloat(_HDRFactor, charaProperties.HDRFactor);
+    }
+    private void UpdateBGPosition()
+    {
+        foreach (uint id in bgCoroutinesDict.Keys)
+        {
+            GameObject bg = FindCached("bg_" + id.ToString());
+            BGProperties bgProperties = bg.GetComponent<BGProperties>();
+            bg.GetComponent<RectTransform>().anchoredPosition = bgProperties.Position + bgProperties.ShakeOffset;
+        }
+    }
+    private void UpdateBGScale()
+    {
+        foreach (uint id in bgCoroutinesDict.Keys)
+        {
+            GameObject bg = FindCached("bg_" + id.ToString());
+            BGProperties bgProperties = bg.GetComponent<BGProperties>();
+            bg.GetComponent<RectTransform>().localScale = new Vector3(0.6510415f * bgProperties.Scale, 0.6510415f * bgProperties.Scale, 1f);
+        }
+    }
+    private void UpdateHighlight()
+    {
+        foreach (string ADVCharaID in CharasExist.Keys)
+        {
+            if (forceHighlight.Contains(ADVCharaID))
+            {
+                Highlight(ADVCharaID);
+            }
+            else if (forceShading.Contains(ADVCharaID))
+            {
+                Shading(ADVCharaID);
+            }
+            else if (talkingChara.Contains(ADVCharaID) && textCanvasVisible)
+            {
+                Highlight(ADVCharaID);
+            }
+            else
+            {
+                Shading(ADVCharaID);
+            }
+        }
+    }
+    private void UpdatePriority()
+    {
+        int priority = -1000;
+        GameObject chara;
+        foreach (string ADVCharaID in charaPriorityLast)
+        {
+            chara = FindCached(ADVCharaID + "_RT");
+            if (chara == null) { continue; }
+            chara.GetComponent<MeshRenderer>().sortingOrder = priority;
+            priority++;
+        }
+        foreach (string ADVCharaID in charaPriorityMid)
+        {
+            chara = FindCached(ADVCharaID + "_RT");
+            if (chara == null) { continue; }
+            chara.GetComponent<MeshRenderer>().sortingOrder = priority;
+            priority++;
+        }
+        foreach (string ADVCharaID in charaPriorityFirst)
+        {
+            chara = FindCached(ADVCharaID + "_RT");
+            if (chara == null) { continue; }
+            chara.GetComponent<MeshRenderer>().sortingOrder = priority;
+            priority++;
+        }
+    }
+    private void UpdateTalkingCharaPriority()
+    {
+        foreach (string ADVCharaID in talkingChara)
+        {
+            if (charaPriorityFirst.Contains(ADVCharaID))
+            {
+                charaPriorityFirst.Remove(ADVCharaID);
+                charaPriorityFirst.Add(ADVCharaID);
+            }
+            if (charaPriorityMid.Contains(ADVCharaID))
+            {
+                charaPriorityMid.Remove(ADVCharaID);
+                charaPriorityMid.Add(ADVCharaID);
+            }
+            if (charaPriorityLast.Contains(ADVCharaID))
+            {
+                charaPriorityLast.Remove(ADVCharaID);
+                charaPriorityLast.Add(ADVCharaID);
+            }
+        }
+    }
+
 }
