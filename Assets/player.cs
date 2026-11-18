@@ -9072,89 +9072,81 @@ public class player : MonoBehaviour
                             }
                             break;
                         case "CharaIn":
-                            if (func.argNum == 2)
-                            {
-                                CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2)], 0);
-                            }
-                            else { CreateCharaProperties(func.m_value1, int.Parse(func.m_value3) == 0 ? -1 : 1, 0); }
+                            CreateCharaProperties(func.m_value1, 0, 0);
                             break;
                         case "CharaInFade":
-                            if (func.argNum == 3)
-                            {
-                                CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2)], 0);
-                            }
-                            else { CreateCharaProperties(func.m_value1, int.Parse(func.m_value3) == 0 ? -1 : 1, 0); }
+                            CreateCharaProperties(func.m_value1, 0, 0);
                             break;
                         case "CharaPosition":
-                            CreateCharaProperties(func.m_value1, charaShotPx[int.Parse(func.m_value2)] + float.Parse(func.m_value3), float.Parse(func.m_value4));
+                            CreateCharaProperties(func.m_value1, 0, 0);
                             break;
                         case "CharaMove":
-                            CreateCharaProperties(func.m_value1, int.Parse(func.m_value3) == 0 ? -1 : 1, 0);
+                            CreateCharaProperties(func.m_value1, 0, 0);
                             break;
                         case "CharaShot":
                             if (GetCharaParams(func.m_value1) != null)
                             {
-                                CreateCharaProperties(func.m_value1, charaShotPx[CharaShotsPreRead[0]], 0);
+                                CreateCharaProperties(func.m_value1, 0, 0);
                             }
                             if (GetCharaParams(func.m_value2) != null)
                             {
-                                CreateCharaProperties(func.m_value2, charaShotPx[CharaShotsPreRead[1]], 0);
+                                CreateCharaProperties(func.m_value2, 0, 0);
                             }
                             if (GetCharaParams(func.m_value3) != null)
                             {
-                                CreateCharaProperties(func.m_value3, charaShotPx[CharaShotsPreRead[2]], 0);
+                                CreateCharaProperties(func.m_value3, 0, 0);
                             }
                             if (GetCharaParams(func.m_value4) != null)
                             {
-                                CreateCharaProperties(func.m_value4, charaShotPx[CharaShotsPreRead[3]], 0);
+                                CreateCharaProperties(func.m_value4, 0, 0);
                             }
                             if (GetCharaParams(func.m_value5) != null)
                             {
-                                CreateCharaProperties(func.m_value5, charaShotPx[CharaShotsPreRead[4]], 0);
+                                CreateCharaProperties(func.m_value5, 0, 0);
                             }
                             break;
                         case "CharaShotFade":
                             if (GetCharaParams(func.m_value1) != null)
                             {
-                                CreateCharaProperties(func.m_value1, charaShotPx[CharaShotsPreRead[0]], 0);
+                                CreateCharaProperties(func.m_value1, 0, 0);
                             }
                             if (GetCharaParams(func.m_value2) != null)
                             {
-                                CreateCharaProperties(func.m_value2, charaShotPx[CharaShotsPreRead[1]], 0);
+                                CreateCharaProperties(func.m_value2, 0, 0);
                             }
                             if (GetCharaParams(func.m_value3) != null)
                             {
-                                CreateCharaProperties(func.m_value3, charaShotPx[CharaShotsPreRead[2]], 0);
+                                CreateCharaProperties(func.m_value3, 0, 0);
                             }
                             if (GetCharaParams(func.m_value4) != null)
                             {
-                                CreateCharaProperties(func.m_value4, charaShotPx[CharaShotsPreRead[3]], 0);
+                                CreateCharaProperties(func.m_value4, 0, 0);
                             }
                             if (GetCharaParams(func.m_value5) != null)
                             {
-                                CreateCharaProperties(func.m_value5, charaShotPx[CharaShotsPreRead[4]], 0);
+                                CreateCharaProperties(func.m_value5, 0, 0);
                             }
                             break;
                         case "SetTarget":
                             if (GetCharaParams(func.m_value1) != null)
                             {
-                                CreateCharaProperties(func.m_value1, charaShotPx[1], 0);
+                                CreateCharaProperties(func.m_value1, 0, 0);
                             }
                             if (GetCharaParams(func.m_value2) != null)
                             {
-                                CreateCharaProperties(func.m_value2, charaShotPx[2], 0);
+                                CreateCharaProperties(func.m_value2, 0, 0);
                             }
                             if (GetCharaParams(func.m_value3) != null)
                             {
-                                CreateCharaProperties(func.m_value3, charaShotPx[3], 0);
+                                CreateCharaProperties(func.m_value3, 0, 0);
                             }
                             if (GetCharaParams(func.m_value4) != null)
                             {
-                                CreateCharaProperties(func.m_value4, charaShotPx[4], 0);
+                                CreateCharaProperties(func.m_value4, 0, 0);
                             }
                             if (GetCharaParams(func.m_value5) != null)
                             {
-                                CreateCharaProperties(func.m_value5, charaShotPx[5], 0);
+                                CreateCharaProperties(func.m_value5, 0, 0);
                             }
                             break;
                         default:
