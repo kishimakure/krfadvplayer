@@ -6708,8 +6708,8 @@ public class player : MonoBehaviour
                 count++;
                 if (b == 0)
                 {
-                    X = (float)random.NextDouble() * ShakeScale[a];
-                    Y = (float)random.NextDouble() * ShakeScale[a];
+                    X = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
+                    Y = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
                 }
                 else if (b == 1)
                 {
@@ -6748,8 +6748,8 @@ public class player : MonoBehaviour
                 count++;
                 if (b == 0)
                 {
-                    X = (float)random.NextDouble() * ShakeScale[a];
-                    Y = (float)random.NextDouble() * ShakeScale[a];
+                    X = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
+                    Y = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
                 }
                 else if (b == 1)
                 {
@@ -6792,8 +6792,8 @@ public class player : MonoBehaviour
                 count++;
                 if (b == 0)
                 {
-                    X = (float)random.NextDouble() * ShakeScale[a];
-                    Y = (float)random.NextDouble() * ShakeScale[a];
+                    X = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
+                    Y = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
                 }
                 else if (b == 1)
                 {
