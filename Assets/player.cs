@@ -1057,7 +1057,7 @@ public class CharaProperties
     public float Angle;
     public Vector2 RotateCenter;
     public float HDRFactor;
-    public bool IsMoting;
+    public bool IsMotMoving;
 }
 public class player : MonoBehaviour
 {
@@ -4466,7 +4466,6 @@ public class player : MonoBehaviour
         float timeElapsed;
         List<advmoParams_Datas> datas = param.m_Datas;
         CharaProperties charaProperties = charaPropertiesDict[ADVCharaID];
-        charaProperties.IsMoting = true;
         float finalx = charaProperties.MotOffset[0];
         float finaly = charaProperties.MotOffset[1];
         float finalscale = 1;
@@ -4475,14 +4474,14 @@ public class player : MonoBehaviour
             timeElapsed = 0f;
             if (datas[i].m_Action == 1)
             {
-                Vector2 start = charaProperties.ShakeOffset;
+                Vector2 start = charaProperties.MotOffset;
                 float endx = datas[i].m_X;
                 float endy = datas[i].m_Y;
                 finalx = endx + start.x;
                 finaly = endy + start.y;
-                charaProperties.IsMoting = false;
+                charaProperties.IsMotMoving = false;
                 yield return null;
-                charaProperties.IsMoting = true;
+                charaProperties.IsMotMoving = true;
                 while (timeElapsed < datas[i].m_Duration)
                 {
                     timeElapsed += Time.deltaTime;
@@ -4495,6 +4494,7 @@ public class player : MonoBehaviour
             }
             else if (datas[i].m_Action == 2)
             {
+                charaProperties.IsMotMoving = false;
                 float start = charaProperties.Scale;
                 float endx = datas[i].m_X;
                 finalscale = endx;
@@ -4517,7 +4517,7 @@ public class player : MonoBehaviour
                 }
             }
         }
-        charaProperties.IsMoting = false;
+        charaProperties.IsMotMoving = false;
         charaProperties.MotOffset = new Vector2(finalx, finaly);
         charaProperties.Scale = finalscale;
         isUpdateCharaPosition.Add(ADVCharaID);
@@ -8491,7 +8491,7 @@ public class player : MonoBehaviour
                 Angle = 0f,
                 RotateCenter = new Vector2(0f, 0f),
                 HDRFactor = 1f,
-                IsMoting = false
+                IsMotMoving = false
             };
             charaPropertiesDict.Add(ADVCharaID, charaProperties);
             charaCoroutinesDict.Add(ADVCharaID, new Dictionary<string, Coroutine>{
@@ -8524,7 +8524,7 @@ public class player : MonoBehaviour
                 Angle = 0f,
                 RotateCenter = new Vector2(0f, 0f),
                 HDRFactor = 1f,
-                IsMoting = false
+                IsMotMoving = false
             };
             charaPropertiesDict.Add(ADVCharaID, charaProperties);
             charaCoroutinesDict.Add(ADVCharaID, new Dictionary<string, Coroutine>{
@@ -10004,7 +10004,7 @@ public class player : MonoBehaviour
             }
         }
     }
-        void LateUpdate()
+    void LateUpdate()
     {
         foreach (string ADVCharaID in isUpdateCharaPosition)
         {
@@ -10141,8 +10141,8 @@ public class player : MonoBehaviour
         double b = -Math.Sin(charaProperties.Angle * Mathf.Deg2Rad);
         double dx = charaProperties.RotateCenter.x * a - charaProperties.RotateCenter.y * b;
         double dy = charaProperties.RotateCenter.y * a + charaProperties.RotateCenter.x * b;
-        float x = (float)dx + GetCharaParamsPose(ADVCharaID).m_OffsetX + charaProperties.Position.x + charaProperties.MotOffset.x + charaProperties.ShakeOffset.x * (charaProperties.IsMoting ? 0f : 1f);
-        float y = (float)dy + GetCharaParamsPose(ADVCharaID).m_OffsetY + charaProperties.Position.y + charaProperties.MotOffset.y + charaProperties.ShakeOffset.y * (charaProperties.IsMoting ? 0f : 1f);
+        float x = (float)dx + GetCharaParamsPose(ADVCharaID).m_OffsetX + charaProperties.Position.x + charaProperties.MotOffset.x + charaProperties.ShakeOffset.x * (charaProperties.IsMotMoving ? 0f : 1f);
+        float y = (float)dy + GetCharaParamsPose(ADVCharaID).m_OffsetY + charaProperties.Position.y + charaProperties.MotOffset.y + charaProperties.ShakeOffset.y * (charaProperties.IsMotMoving ? 0f : 1f);
         rectTransform.anchoredPosition = new Vector3(x, y + 10000f, 0f);
         rectTransform.localRotation = Quaternion.Euler(0f, 0f, charaProperties.Angle);
         rectTransform.localScale = new Vector3(charaProperties.Scale, charaProperties.Scale, 1f);
