@@ -3237,7 +3237,7 @@ public class player : MonoBehaviour
         {1,"Story"},{2,"Event"},{3,"CharaEvent"},{4,"CrossEvent"},{5,"WeaponEvent"},{6,"Other"},{7,"Writer"},{9,"Custom"}
     };
     private Dictionary<int, float> ShakeScale = new Dictionary<int, float>{
-        {0,2.5f},{1,7.5f},{2,20f}
+        {0,2f},{1,7f},{2,20f},{-1,1f}
     };
     private bool Playing = false;
     private bool JsonLoading = true;
@@ -6708,8 +6708,8 @@ public class player : MonoBehaviour
                 count++;
                 if (b == 0)
                 {
-                    X = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
-                    Y = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
+                    X = UnityEngine.Random.Range(-1f, 1f) * ShakeScale[a == 0 ? -1 : a];
+                    Y = UnityEngine.Random.Range(-1f, 1f) * ShakeScale[a];
                 }
                 else if (b == 1)
                 {
@@ -6748,8 +6748,8 @@ public class player : MonoBehaviour
                 count++;
                 if (b == 0)
                 {
-                    X = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
-                    Y = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
+                    X = UnityEngine.Random.Range(-1f, 1f) * ShakeScale[a == 0 ? -1 : a];
+                    Y = UnityEngine.Random.Range(-1f, 1f) * ShakeScale[a == 0 ? -1 : a];
                 }
                 else if (b == 1)
                 {
@@ -6792,8 +6792,8 @@ public class player : MonoBehaviour
                 count++;
                 if (b == 0)
                 {
-                    X = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
-                    Y = (float)(2 * random.NextDouble() - 1) * ShakeScale[a];
+                    X = UnityEngine.Random.Range(-1f, 1f) * ShakeScale[a == 0 ? -1 : a];
+                    Y = UnityEngine.Random.Range(-1f, 1f) * ShakeScale[a == 0 ? -1 : a];
                 }
                 else if (b == 1)
                 {
