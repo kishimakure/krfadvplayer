@@ -7122,7 +7122,7 @@ public class player : MonoBehaviour
         CharaSetPosition(ADVCharaID, StartSide == 0 ? -1 : 1);
         charaPropertiesDict[ADVCharaID].Fade = 1f;
         isUpdateCharaFade.Add(ADVCharaID);
-        StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset, 0, Sec, CurveType));
+        StartCoroutine(CharaMoveTo(ADVCharaID, charaShotPx[StandPosition] + XOffset * 2, 0, Sec, CurveType));
     }
     private void CharaOut(string ADVCharaID)
     {
